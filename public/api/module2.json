@@ -1,0 +1,152 @@
+[
+  { "id": 1, "q": "This video is about why ______ trading?", "choices": [
+    { "key": "A", "text": "Stock" },
+    { "key": "B", "text": "Manual" },
+    { "key": "C", "text": "Bot" },
+    { "key": "D", "text": "Signal" }
+  ], "answer": "C" },
+  { "id": 2, "q": "How many major challenges are there in manual trading?", "choices": [
+    { "key": "A", "text": "6" },
+    { "key": "B", "text": "5" },
+    { "key": "C", "text": "7" },
+    { "key": "D", "text": "4" }
+  ], "answer": "B" },
+  { "id": 3, "q": "Why can't humans succeed in the crypto market?", "choices": [
+    { "key": "A", "text": "Night-time movement / high volatility" },
+    { "key": "B", "text": "Technical terms" },
+    { "key": "C", "text": "Creating a perfect structure" },
+    { "key": "D", "text": "Market analysis" }
+  ], "answer": "A" },
+  { "id": 4, "q": "What is the technical term for not being able to focus on the market for 24 hours?", "choices": [
+    { "key": "A", "text": "Risk Management" },
+    { "key": "B", "text": "Fundamental Analysis" },
+    { "key": "C", "text": "Money Management" },
+    { "key": "D", "text": "Time Management" }
+  ], "answer": "D" },
+  { "id": 5, "q": "Crypto is a 24/7 market — which time matters most?", "choices": [
+    { "key": "A", "text": "Perfect entry & exit time" },
+    { "key": "B", "text": "News time" },
+    { "key": "C", "text": "War time" },
+    { "key": "D", "text": "Analysis time" }
+  ], "answer": "A" },
+  { "id": 6, "q": "How many years are required to study technical analysis?", "choices": [
+    { "key": "A", "text": "8–10 years" },
+    { "key": "B", "text": "15–20 years" },
+    { "key": "C", "text": "3–5 years" },
+    { "key": "D", "text": "1–2 years" }
+  ], "answer": "C" },
+  { "id": 7, "q": "How many trading patterns are available?", "choices": [
+    { "key": "A", "text": "2000+" },
+    { "key": "B", "text": "200+" },
+    { "key": "C", "text": "50+" },
+    { "key": "D", "text": "250+" }
+  ], "answer": "D" },
+  { "id": 8, "q": "What is the technical term for knowing basic information?", "choices": [
+    { "key": "A", "text": "Fundamental Analysis" },
+    { "key": "B", "text": "Time Management" },
+    { "key": "C", "text": "Risk Management" },
+    { "key": "D", "text": "Money Management" }
+  ], "answer": "A" },
+  { "id": 9, "q": "How can I gain more experience in trading?", "choices": [
+    { "key": "A", "text": "Invest more money" },
+    { "key": "B", "text": "Get more signals" },
+    { "key": "C", "text": "Face more losses" },
+    { "key": "D", "text": "Read more books" }
+  ], "answer": "C" },
+  { "id": 10, "q": "Placing a trade to recover a loss is called?", "choices": [
+    { "key": "A", "text": "Demo Trading" },
+    { "key": "B", "text": "News Trading" },
+    { "key": "C", "text": "Profit Trading" },
+    { "key": "D", "text": "Over Trading" }
+  ], "answer": "D" },
+  { "id": 11, "q": "In manual trading, who is the decision maker?", "choices": [
+    { "key": "A", "text": "I am" },
+    { "key": "B", "text": "My friend" },
+    { "key": "C", "text": "Signals" },
+    { "key": "D", "text": "Bot" }
+  ], "answer": "A" },
+  { "id": 12, "q": "To avoid losses in spot trading, what should I do?", "choices": [
+    { "key": "A", "text": "Sell" },
+    { "key": "B", "text": "Hold" },
+    { "key": "C", "text": "Accept losses" },
+    { "key": "D", "text": "Use a bot" }
+  ], "answer": "B" },
+  { "id": 13, "q": "Spot trading is the process of?", "choices": [
+    { "key": "A", "text": "Buying, holding, and selling coins" },
+    { "key": "B", "text": "Trading with leverage" },
+    { "key": "C", "text": "Intraday trading" },
+    { "key": "D", "text": "Current market trading" }
+  ], "answer": "A" },
+  { "id": 14, "q": "Futures trading is the process of?", "choices": [
+    { "key": "A", "text": "Buying, holding, and selling coins" },
+    { "key": "B", "text": "Intraday trading" },
+    { "key": "C", "text": "Trading with leverage" },
+    { "key": "D", "text": "Current market trading" }
+  ], "answer": "C" },
+  { "id": 15, "q": "What happens if money management is not proper in futures trading?", "choices": [
+    { "key": "A", "text": "Get more profits" },
+    { "key": "B", "text": "Money doubles or triples" },
+    { "key": "C", "text": "Market movement becomes high" },
+    { "key": "D", "text": "Account gets liquidated" }
+  ], "answer": "D" },
+  { "id": 16, "q": "Which funds should be used for trading?", "choices": [
+    { "key": "A", "text": "Extra money" },
+    { "key": "B", "text": "Backup funds" },
+    { "key": "C", "text": "Strong source of income" },
+    { "key": "D", "text": "All of the above" }
+  ], "answer": "D" },
+  { "id": 17, "q": "To learn manual trading, which statement should you check?", "choices": [
+    { "key": "A", "text": "Trading statement of 1 or 2 days" },
+    { "key": "B", "text": "Trading statement of 1 or 2 months" },
+    { "key": "C", "text": "Trading statement of 6 months to 1 year" },
+    { "key": "D", "text": "Trading statement of 5 to 12 weeks" }
+  ], "answer": "C" },
+  { "id": 18, "q": "How much money is usually required to learn manual trading?", "choices": [
+    { "key": "A", "text": "3 to 5 Lakhs" },
+    { "key": "B", "text": "15,000 to 30,000" },
+    { "key": "C", "text": "5,000 to 15,000" },
+    { "key": "D", "text": "1 to 2 Lakhs" }
+  ], "answer": "A" },
+  { "id": 19, "q": "The market used for practice is called?", "choices": [
+    { "key": "A", "text": "Live Trading" },
+    { "key": "B", "text": "Demo / Paper Trading" },
+    { "key": "C", "text": "Profit Trading" },
+    { "key": "D", "text": "Manual Trading" }
+  ], "answer": "B" },
+  { "id": 20, "q": "Investing your money in a company wallet or another person’s wallet is?", "choices": [
+    { "key": "A", "text": "More safe" },
+    { "key": "B", "text": "More profit" },
+    { "key": "C", "text": "More benefit" },
+    { "key": "D", "text": "More risk" }
+  ], "answer": "D" },
+  { "id": 21, "q": "If someone is skilled in trading, what should they do?", "choices": [
+    { "key": "A", "text": "Take money from people" },
+    { "key": "B", "text": "Do demo trading" },
+    { "key": "C", "text": "Pass a funded account" },
+    { "key": "D", "text": "Get a job or do business" }
+  ], "answer": "C" },
+  { "id": 22, "q": "The formula of trading and earnings is?", "choices": [
+    { "key": "A", "text": "Time = Money" },
+    { "key": "B", "text": "Risk = Reward" },
+    { "key": "C", "text": "Profit = Loss" },
+    { "key": "D", "text": "All of the above" }
+  ], "answer": "D" },
+  { "id": 23, "q": "The overall profit and loss history is called?", "choices": [
+    { "key": "A", "text": "Profit History" },
+    { "key": "B", "text": "Loss History" },
+    { "key": "C", "text": "PNL History" },
+    { "key": "D", "text": "Life History" }
+  ], "answer": "C" },
+  { "id": 24, "q": "Where is your money stored while using Trendex?", "choices": [
+    { "key": "A", "text": "In my own Binance wallet" },
+    { "key": "B", "text": "In the Trendex company wallet" },
+    { "key": "C", "text": "In my friend’s wallet" },
+    { "key": "D", "text": "In a cold wallet" }
+  ], "answer": "A" },
+  { "id": 25, "q": "The reason for choosing Trendex is?", "choices": [
+    { "key": "A", "text": "Safe trading" },
+    { "key": "B", "text": "Instant deposit & withdrawal" },
+    { "key": "C", "text": "Daily software updates" },
+    { "key": "D", "text": "All of the above" }
+  ], "answer": "D" }
+]

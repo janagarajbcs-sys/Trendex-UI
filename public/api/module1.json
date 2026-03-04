@@ -1,0 +1,152 @@
+[
+  { "id": 1, "q": "What is trading?", "choices": [
+    { "key": "A", "text": "Buying" },
+    { "key": "B", "text": "Selling" },
+    { "key": "C", "text": "Buy/Sell" },
+    { "key": "D", "text": "Buy/Hold/Sell" }
+  ], "answer": "D" },
+  { "id": 2, "q": "How many types of trading are explained in this video?", "choices": [
+    { "key": "A", "text": "8" },
+    { "key": "B", "text": "7" },
+    { "key": "C", "text": "9" },
+    { "key": "D", "text": "5" }
+  ], "answer": "B" },
+  { "id": 3, "q": "What type of trading is gambling?", "choices": [
+    { "key": "A", "text": "Binary/Colour Prediction" },
+    { "key": "B", "text": "Share/Stock" },
+    { "key": "C", "text": "Crypto/Forex" },
+    { "key": "D", "text": "Commodity" }
+  ], "answer": "A" },
+  { "id": 4, "q": "Which market has more holidays?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Forex" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "D" },
+  { "id": 5, "q": "The market that is based on companies is called?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Share and Stock" },
+    { "key": "C", "text": "Commodity" },
+    { "key": "D", "text": "Forex" }
+  ], "answer": "B" },
+  { "id": 6, "q": "Mutual Funds, Nifty 50, Bank Nifty, and Sensex come under which market?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Share and Stock" },
+    { "key": "D", "text": "Forex" }
+  ], "answer": "C" },
+  { "id": 7, "q": "Which market is based on the economy?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Share and Stock" },
+    { "key": "D", "text": "Forex" }
+  ], "answer": "D" },
+  { "id": 8, "q": "Which market is designed only for trading and cannot be held long-term?", "choices": [
+    { "key": "A", "text": "Forex" },
+    { "key": "B", "text": "Crypto" },
+    { "key": "C", "text": "Commodity" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "A" },
+  { "id": 9, "q": "Which market runs 24/7?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Forex" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "A" },
+  { "id": 10, "q": "Which market runs 24/5?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Forex" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "C" },
+  { "id": 11, "q": "What is the reason market prices move up and down?", "choices": [
+    { "key": "A", "text": "Demand" },
+    { "key": "B", "text": "Demand/Supply" },
+    { "key": "C", "text": "Market Crash" },
+    { "key": "D", "text": "App/Broker" }
+  ], "answer": "B" },
+  { "id": 12, "q": "What is the total supply of Bitcoin?", "choices": [
+    { "key": "A", "text": "1 Lakh" },
+    { "key": "B", "text": "12 Crore" },
+    { "key": "C", "text": "21 Million" },
+    { "key": "D", "text": "2 Trillion" }
+  ], "answer": "C" },
+  { "id": 13, "q": "Which website is used to verify crypto-related information?", "choices": [
+    { "key": "A", "text": "Coin" },
+    { "key": "B", "text": "CoinMarketCap" },
+    { "key": "C", "text": "Trendex" },
+    { "key": "D", "text": "TradingView" }
+  ], "answer": "B" },
+  { "id": 14, "q": "Cryptocurrency is made by?", "choices": [
+    { "key": "A", "text": "Government" },
+    { "key": "B", "text": "Private" },
+    { "key": "C", "text": "Corporate" },
+    { "key": "D", "text": "Computer/Graphics Card" }
+  ], "answer": "D" },
+  { "id": 15, "q": "Which market runs based on import & export?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Forex" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "B" },
+  { "id": 16, "q": "Which is the top coin in crypto?", "choices": [
+    { "key": "A", "text": "Trump" },
+    { "key": "B", "text": "Doge" },
+    { "key": "C", "text": "Ripple" },
+    { "key": "D", "text": "Bitcoin" }
+  ], "answer": "D" },
+  { "id": 17, "q": "Which market contains agricultural products?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Forex" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "B" },
+  { "id": 18, "q": "Which market is based on time frames?", "choices": [
+    { "key": "A", "text": "Crypto" },
+    { "key": "B", "text": "Forex" },
+    { "key": "C", "text": "Binary" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "C" },
+  { "id": 19, "q": "Which market has a pre-fixed payout?", "choices": [
+    { "key": "A", "text": "Binary/Colour" },
+    { "key": "B", "text": "Commodity/Crypto" },
+    { "key": "C", "text": "Forex/Gold" },
+    { "key": "D", "text": "Share and Stock" }
+  ], "answer": "A" },
+  { "id": 20, "q": "Which market has full movement control by the app?", "choices": [
+    { "key": "A", "text": "Crypto/Forex" },
+    { "key": "B", "text": "Commodity/Stock" },
+    { "key": "C", "text": "Forex/Share" },
+    { "key": "D", "text": "Binary/Colour" }
+  ], "answer": "D" },
+  { "id": 21, "q": "Which market runs from 9:30 to 11:30?", "choices": [
+    { "key": "A", "text": "Forex" },
+    { "key": "B", "text": "Commodity" },
+    { "key": "C", "text": "Share/Stock" },
+    { "key": "D", "text": "Crypto" }
+  ], "answer": "B" },
+  { "id": 22, "q": "How to trade in cryptocurrency?", "choices": [
+    { "key": "A", "text": "AngelOne/Zerodha" },
+    { "key": "B", "text": "Binance/Trendex" },
+    { "key": "C", "text": "Demat Account" },
+    { "key": "D", "text": "MT5/Binomo" }
+  ], "answer": "B" },
+  { "id": 23, "q": "Who is the partner of Binance?", "choices": [
+    { "key": "A", "text": "CZ/Cristiano Ronaldo" },
+    { "key": "B", "text": "Trump/Elon Musk" },
+    { "key": "C", "text": "Trendex" },
+    { "key": "D", "text": "Bitcoin" }
+  ], "answer": "A" },
+  { "id": 24, "q": "Who helps you place trades?", "choices": [
+    { "key": "A", "text": "My Friend" },
+    { "key": "B", "text": "Trendex" },
+    { "key": "C", "text": "Signals" },
+    { "key": "D", "text": "App" }
+  ], "answer": "B" },
+  { "id": 25, "q": "Trendex performs trading in?", "choices": [
+    { "key": "A", "text": "MT5" },
+    { "key": "B", "text": "Spot" },
+    { "key": "C", "text": "Futures" },
+    { "key": "D", "text": "Spot/Futures" }
+  ], "answer": "D" }
+]

@@ -1,0 +1,152 @@
+[
+  { "id": 1, "q": "How many types of earnings are available in Trendex?", "choices": [
+    { "key": "A", "text": "2" },
+    { "key": "B", "text": "5" },
+    { "key": "C", "text": "3" },
+    { "key": "D", "text": "4" }
+  ], "answer": "B" },
+  { "id": 2, "q": "Do I need to monitor this trading?", "choices": [
+    { "key": "A", "text": "Fully automatic" },
+    { "key": "B", "text": "Yes, monitor" },
+    { "key": "C", "text": "Daily on/off" },
+    { "key": "D", "text": "Apply the signal" }
+  ], "answer": "A" },
+  { "id": 3, "q": "Is Trendex trading manual or automatic?", "choices": [
+    { "key": "A", "text": "Manual" },
+    { "key": "B", "text": "Semi-manual" },
+    { "key": "C", "text": "Fully automatic" },
+    { "key": "D", "text": "Signal-based" }
+  ], "answer": "C" },
+  { "id": 4, "q": "Who controls the trades in Trendex?", "choices": [
+    { "key": "A", "text": "User" },
+    { "key": "B", "text": "Broker" },
+    { "key": "C", "text": "Software/Bot" },
+    { "key": "D", "text": "Friend" }
+  ], "answer": "C" },
+  { "id": 5, "q": "Do I need technical knowledge to use Trendex?", "choices": [
+    { "key": "A", "text": "Yes" },
+    { "key": "B", "text": "No" },
+    { "key": "C", "text": "Only basic knowledge" },
+    { "key": "D", "text": "Expert level required" }
+  ], "answer": "B" },
+  { "id": 6, "q": "Can I stop the bot and take Capital amount anytime?", "choices": [
+    { "key": "A", "text": "No" },
+    { "key": "B", "text": "Only weekly" },
+    { "key": "C", "text": "Yes" },
+    { "key": "D", "text": "Only monthly" }
+  ], "answer": "C" },
+  { "id": 7, "q": "What is required to start Trendex trading?", "choices": [
+    { "key": "A", "text": "Laptop only" },
+    { "key": "B", "text": "Binance account & capital" },
+    { "key": "C", "text": "Demat account" },
+    { "key": "D", "text": "Company wallet" }
+  ], "answer": "B" },
+  { "id": 8, "q": "Is my money stored in the Trendex company wallet?", "choices": [
+    { "key": "A", "text": "Yes" },
+    { "key": "B", "text": "No" },
+    { "key": "C", "text": "Sometimes" },
+    { "key": "D", "text": "Depends on plan" }
+  ], "answer": "B" },
+  { "id": 9, "q": "Where is my money stored?", "choices": [
+    { "key": "A", "text": "My own Binance wallet" },
+    { "key": "B", "text": "Company wallet" },
+    { "key": "C", "text": "Friend’s wallet" },
+    { "key": "D", "text": "Broker wallet" }
+  ], "answer": "A" },
+  { "id": 10, "q": "Is Trendex suitable for beginners?", "choices": [
+    { "key": "A", "text": "No" },
+    { "key": "B", "text": "Yes" },
+    { "key": "C", "text": "Only experts" },
+    { "key": "D", "text": "Only traders" }
+  ], "answer": "B" },
+  { "id": 11, "q": "What type of income does Trendex provide?", "choices": [
+    { "key": "A", "text": "Active income" },
+    { "key": "B", "text": "Passive income" },
+    { "key": "C", "text": "Salary fixed" },
+    { "key": "D", "text": "One time Commission only" }
+  ], "answer": "B" },
+  { "id": 12, "q": "Can I withdraw my referal income anytime?", "choices": [
+    { "key": "A", "text": "No" },
+    { "key": "B", "text": "Yes" },
+    { "key": "C", "text": "Monthly only" },
+    { "key": "D", "text": "Request & wait" }
+  ], "answer": "B" },
+  { "id": 13, "q": "Does Trendex require 24-hour monitoring?", "choices": [
+    { "key": "A", "text": "Yes" },
+    { "key": "B", "text": "Only at night" },
+    { "key": "C", "text": "No" },
+    { "key": "D", "text": "Only in the morning" }
+  ], "answer": "C" },
+  { "id": 14, "q": "Is Trendex emotion-free trading?", "choices": [
+    { "key": "A", "text": "No" },
+    { "key": "B", "text": "Yes" },
+    { "key": "C", "text": "Sometimes" },
+    { "key": "D", "text": "Manual decision" }
+  ], "answer": "B" },
+  { "id": 15, "q": "Who makes the trading decisions in Trendex?", "choices": [
+    { "key": "A", "text": "Human" },
+    { "key": "B", "text": "Friend" },
+    { "key": "C", "text": "AI / Bot" },
+    { "key": "D", "text": "Broker" }
+  ], "answer": "C" },
+  { "id": 16, "q": "What is mean by Imperial Package?", "choices": [
+    { "key": "A", "text": "120$ subscription" },
+    { "key": "B", "text": "180$ subscription" },
+    { "key": "C", "text": "250$ subscription" },
+    { "key": "D", "text": "None of the above" }
+  ], "answer": "C" },
+  { "id": 17, "q": "What is mean by Executive Package?", "choices": [
+    { "key": "A", "text": "120$ subscription" },
+    { "key": "B", "text": "180$ subscription" },
+    { "key": "C", "text": "250$ subscription" },
+    { "key": "D", "text": "None of the above" }
+  ], "answer": "B" },
+  { "id": 18, "q": "How much cash outflow in pair matching?", "choices": [
+    { "key": "A", "text": "720$" },
+    { "key": "B", "text": "550$" },
+    { "key": "C", "text": "5750$" },
+    { "key": "D", "text": "870$" }
+  ], "answer": "D" },
+  { "id": 19, "q": "How much profit balance to Trendex?", "choices": [
+    { "key": "A", "text": "4330$" },
+    { "key": "B", "text": "550$" },
+    { "key": "C", "text": "5750$" },
+    { "key": "D", "text": "870$" }
+  ], "answer": "A" },
+  { "id": 20, "q": "Why other company getting closed?", "choices": [
+    { "key": "A", "text": "No purchase income" },
+    { "key": "B", "text": "No repurchase income" },
+    { "key": "C", "text": "No promoters" },
+    { "key": "D", "text": "No plan updation" }
+  ], "answer": "B" },
+  { "id": 21, "q": "How much fuel fees deducted in each Trading Profit?", "choices": [
+    { "key": "A", "text": "100%" },
+    { "key": "B", "text": "80%" },
+    { "key": "C", "text": "20%" },
+    { "key": "D", "text": "4%" }
+  ], "answer": "C" },
+  { "id": 22, "q": "When you got company shares?", "choices": [
+    { "key": "A", "text": "Complete Champ rank" },
+    { "key": "B", "text": "Complete Trading" },
+    { "key": "C", "text": "Complete Joining" },
+    { "key": "D", "text": "Complete Top Rank" }
+  ], "answer": "D" },
+  { "id": 23, "q": "How Core Allocation is given by the company?", "choices": [
+    { "key": "A", "text": "From Joining Amount" },
+    { "key": "B", "text": "From Fuel fees" },
+    { "key": "C", "text": "From Leaders" },
+    { "key": "D", "text": "From Binance" }
+  ], "answer": "B" },
+  { "id": 24, "q": "Any risk or problems in Promoting this Trendex?", "choices": [
+    { "key": "A", "text": "Yes" },
+    { "key": "B", "text": "Loss" },
+    { "key": "C", "text": "No" },
+    { "key": "D", "text": "Profit" }
+  ], "answer": "C" },
+  { "id": 25, "q": "What happens when loss in trading?", "choices": [
+    { "key": "A", "text": "No profits to company & Leaders" },
+    { "key": "B", "text": "No Friend list" },
+    { "key": "C", "text": "Change to another Bot" },
+    { "key": "D", "text": "Withdraw all funds" }
+  ], "answer": "A" }
+]

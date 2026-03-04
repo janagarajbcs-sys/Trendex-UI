@@ -1,0 +1,152 @@
+[
+  { "id": 1, "q": "What is the first step to get start enquires?", "choices": [
+    { "key": "A", "text": "Go to job" },
+    { "key": "B", "text": "Watch reels" },
+    { "key": "C", "text": "Promote status" },
+    { "key": "D", "text": "Play games" }
+  ], "answer": "C" },
+  { "id": 2, "q": "Can I give the plan immediately when anyone asked?", "choices": [
+    { "key": "A", "text": "Yes, explain immediately" },
+    { "key": "B", "text": "Analysis about him first" },
+    { "key": "C", "text": "Don’t respond him" },
+    { "key": "D", "text": "Immediately connect with leaders" }
+  ], "answer": "B" },
+  { "id": 3, "q": "How many types of needs explained in this video?", "choices": [
+    { "key": "A", "text": "10" },
+    { "key": "B", "text": "12" },
+    { "key": "C", "text": "9" },
+    { "key": "D", "text": "11" }
+  ], "answer": "A" },
+  { "id": 4, "q": "During invitation what is the important step?", "choices": [
+    { "key": "A", "text": "Not go there on-time" },
+    { "key": "B", "text": "Explain without control" },
+    { "key": "C", "text": "Talk stories" },
+    { "key": "D", "text": "Time and spot fix" }
+  ], "answer": "D" },
+  { "id": 5, "q": "Leaders must be:", "choices": [
+    { "key": "A", "text": "Hidden" },
+    { "key": "B", "text": "Edified before presentation" },
+    { "key": "C", "text": "Replaced" },
+    { "key": "D", "text": "Silent" }
+  ], "answer": "B" },
+  { "id": 6, "q": "“Confident + Bold + Trust” belongs to:", "choices": [
+    { "key": "A", "text": "Invitation" },
+    { "key": "B", "text": "Presentation" },
+    { "key": "C", "text": "Closing points" },
+    { "key": "D", "text": "Follow-up" }
+  ], "answer": "C" },
+  { "id": 7, "q": "Invitation psychology includes:", "choices": [
+    { "key": "A", "text": "Busy after invite" },
+    { "key": "B", "text": "5:5 doubts" },
+    { "key": "C", "text": "Follow-up list" },
+    { "key": "D", "text": "Closing confirm" }
+  ], "answer": "A" },
+  { "id": 8, "q": "Closing must end confidently with:", "choices": [
+    { "key": "A", "text": "Market proof" },
+    { "key": "B", "text": "Leader name" },
+    { "key": "C", "text": "TRENDEX" },
+    { "key": "D", "text": "Screenshot" }
+  ], "answer": "C" },
+  { "id": 9, "q": "Which creates demand?", "choices": [
+    { "key": "A", "text": "Low dollar rate saving" },
+    { "key": "B", "text": "Permanent free offer" },
+    { "key": "C", "text": "Unlimited cashback" },
+    { "key": "D", "text": "Join at any time" }
+  ], "answer": "A" },
+  { "id": 10, "q": "Maximum time to collect closing amount:", "choices": [
+    { "key": "A", "text": "24 hours" },
+    { "key": "B", "text": "48 hours" },
+    { "key": "C", "text": "72 hours" },
+    { "key": "D", "text": "7 days" }
+  ], "answer": "B" },
+  { "id": 11, "q": "“Talk Business = Not an Amount” means:", "choices": [
+    { "key": "A", "text": "Focus on value, not price" },
+    { "key": "B", "text": "Fix minimum package" },
+    { "key": "C", "text": "Offer discount" },
+    { "key": "D", "text": "Compare competitors" }
+  ], "answer": "A" },
+  { "id": 12, "q": "After presentation, you must stop doing business discussion with:", "choices": [
+    { "key": "A", "text": "Strangers" },
+    { "key": "B", "text": "Parents, Friends, Relatives" },
+    { "key": "C", "text": "Leaders" },
+    { "key": "D", "text": "New prospects" }
+  ], "answer": "B" },
+  { "id": 13, "q": "5:5 refers to:", "choices": [
+    { "key": "A", "text": "5 leaders & 5 investors" },
+    { "key": "B", "text": "5 instructions & 5 doubts" },
+    { "key": "C", "text": "5 days system" },
+    { "key": "D", "text": "5 payments" }
+  ], "answer": "B" },
+  { "id": 14, "q": "The reason for “No Self Plan Only Leaders”:", "choices": [
+    { "key": "A", "text": "Follow-up with Leaders" },
+    { "key": "B", "text": "Plan Presentation" },
+    { "key": "C", "text": "Payments" },
+    { "key": "D", "text": "Invitation" }
+  ], "answer": "A" },
+  { "id": 15, "q": "Which is NOT part of 4C?", "choices": [
+    { "key": "A", "text": "Compliment" },
+    { "key": "B", "text": "Curiosity" },
+    { "key": "C", "text": "Control" },
+    { "key": "D", "text": "Conversion" }
+  ], "answer": "D" },
+  { "id": 16, "q": "Before invitation, the correct method is:", "choices": [
+    { "key": "A", "text": "Create urgency" },
+    { "key": "B", "text": "Talk amount" },
+    { "key": "C", "text": "Story talk & understand" },
+    { "key": "D", "text": "Confirm payment" }
+  ], "answer": "C" },
+  { "id": 17, "q": "If Plan duplication, is must start doing with:", "choices": [
+    { "key": "A", "text": "Strangers" },
+    { "key": "B", "text": "Parents, Friends, Relatives" },
+    { "key": "C", "text": "Leaders" },
+    { "key": "D", "text": "New prospects" }
+  ], "answer": "C" },
+  { "id": 18, "q": "Which of the following is listed under “Types of Needs” in the PPT?", "choices": [
+    { "key": "A", "text": "Government pension" },
+    { "key": "B", "text": "Sports" },
+    { "key": "C", "text": "Stock dividends" },
+    { "key": "D", "text": "Foreign trip visa" }
+  ], "answer": "B" },
+  { "id": 19, "q": "“The topic I is most important – Connect a story” means:", "choices": [
+    { "key": "A", "text": "Only technical talk" },
+    { "key": "B", "text": "Random discussion" },
+    { "key": "C", "text": "Emotional story-based explanation" },
+    { "key": "D", "text": "Fast closing" }
+  ], "answer": "C" },
+  { "id": 20, "q": "The PPT suggests collecting payment:", "choices": [
+    { "key": "A", "text": "After 7 days" },
+    { "key": "B", "text": "On the spot" },
+    { "key": "C", "text": "After 1 month" },
+    { "key": "D", "text": "When they can" }
+  ], "answer": "B" },
+  { "id": 21, "q": "Follow-up must compare:", "choices": [
+    { "key": "A", "text": "Yesterday vs today profit" },
+    { "key": "B", "text": "Leader income" },
+    { "key": "C", "text": "Dollar fluctuation" },
+    { "key": "D", "text": "Before – Now – Future situation" }
+  ], "answer": "D" },
+  { "id": 22, "q": "The final instruction of the PPT encourages to:", "choices": [
+    { "key": "A", "text": "Focus only on money" },
+    { "key": "B", "text": "Connect all dots to be successful" },
+    { "key": "C", "text": "Recruit randomly" },
+    { "key": "D", "text": "Avoid leaders" }
+  ], "answer": "B" },
+  { "id": 23, "q": "When one person only do Trading in Trendex?", "choices": [
+    { "key": "A", "text": "Always watch History" },
+    { "key": "B", "text": "Panic of Market" },
+    { "key": "C", "text": "Just set and sit freely" },
+    { "key": "D", "text": "Do settings in bot" }
+  ], "answer": "C" },
+  { "id": 24, "q": "When any work started and completed?", "choices": [
+    { "key": "A", "text": "Should update & maintain in Lists" },
+    { "key": "B", "text": "Just complete the task" },
+    { "key": "C", "text": "Create a demand" },
+    { "key": "D", "text": "Don’t do anything" }
+  ], "answer": "A" },
+  { "id": 25, "q": "The PPT was created by:", "choices": [
+    { "key": "A", "text": "Team member" },
+    { "key": "B", "text": "Business owner" },
+    { "key": "C", "text": "Mr. Solo Janagaraj" },
+    { "key": "D", "text": "Anonymous" }
+  ], "answer": "C" }
+]

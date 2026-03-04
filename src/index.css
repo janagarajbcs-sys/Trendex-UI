@@ -1,0 +1,9 @@
+:root{
+  font-family: "Poppins", "Montserrat", system-ui, Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+*{ box-sizing: border-box; }
+body{ margin:0; background:#F5F7FA; color:#111827; }
+table{ width:100%; border-collapse: collapse; }
+th,td{ padding:10px; border-bottom:1px solid #E5E7EB; text-align:center; }
+th{ color:#1E3A8A; font-weight:700; background:#EAF0FF; }

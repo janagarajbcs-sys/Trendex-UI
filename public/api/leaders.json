@@ -1,0 +1,11 @@
+[
+  { "id": "l_1", "sno": 1, "photo": "jana.jpeg",   "name": "Mr. Janagaraj",      "title": "Prime Trader",  "loc": "Dharapuram" },
+  { "id": "l_2", "sno": 2, "photo": "raghul.jpg",  "name": "Mr. Raghul",         "title": "Archer Trader", "loc": "Erode" },
+  { "id": "l_3", "sno": 3, "photo": "maha.jpg",    "name": "Ms. Mahalakshmi",    "title": "Monarch Trader","loc": "Coimbatore" },
+  { "id": "l_4", "sno": 4, "photo": "arun.jpeg",   "name": "Mr. Arunagiri",      "title": "Atlas Trader",  "loc": "Coimbatore" },
+  { "id": "l_5", "sno": 5, "photo": "uneha.jpeg",  "name": "Mrs. Uneha",         "title": "Atlas Trader",  "loc": "Kerala" },
+  { "id": "l_6", "sno": 6, "photo": "venket.jpeg", "name": "Mr. Venket",         "title": "Champ Trader",  "loc": "Chennai" },
+  { "id": "l_7", "sno": 7, "photo": "passport.jpg","name": "Mr. Perinbha Raj",   "title": "Champ Trader",  "loc": "Coimbatore" },
+  { "id": "l_8", "sno": 8, "photo": "guna.jpeg",   "name": "Ms. Guna Sanju",     "title": "Champ Trader",  "loc": "Erode" },
+  { "id": "l_9", "sno": 9, "photo": "mani.jpg",    "name": "Mr. Mani Vasakam",   "title": "Champ Trader",  "loc": "Dharapuram" }
+]
