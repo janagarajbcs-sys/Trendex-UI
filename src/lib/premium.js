@@ -1,3 +1,4 @@
+import { api } from './apiClient'
 const USERS_KEY = 'premium_users'
 const CURRENT_KEY = 'premium_current'
 const PROGRESS_KEY = 'premium_progress'
@@ -62,10 +63,7 @@ export function denyUser(id) {
   saveUsers(users)
 }
 export async function getUsersBackendAsync() {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + '/api/auth/list', { cache: 'no-store', headers: getAdminAuthHeaders() })
-  if (!res.ok) return getUsers()
-  const arr = await res.json()
+  const arr = await api.get('/api/auth/list', { admin: true }).catch(() => getUsers())
   const items = Array.isArray(arr) ? arr.map((x) => ({
     id: x.id || x._id || '',
     name: x.name || '',
@@ -83,27 +81,22 @@ export async function getUsersBackendAsync() {
   return items
 }
 export async function approveUserBackend(id) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + `/api/auth/approve/${encodeURIComponent(id)}`, { method: 'PUT', headers: getAdminAuthHeaders() })
-  if (!res.ok) return approveUser(id)
-  const updated = await res.json()
+  const updated = await api.put(`/api/auth/approve/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
+  if (!updated) return approveUser(id)
   const users = getUsers().map((u) => (u.id === id ? { ...u, approved: true } : u))
   saveUsers(users)
   return updated
 }
 export async function disableUserBackend(id) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + `/api/auth/disable/${encodeURIComponent(id)}`, { method: 'PUT', headers: getAdminAuthHeaders() })
-  if (!res.ok) return disableUser(id)
-  const updated = await res.json()
+  const updated = await api.put(`/api/auth/disable/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
+  if (!updated) return disableUser(id)
   const users = getUsers().map((u) => (u.id === id ? { ...u, approved: false } : u))
   saveUsers(users)
   return updated
 }
 export async function denyUserBackend(id) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + `/api/auth/${encodeURIComponent(id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() })
-  if (!res.ok) return denyUser(id)
+  const ok = await api.del(`/api/auth/${encodeURIComponent(id)}`, { admin: true }).then(() => true).catch(() => false)
+  if (!ok) return denyUser(id)
   const users = getUsers().filter((u) => u.id !== id)
   saveUsers(users)
   return true
@@ -136,10 +129,7 @@ export async function loginUserBackend(identifier, password) {
 
 export async function getUsersCountAsync() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/auth/count', { cache: 'no-store' })
-    if (!res.ok) throw new Error('not ok')
-    const data = await res.json()
+    const data = await api.get('/api/auth/count')
     if (typeof data.count === 'number') return data.count
     throw new Error('bad format')
   } catch {
@@ -178,8 +168,7 @@ export function getProgress(userId) {
       map[userId].unlocked = desiredUnlocked
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(map))
     }
-  } catch {
-  }
+  } catch (e) { void e }
   return map[userId]
 }
 export function setProgress(userId, prog) {
@@ -209,15 +198,8 @@ export async function getProgressBackend(userId) {
 
 export async function setProgressBackend(userId, prog) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
     const payload = { unlocked: prog.unlocked, completed: prog.completed }
-    const res = await fetch(base + `/api/progress/${encodeURIComponent(userId)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-    if (!res.ok) throw new Error('not_ok')
-    const data = await res.json().catch(() => null)
+    const data = await api.put(`/api/progress/${encodeURIComponent(userId)}`, payload).catch(() => null)
     const merged = {
       unlocked: data && typeof data.unlocked === 'number' ? data.unlocked : prog.unlocked,
       completed: data && Array.isArray(data.completed) ? data.completed : prog.completed,
@@ -245,13 +227,8 @@ export function setVideoAccess(userId, enabled) {
   setProgress(userId, next)
 }
 export async function setVideoAccessBackend(userId, enabled) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + `/api/auth/video-access/${encodeURIComponent(userId)}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() },
-    body: JSON.stringify({ enabled: !!enabled }),
-  })
-  if (!res.ok) {
+  const ok = await api.put(`/api/auth/video-access/${encodeURIComponent(userId)}`, { enabled: !!enabled }, { admin: true }).then(() => true).catch(() => false)
+  if (!ok) {
     setVideoAccess(userId, enabled)
     return false
   }
@@ -370,10 +347,8 @@ export function clearSavedAnswers(userId, moduleId) {
 
 export async function getSavedAnswersBackend(userId, moduleId) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, { cache: 'no-store' })
-    if (!res.ok) throw new Error('not_ok')
-    const data = await res.json()
+    const data = await api.get(`/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`).catch(() => null)
+    if (!data) throw new Error('not_ok')
     const answers = data && data.answers && typeof data.answers === 'object' ? data.answers : {}
     setSavedAnswers(userId, moduleId, answers)
     return answers
@@ -384,14 +359,7 @@ export async function getSavedAnswersBackend(userId, moduleId) {
 
 export async function setSavedAnswersBackend(userId, moduleId, answers) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers }),
-    })
-    if (!res.ok) throw new Error('not_ok')
-    const data = await res.json().catch(() => null)
+    const data = await api.put(`/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, { answers }).catch(() => null)
     const next = data && data.answers && typeof data.answers === 'object' ? data.answers : answers
     setSavedAnswers(userId, moduleId, next)
     return next
@@ -424,10 +392,7 @@ export function getComplaintResponses() {
 
 export async function getJoinResponsesBackend() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/join', { cache: 'no-store', headers: getAdminAuthHeaders() })
-    if (!res.ok) throw new Error('not_ok')
-    const data = await res.json().catch(() => [])
+    const data = await api.get('/api/join', { admin: true }).catch(() => [])
     const normalized = Array.isArray(data)
       ? data.map((r) => ({
         id: r._id || '',
@@ -450,10 +415,7 @@ export async function getJoinResponsesBackend() {
 
 export async function getComplaintResponsesBackend() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/complaints', { cache: 'no-store', headers: getAdminAuthHeaders() })
-    if (!res.ok) throw new Error('not_ok')
-    const data = await res.json().catch(() => [])
+    const data = await api.get('/api/complaints', { admin: true }).catch(() => [])
     const normalized = Array.isArray(data)
       ? data.map((r) => ({
         id: r._id || '',
@@ -523,14 +485,7 @@ export function getQuestionsForModule(n) {
 
 export async function verifyModuleAnswersBackend(moduleId, answers) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/modules/${encodeURIComponent(moduleId)}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers }),
-    })
-    if (!res.ok) throw new Error('not_ok')
-    const data = await res.json().catch(() => null)
+    const data = await api.post(`/api/modules/${encodeURIComponent(moduleId)}/verify`, { answers }).catch(() => null)
     const wrong = data && Array.isArray(data.wrong) ? data.wrong : []
     return { wrong }
   } catch {
@@ -559,11 +514,8 @@ export function getLeaders() {
 }
 export async function getLeadersAsync() {
   try {
-    // Try backend API first
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const resApi = await fetch(base + '/api/leaders', { cache: 'no-store' })
-    if (resApi.ok) {
-      const apiData = await resApi.json()
+    const apiData = await api.get('/api/leaders').catch(() => [])
+    if (Array.isArray(apiData)) {
       if (Array.isArray(apiData) && apiData.length) {
         const normalizedApi = apiData
           .map((x, i) => ({
@@ -579,7 +531,7 @@ export async function getLeadersAsync() {
       }
     }
     // Fallback to static JSON
-    const res = await fetch('/api/leaders.json', { cache: 'no-store' })
+    const res = await fetch('http://localhost:3020/api/leaders.json', { cache: 'no-store' })
     if (!res.ok) throw new Error('not ok')
     const data = await res.json()
     if (!Array.isArray(data)) throw new Error('bad format')
@@ -660,10 +612,7 @@ export function moveLeader(id, dir) {
 }
 export async function addLeaderBackend(item) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/leaders', { method: 'POST', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(item) })
-    if (!res.ok) throw new Error('fail')
-    const _ = await res.json()
+    await api.post('/api/leaders', item, { admin: true })
     const list = await getLeadersAsync()
     saveLeaders(list)
     return list
@@ -673,10 +622,7 @@ export async function addLeaderBackend(item) {
 }
 export async function updateLeaderBackend(id, patch) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/leaders/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(patch) })
-    if (!res.ok) throw new Error('fail')
-    const _ = await res.json()
+    await api.put(`/api/leaders/${encodeURIComponent(id)}`, patch, { admin: true })
     const list = await getLeadersAsync()
     saveLeaders(list)
     return list
@@ -686,9 +632,7 @@ export async function updateLeaderBackend(id, patch) {
 }
 export async function deleteLeaderBackend(id) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/leaders/${encodeURIComponent(id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() })
-    if (!res.ok) throw new Error('fail')
+    await api.del(`/api/leaders/${encodeURIComponent(id)}`, { admin: true })
     const list = await getLeadersAsync()
     saveLeaders(list)
     return list
@@ -705,9 +649,8 @@ export async function moveLeaderBackend(id, dir) {
     if (j < 0 || j >= list.length) return list
     const a = list[idx]
     const b = list[j]
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    await fetch(base + `/api/leaders/${encodeURIComponent(a.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: b.sno }) })
-    await fetch(base + `/api/leaders/${encodeURIComponent(b.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: a.sno }) })
+    await api.put(`/api/leaders/${encodeURIComponent(a.id)}`, { sno: b.sno }, { admin: true })
+    await api.put(`/api/leaders/${encodeURIComponent(b.id)}`, { sno: a.sno }, { admin: true })
     const next = await getLeadersAsync()
     saveLeaders(next)
     return next
@@ -916,7 +859,7 @@ export function initBannersIfEmpty() {
 }
 export async function getBannersAsync() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
+    const base ="http://localhost:3020"
     const resTop = await fetch(base + '/api/top-slider', { cache: 'no-store' })
     if (resTop.ok) {
       const top = await resTop.json().catch(() => [])
@@ -1056,7 +999,7 @@ export async function addEventBackend(item) {
     saveEvents(list)
     return list
   } catch {
-    const next = addEvent(item)
+    addEvent(item)
     const list = getEvents()
     saveEvents(list)
     return list
@@ -1073,7 +1016,7 @@ export async function updateEventBackend(id, patch) {
     saveEvents(list)
     return list
   } catch {
-    const updated = updateEvent(id, patch)
+    updateEvent(id, patch)
     const list = getEvents()
     saveEvents(list)
     return list

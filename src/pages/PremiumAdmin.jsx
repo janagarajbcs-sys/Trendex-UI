@@ -17,6 +17,7 @@ export default function PremiumAdmin() {
   const [eEditing, setEEditing] = useState(null)
   const [joins, setJoins] = useState(() => getJoinResponses())
   const [complaints, setComplaints] = useState(() => getComplaintResponses())
+  console.log(complaints,"complaints")
   const nav = useNavigate()
   function resolvePhoto(val) {
     if (!val) return ''
