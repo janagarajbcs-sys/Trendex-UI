@@ -1,4 +1,4 @@
-import { api } from './apiClient'
+import { api, BASE } from './apiClient'
 const USERS_KEY = 'premium_users'
 const CURRENT_KEY = 'premium_current'
 const PROGRESS_KEY = 'premium_progress'
@@ -29,8 +29,7 @@ export function registerUser({ name, phone, email, team, leader, password }) {
   return user
 }
 export async function registerUserBackend(payload) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + '/api/auth/signup', {
+  const res = await fetch(BASE + '/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -63,7 +62,7 @@ export function denyUser(id) {
   saveUsers(users)
 }
 export async function getUsersBackendAsync() {
-  const arr = await api.get('/api/auth/list', { admin: true }).catch(() => getUsers())
+  const arr = await api.get('/auth/list', { admin: true }).catch(() => getUsers())
   const items = Array.isArray(arr) ? arr.map((x) => ({
     id: x.id || x._id || '',
     name: x.name || '',
@@ -81,21 +80,21 @@ export async function getUsersBackendAsync() {
   return items
 }
 export async function approveUserBackend(id) {
-  const updated = await api.put(`/api/auth/approve/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
+  const updated = await api.put(`/auth/approve/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
   if (!updated) return approveUser(id)
   const users = getUsers().map((u) => (u.id === id ? { ...u, approved: true } : u))
   saveUsers(users)
   return updated
 }
 export async function disableUserBackend(id) {
-  const updated = await api.put(`/api/auth/disable/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
+  const updated = await api.put(`/auth/disable/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
   if (!updated) return disableUser(id)
   const users = getUsers().map((u) => (u.id === id ? { ...u, approved: false } : u))
   saveUsers(users)
   return updated
 }
 export async function denyUserBackend(id) {
-  const ok = await api.del(`/api/auth/${encodeURIComponent(id)}`, { admin: true }).then(() => true).catch(() => false)
+  const ok = await api.del(`/auth/${encodeURIComponent(id)}`, { admin: true }).then(() => true).catch(() => false)
   if (!ok) return denyUser(id)
   const users = getUsers().filter((u) => u.id !== id)
   saveUsers(users)
@@ -111,8 +110,7 @@ export function loginUser(identifier, password) {
   return null
 }
 export async function loginUserBackend(identifier, password) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + '/api/auth/login', {
+  const res = await fetch(BASE + '/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ identifier, password }),
@@ -129,7 +127,7 @@ export async function loginUserBackend(identifier, password) {
 
 export async function getUsersCountAsync() {
   try {
-    const data = await api.get('/api/auth/count')
+    const data = await api.get('/auth/count')
     if (typeof data.count === 'number') return data.count
     throw new Error('bad format')
   } catch {
@@ -180,8 +178,7 @@ export function setProgress(userId, prog) {
 
 export async function getProgressBackend(userId) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/progress/${encodeURIComponent(userId)}`, { cache: 'no-store' })
+    const res = await fetch(BASE + `/progress/${encodeURIComponent(userId)}`, { cache: 'no-store' })
     if (!res.ok) throw new Error('not_ok')
     const data = await res.json()
     const prog = {
@@ -199,7 +196,7 @@ export async function getProgressBackend(userId) {
 export async function setProgressBackend(userId, prog) {
   try {
     const payload = { unlocked: prog.unlocked, completed: prog.completed }
-    const data = await api.put(`/api/progress/${encodeURIComponent(userId)}`, payload).catch(() => null)
+    const data = await api.put(`/progress/${encodeURIComponent(userId)}`, payload).catch(() => null)
     const merged = {
       unlocked: data && typeof data.unlocked === 'number' ? data.unlocked : prog.unlocked,
       completed: data && Array.isArray(data.completed) ? data.completed : prog.completed,
@@ -227,7 +224,7 @@ export function setVideoAccess(userId, enabled) {
   setProgress(userId, next)
 }
 export async function setVideoAccessBackend(userId, enabled) {
-  const ok = await api.put(`/api/auth/video-access/${encodeURIComponent(userId)}`, { enabled: !!enabled }, { admin: true }).then(() => true).catch(() => false)
+  const ok = await api.put(`/auth/video-access/${encodeURIComponent(userId)}`, { enabled: !!enabled }, { admin: true }).then(() => true).catch(() => false)
   if (!ok) {
     setVideoAccess(userId, enabled)
     return false
@@ -236,8 +233,7 @@ export async function setVideoAccessBackend(userId, enabled) {
   return users.some((u) => u.id === userId && !!u.videoAccess === !!enabled)
 }
 export async function activatePaidAccessBackend(userId, days = 70) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + `/api/auth/paid-access/${encodeURIComponent(userId)}`, {
+  const res = await fetch(BASE + `/auth/paid-access/${encodeURIComponent(userId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() },
     body: JSON.stringify({ days }),
@@ -292,8 +288,7 @@ export function signOutAdmin() {
   localStorage.removeItem(ADMIN_TOKEN_KEY)
 }
 export async function loginAdminBackend(email, password) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-  const res = await fetch(base + '/api/auth/admin-login', {
+  const res = await fetch(BASE + '/auth/admin-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -347,7 +342,7 @@ export function clearSavedAnswers(userId, moduleId) {
 
 export async function getSavedAnswersBackend(userId, moduleId) {
   try {
-    const data = await api.get(`/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`).catch(() => null)
+    const data = await api.get(`/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`).catch(() => null)
     if (!data) throw new Error('not_ok')
     const answers = data && data.answers && typeof data.answers === 'object' ? data.answers : {}
     setSavedAnswers(userId, moduleId, answers)
@@ -359,7 +354,7 @@ export async function getSavedAnswersBackend(userId, moduleId) {
 
 export async function setSavedAnswersBackend(userId, moduleId, answers) {
   try {
-    const data = await api.put(`/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, { answers }).catch(() => null)
+    const data = await api.put(`/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, { answers }).catch(() => null)
     const next = data && data.answers && typeof data.answers === 'object' ? data.answers : answers
     setSavedAnswers(userId, moduleId, next)
     return next
@@ -371,8 +366,7 @@ export async function setSavedAnswersBackend(userId, moduleId, answers) {
 
 export async function clearSavedAnswersBackend(userId, moduleId) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    await fetch(base + `/api/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, { method: 'DELETE' })
+    await fetch(BASE + `/answers/${encodeURIComponent(userId)}/${encodeURIComponent(moduleId)}`, { method: 'DELETE' })
     clearSavedAnswers(userId, moduleId)
     return true
   } catch {
@@ -392,7 +386,7 @@ export function getComplaintResponses() {
 
 export async function getJoinResponsesBackend() {
   try {
-    const data = await api.get('/api/join', { admin: true }).catch(() => [])
+    const data = await api.get('/join', { admin: true }).catch(() => [])
     const normalized = Array.isArray(data)
       ? data.map((r) => ({
         id: r._id || '',
@@ -415,7 +409,7 @@ export async function getJoinResponsesBackend() {
 
 export async function getComplaintResponsesBackend() {
   try {
-    const data = await api.get('/api/complaints', { admin: true }).catch(() => [])
+    const data = await api.get('/complaints', { admin: true }).catch(() => [])
     const normalized = Array.isArray(data)
       ? data.map((r) => ({
         id: r._id || '',
@@ -485,7 +479,7 @@ export function getQuestionsForModule(n) {
 
 export async function verifyModuleAnswersBackend(moduleId, answers) {
   try {
-    const data = await api.post(`/api/modules/${encodeURIComponent(moduleId)}/verify`, { answers }).catch(() => null)
+    const data = await api.post(`/modules/${encodeURIComponent(moduleId)}/verify`, { answers }).catch(() => null)
     const wrong = data && Array.isArray(data.wrong) ? data.wrong : []
     return { wrong }
   } catch {
@@ -496,8 +490,7 @@ export async function verifyModuleAnswersBackend(moduleId, answers) {
 }
 export async function getQuestionsForModuleAsync(n) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/modules/${n}`, { cache: 'no-store' })
+    const res = await fetch(BASE + `/modules/${n}`, { cache: 'no-store' })
     if (!res.ok) throw new Error('not ok')
     const data = await res.json()
     if (!Array.isArray(data)) throw new Error('bad format')
@@ -514,7 +507,7 @@ export function getLeaders() {
 }
 export async function getLeadersAsync() {
   try {
-    const apiData = await api.get('/api/leaders').catch(() => [])
+    const apiData = await api.get('/leaders').catch(() => [])
     if (Array.isArray(apiData)) {
       if (Array.isArray(apiData) && apiData.length) {
         const normalizedApi = apiData
@@ -531,7 +524,7 @@ export async function getLeadersAsync() {
       }
     }
     // Fallback to static JSON
-    const res = await fetch('http://localhost:3020/api/leaders.json', { cache: 'no-store' })
+    const res = await fetch(BASE + '/leaders.json', { cache: 'no-store' })
     if (!res.ok) throw new Error('not ok')
     const data = await res.json()
     if (!Array.isArray(data)) throw new Error('bad format')
@@ -612,7 +605,7 @@ export function moveLeader(id, dir) {
 }
 export async function addLeaderBackend(item) {
   try {
-    await api.post('/api/leaders', item, { admin: true })
+    await api.post('/leaders', item, { admin: true })
     const list = await getLeadersAsync()
     saveLeaders(list)
     return list
@@ -622,7 +615,7 @@ export async function addLeaderBackend(item) {
 }
 export async function updateLeaderBackend(id, patch) {
   try {
-    await api.put(`/api/leaders/${encodeURIComponent(id)}`, patch, { admin: true })
+    await api.put(`/leaders/${encodeURIComponent(id)}`, patch, { admin: true })
     const list = await getLeadersAsync()
     saveLeaders(list)
     return list
@@ -632,7 +625,7 @@ export async function updateLeaderBackend(id, patch) {
 }
 export async function deleteLeaderBackend(id) {
   try {
-    await api.del(`/api/leaders/${encodeURIComponent(id)}`, { admin: true })
+    await api.del(`/leaders/${encodeURIComponent(id)}`, { admin: true })
     const list = await getLeadersAsync()
     saveLeaders(list)
     return list
@@ -649,8 +642,8 @@ export async function moveLeaderBackend(id, dir) {
     if (j < 0 || j >= list.length) return list
     const a = list[idx]
     const b = list[j]
-    await api.put(`/api/leaders/${encodeURIComponent(a.id)}`, { sno: b.sno }, { admin: true })
-    await api.put(`/api/leaders/${encodeURIComponent(b.id)}`, { sno: a.sno }, { admin: true })
+    await api.put(`/leaders/${encodeURIComponent(a.id)}`, { sno: b.sno }, { admin: true })
+    await api.put(`/leaders/${encodeURIComponent(b.id)}`, { sno: a.sno }, { admin: true })
     const next = await getLeadersAsync()
     saveLeaders(next)
     return next
@@ -742,11 +735,10 @@ export function moveBanner(id, dir) {
 }
 export async function addBannerBackend(item) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/banners', { method: 'POST', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(item) })
+    const res = await fetch(BASE + '/banners', { method: 'POST', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(item) })
     if (!res.ok) throw new Error('fail')
     const _ = await res.json()
-    const list = await fetch(base + '/api/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
+    const list = await fetch(BASE + '/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
     const normalized = Array.isArray(list) ? list.map((x, i) => ({
       id: x._id || x.id || ('b_' + (i + 1)),
       sno: Number(x.sno || i + 1),
@@ -764,11 +756,10 @@ export async function addBannerBackend(item) {
 }
 export async function updateBannerBackend(id, patch) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/banners/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(patch) })
+    const res = await fetch(BASE + `/banners/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(patch) })
     if (!res.ok) throw new Error('fail')
     const _ = await res.json()
-    const list = await fetch(base + '/api/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
+    const list = await fetch(BASE + '/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
     const normalized = Array.isArray(list) ? list.map((x, i) => ({
       id: x._id || x.id || ('b_' + (i + 1)),
       sno: Number(x.sno || i + 1),
@@ -786,10 +777,9 @@ export async function updateBannerBackend(id, patch) {
 }
 export async function deleteBannerBackend(id) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/banners/${encodeURIComponent(id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() })
+    const res = await fetch(BASE + `/banners/${encodeURIComponent(id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() })
     if (!res.ok) throw new Error('fail')
-    const list = await fetch(base + '/api/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
+    const list = await fetch(BASE + '/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
     const normalized = Array.isArray(list) ? list.map((x, i) => ({
       id: x._id || x.id || ('b_' + (i + 1)),
       sno: Number(x.sno || i + 1),
@@ -807,8 +797,7 @@ export async function deleteBannerBackend(id) {
 }
 export async function moveBannerBackend(id, dir) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const list = await fetch(base + '/api/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
+    const list = await fetch(BASE + '/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
     const normalized = Array.isArray(list) ? list.map((x, i) => ({
       id: x._id || x.id || ('b_' + (i + 1)),
       sno: Number(x.sno || i + 1),
@@ -824,9 +813,9 @@ export async function moveBannerBackend(id, dir) {
     if (j < 0 || j >= normalized.length) return normalized
     const a = normalized[idx]
     const b = normalized[j]
-    await fetch(base + `/api/banners/${encodeURIComponent(a.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: b.sno }) })
-    await fetch(base + `/api/banners/${encodeURIComponent(b.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: a.sno }) })
-    const nextList = await fetch(base + '/api/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
+    await fetch(BASE + `/banners/${encodeURIComponent(a.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: b.sno }) })
+    await fetch(BASE + `/banners/${encodeURIComponent(b.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: a.sno }) })
+    const nextList = await fetch(BASE + '/banners', { cache: 'no-store' }).then((r) => r.json()).catch(() => [])
     const next = Array.isArray(nextList) ? nextList.map((x, i) => ({
       id: x._id || x.id || ('b_' + (i + 1)),
       sno: Number(x.sno || i + 1),
@@ -859,8 +848,7 @@ export function initBannersIfEmpty() {
 }
 export async function getBannersAsync() {
   try {
-    const base ="http://localhost:3020"
-    const resTop = await fetch(base + '/api/top-slider', { cache: 'no-store' })
+    const resTop = await fetch(BASE + '/top-slider', { cache: 'no-store' })
     if (resTop.ok) {
       const top = await resTop.json().catch(() => [])
       if (Array.isArray(top) && top.length) {
@@ -876,7 +864,7 @@ export async function getBannersAsync() {
         return normalizedTop.map((b) => ({ id: b.id, img: b.img, title: b.title, subtitle: b.subtitle, cta: { text: b.ctaText, to: b.ctaTo } }))
       }
     }
-    const resApi = await fetch(base + '/api/banners', { cache: 'no-store' })
+    const resApi = await fetch(BASE + '/banners', { cache: 'no-store' })
     if (resApi.ok) {
       const apiData = await resApi.json()
       if (Array.isArray(apiData) && apiData.length) {
@@ -970,8 +958,7 @@ export function clearEvents() {
 
 export async function getEventsAsync() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/events', { cache: 'no-store' })
+    const res = await fetch(BASE + '/events', { cache: 'no-store' })
     if (!res.ok) throw new Error('not_ok')
     const data = await res.json().catch(() => [])
     const normalized = Array.isArray(data) ? data.map((x, i) => ({
@@ -991,8 +978,7 @@ export async function getEventsAsync() {
 
 export async function addEventBackend(item) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(item) })
+    const res = await fetch(BASE + '/events', { method: 'POST', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(item) })
     if (!res.ok) throw new Error('fail')
     await res.json().catch(() => null)
     const list = await getEventsAsync()
@@ -1008,8 +994,7 @@ export async function addEventBackend(item) {
 
 export async function updateEventBackend(id, patch) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/events/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(patch) })
+    const res = await fetch(BASE + `/events/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify(patch) })
     if (!res.ok) throw new Error('fail')
     await res.json().catch(() => null)
     const list = await getEventsAsync()
@@ -1025,8 +1010,7 @@ export async function updateEventBackend(id, patch) {
 
 export async function deleteEventBackend(id) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + `/api/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() })
+    const res = await fetch(BASE + `/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() })
     if (!res.ok) throw new Error('fail')
     await res.json().catch(() => null)
     const list = await getEventsAsync()
@@ -1049,9 +1033,8 @@ export async function moveEventBackend(id, dir) {
     if (j < 0 || j >= list.length) return list
     const a = list[idx]
     const b = list[j]
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    await fetch(base + `/api/events/${encodeURIComponent(a.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: b.sno }) })
-    await fetch(base + `/api/events/${encodeURIComponent(b.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: a.sno }) })
+    await fetch(BASE + `/events/${encodeURIComponent(a.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: b.sno }) })
+    await fetch(BASE + `/events/${encodeURIComponent(b.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() }, body: JSON.stringify({ sno: a.sno }) })
     const next = await getEventsAsync()
     saveEvents(next)
     return next
@@ -1066,8 +1049,7 @@ export async function moveEventBackend(id, dir) {
 export async function clearEventsBackend() {
   try {
     const list = await getEventsAsync()
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    await Promise.all(list.map((ev) => fetch(base + `/api/events/${encodeURIComponent(ev.id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() }).catch(() => null)))
+    await Promise.all(list.map((ev) => fetch(BASE + `/events/${encodeURIComponent(ev.id)}`, { method: 'DELETE', headers: getAdminAuthHeaders() }).catch(() => null)))
     const empty = await getEventsAsync()
     saveEvents(empty)
     return empty
@@ -1081,8 +1063,7 @@ export async function clearEventsBackend() {
 
 export async function syncTopSliderEventsBackend() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/admin/sync-topslider-events', { method: 'POST', headers: getAdminAuthHeaders() })
+    const res = await fetch(BASE + '/admin/sync-topslider-events', { method: 'POST', headers: getAdminAuthHeaders() })
     if (!res.ok) throw new Error('fail')
     const list = await res.json().catch(() => [])
     const normalized = Array.isArray(list)
@@ -1097,8 +1078,7 @@ export async function syncTopSliderEventsBackend() {
 }
 export async function submitJoinResponse(payload) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/join', {
+    const res = await fetch(BASE + '/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1127,8 +1107,7 @@ export async function submitJoinResponse(payload) {
 
 export async function importApiFolderBackend() {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/admin/import-api-folder', { method: 'POST', headers: getAdminAuthHeaders() })
+    const res = await fetch(BASE + '/admin/import-api-folder', { method: 'POST', headers: getAdminAuthHeaders() })
     if (!res.ok) throw new Error('fail')
     const summary = await res.json().catch(() => ({}))
     const leaders = await getLeadersAsync().catch(() => getLeaders())
@@ -1140,10 +1119,51 @@ export async function importApiFolderBackend() {
     return { ok: false }
   }
 }
+export async function getTopSliderImagesBackend() {
+  try {
+    const res = await fetch(BASE + '/top-slider', { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json().catch(() => [])
+    return Array.isArray(data) ? data : []
+  } catch {
+    return []
+  }
+}
+export async function addTopSliderImageBackend(file) {
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    const headers = getAdminAuthHeaders()
+    const res = await fetch(BASE + '/top-slider', {
+      method: 'POST',
+      headers,
+      body: fd,
+    })
+    if (!res.ok) throw new Error('upload_failed')
+    await res.json().catch(() => null)
+    return await getTopSliderImagesBackend()
+  } catch {
+    return await getTopSliderImagesBackend()
+  }
+}
+export async function deleteTopSliderImageBackend(name) {
+  try {
+    const safe = String(name || '').toLowerCase()
+    if (!safe) return await getTopSliderImagesBackend()
+    const res = await fetch(BASE + `/top-slider/${encodeURIComponent(safe)}`, {
+      method: 'DELETE',
+      headers: getAdminAuthHeaders(),
+    })
+    if (!res.ok) throw new Error('delete_failed')
+    await res.json().catch(() => null)
+    return await getTopSliderImagesBackend()
+  } catch {
+    return await getTopSliderImagesBackend()
+  }
+}
 export async function submitComplaintResponse(payload) {
   try {
-    const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : ''
-    const res = await fetch(base + '/api/complaints', {
+    const res = await fetch(BASE + '/complaints', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
