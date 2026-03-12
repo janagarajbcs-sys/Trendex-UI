@@ -37,14 +37,21 @@ function Layout({ children }) {
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.slice(1)
-      const el = document.getElementById(id)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const scroll = () => {
+        const el = document.getElementById(id)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          return true
+        }
+        return false
+      }
+      if (!scroll()) {
+        setTimeout(scroll, 100)
+        setTimeout(scroll, 300)
+        setTimeout(scroll, 600)
       } else {
-        setTimeout(() => {
-          const el2 = document.getElementById(id)
-          if (el2) el2.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 60)
+        // Even if found, re-scroll after a bit because page height might change (images/banners loading)
+        setTimeout(scroll, 300)
       }
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' })

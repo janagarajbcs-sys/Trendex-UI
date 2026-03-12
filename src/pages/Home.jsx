@@ -77,18 +77,6 @@ export default function Home() {
     }
   }
 
-  useEffect(() => {
-    if (location.hash === '#join-business') {
-      const el = document.getElementById('join-business')
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      else {
-        setTimeout(() => {
-          const e2 = document.getElementById('join-business')
-          if (e2) e2.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 80)
-      }
-    }
-  }, [location])
   // Market snapshot
   useEffect(() => {
     async function formatTimeIST(ts) {

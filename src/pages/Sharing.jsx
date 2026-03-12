@@ -27,7 +27,6 @@ export default function Sharing() {
         <p>👥 Direct Referral → 25 USDT (₹2,400)</p>
         <p>👥 Direct Referral → 25 USDT (₹2,400)</p>
         <p>🔗 Pair Matching (Direct / Indirect) → 30 USDT (₹2,880)</p>
-        <p>🔗 Pair Matching (Direct / Indirect) → 30 USDT (₹2,880)</p>
         <hr style={{ border: 'none', height: 1, background: 'rgba(255,255,255,0.12)' }} />
         <p><strong>🏆 Total → 80 USDT (₹7,680)</strong></p>
       </div>
@@ -43,8 +42,27 @@ export default function Sharing() {
       </div>
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12, justifyContent: 'center' }}>
-        <Link to="/sharing/cashback" className="btn secondary">Cashback & Gadget Fund Offer</Link>
-        <Link to="/bot" className="btn secondary">Trading</Link>
+        <Link to="/sharing/cashback" className="btn secondary">Cashback & MPR Offer Video</Link>
+        <Link
+          to="/bot"
+          className="btn"
+          style={{
+            background: '#1E3A8A',
+            color: '#ffffff',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(30, 58, 138, 0.25)'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = '#1A337A'
+            e.currentTarget.style.transform = 'translateY(-2px)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = '#1E3A8A'
+            e.currentTarget.style.transform = 'translateY(0)'
+          }}
+        >
+          Trading
+        </Link>
       </div>
       
     </div>

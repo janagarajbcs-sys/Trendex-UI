@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Bot() {
   const [inr, setInr] = useState('')
   const [usdt, setUsdt] = useState('')
+  const calculatorRef = useRef(null)
   const rate = 96
   const bots = [
     { name: 'DCA Bot', desc: ['Only runs in top BTC/USDT pair (Spot)', 'Algorithm-based averaging', 'Buys in downtrend, sells on uptrend'], capital: '15 USDT' },
@@ -41,6 +43,12 @@ export default function Bot() {
     }
   }
 
+  const handleBotClick = (capitalStr) => {
+    const val = parseFloat(capitalStr.replace(' USDT', ''))
+    onUsdt(val)
+    calculatorRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div>
       <h1 style={{ color: '#00ddeb' }}>Trading Strategies</h1>
@@ -50,18 +58,40 @@ export default function Bot() {
         {bots.map((b) => (
           <div key={b.name} className="card" style={{ textAlign: 'center', width: '100%' }}>
             <h3 style={{ color: '#cfeef3', marginTop: 0 }}>{b.name}</h3>
-            <ul style={{ listStylePosition: 'inside', padding: 0, margin: 0, textAlign: 'center' }}>
+            <ul style={{ listStylePosition: 'inside', padding: 0, margin: 0, textAlign: 'left' }}>
               {b.desc.map((d) => <li key={d}>{d}</li>)}
             </ul>
-            <div style={{ marginTop: 8 }}>
-              <span style={{ opacity: 0.85 }}>Start with</span>{' '}
-              <strong>{b.capital}</strong>
+            <div style={{ marginTop: 12 }}>
+              <button
+                onClick={() => handleBotClick(b.capital)}
+                style={{
+                  background: '#2563EB',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)'
+                  e.currentTarget.style.background = '#1D4ED8'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.background = '#2563EB'
+                }}
+              >
+                Start with {b.capital}
+              </button>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="card" style={{ margin: '16px auto', maxWidth: 520, textAlign: 'center' }}>
+      <div ref={calculatorRef} className="card" style={{ margin: '16px auto', maxWidth: 520, textAlign: 'center' }}>
         <h2 style={{ marginTop: 0, color: '#cfeef3' }}>Capital & Returns Calculator</h2>
         <label style={{ display: 'block', marginTop: 8, textAlign: 'center' }}>
           Enter Capital in INR
@@ -96,6 +126,37 @@ export default function Bot() {
           <div>Deponds on the market movement <br />The results(returns) will be differ</div>
           <div>so keep your funds atleast for 6 month durations Minimum</div>
         </div>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 40 }}>
+        <Link
+          className="btn"
+          to="/#join-business"
+          style={{
+            display: 'inline-block',
+            padding: '12px 28px',
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
+            borderRadius: '30px',
+            textDecoration: 'none',
+            background: '#22C55E',
+            color: '#fff',
+            boxShadow: '0 6px 20px rgba(34, 197, 94, 0.3)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px)'
+            e.currentTarget.style.background = '#16A34A'
+            e.currentTarget.style.boxShadow = '0 10px 25px rgba(34, 197, 94, 0.4)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.background = '#22C55E'
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(34, 197, 94, 0.3)'
+          }}
+        >
+          Join / Subscribe Now
+        </Link>
       </div>
     </div>
   )
