@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getCurrentUser, getProgress, setProgress, modules, getQuestionsForModuleAsync, getSavedAnswers, setSavedAnswers, clearSavedAnswers, getVideoAccess, activatePaidAccessBackend, getUsersBackendAsync, setProgressBackend, setSavedAnswersBackend, clearSavedAnswersBackend, verifyModuleAnswersBackend } from '../lib/premium'
+import { getCurrentUser, getProgress, setProgress, modules, getModulesAsync, getQuestionsForModuleAsync, getSavedAnswers, setSavedAnswers, clearSavedAnswers, getVideoAccess, activatePaidAccessBackend, getUsersBackendAsync, setProgressBackend, setSavedAnswersBackend, clearSavedAnswersBackend, verifyModuleAnswersBackend } from '../lib/premium'
 import { Link, useNavigate } from 'react-router-dom'
 
 export default function PremiumCourse() {
@@ -7,6 +7,7 @@ export default function PremiumCourse() {
   const user = getCurrentUser()
   const initialProg = user ? getProgress(user.id) : null
   const [modIdx, setModIdx] = useState(() => initialProg ? initialProg.unlocked - 1 : 0)
+  const [courseModules, setCourseModules] = useState(modules)
   const [ended, setEnded] = useState(false)
   const [qs, setQs] = useState([])
   const [answers, setAnswers] = useState({})
@@ -56,121 +57,39 @@ export default function PremiumCourse() {
   }
 
   useEffect(() => {
+    getModulesAsync().then(setCourseModules)
+  }, [])
+
+  useEffect(() => {
     if (!user) {
       nav('/premium/login')
     }
   }, [user, nav])
   useEffect(() => {
     let cancelled = false
-    const m = modules[modIdx]
+    const m = courseModules[modIdx]
+    if (!m) return
     async function load() {
       const data = await getQuestionsForModuleAsync(m.id)
       if (!cancelled) setQs(data)
     }
     load()
     return () => { cancelled = true }
-  }, [modIdx])
+  }, [modIdx, courseModules])
   useEffect(() => {}, [modIdx, user])
-  useEffect(() => {
-    const m = modules[modIdx]
-    if (!m?.ytId) return
-    function createPlayer() {
-      if (!ytContainerRef.current || !window.YT || !window.YT.Player) return
-      ytPlayerRef.current = new window.YT.Player(ytContainerRef.current, {
-        videoId: m.ytId,
-        playerVars: { controls: 0, disablekb: 1, rel: 0, modestbranding: 1 },
-        events: {
-          onReady: () => {
-            const d = ytPlayerRef.current?.getDuration?.() || 0
-            setDur(d || 0)
-          },
-          onStateChange: (e) => {
-            if (e.data === window.YT.PlayerState.PAUSED) {
-              if (ytPlayerRef.current) ytPlayerRef.current.playVideo()
-            }
-            if (e.data === window.YT.PlayerState.PLAYING) {
-              if (ytTimerRef.current) clearInterval(ytTimerRef.current)
-              ytTimerRef.current = setInterval(() => {
-                if (!ytPlayerRef.current) return
-                const t = ytPlayerRef.current.getCurrentTime()
-                if (t < lastTimeRef.current - 0.4) {
-                  ytPlayerRef.current.seekTo(lastTimeRef.current, true)
-                } else {
-                  lastTimeRef.current = t
-                }
-                setCur(t)
-                const d = ytPlayerRef.current?.getDuration?.() || 0
-                if (d > 0) setPct(Math.min(100, Math.round((t / d) * 100)))
-              }, 250)
-            }
-            if (e.data === window.YT.PlayerState.ENDED) {
-              if (ytTimerRef.current) { clearInterval(ytTimerRef.current); ytTimerRef.current = null }
-              setEnded(true)
-              const d = ytPlayerRef.current?.getDuration?.() || 0
-              setCur(d)
-              setPct(100)
-            }
-          },
-        },
-      })
-    }
-    if (!window.YT || !window.YT.Player) {
-      const s = document.createElement('script')
-      s.src = 'https://www.youtube.com/iframe_api'
-      s.async = true
-      document.body.appendChild(s)
-      const prev = window.onYouTubeIframeAPIReady
-      window.onYouTubeIframeAPIReady = function () {
-        if (typeof prev === 'function') prev()
-        createPlayer()
-      }
-    } else {
-      createPlayer()
-    }
-    return () => {
-      if (ytTimerRef.current) { clearInterval(ytTimerRef.current); ytTimerRef.current = null }
-      if (ytPlayerRef.current && ytPlayerRef.current.destroy) ytPlayerRef.current.destroy()
-      ytPlayerRef.current = null
-      lastTimeRef.current = 0
-    }
-  }, [modIdx])
+  
+  const currentModule = courseModules[modIdx]
+  if (!user || !currentModule) return null
 
-  function onTimeUpdate() {
-    const v = vref.current
-    if (!v) return
-    if (v.currentTime > lastTimeRef.current + 0.6 || v.currentTime < lastTimeRef.current - 0.5) {
-      v.currentTime = lastTimeRef.current
-    } else {
-      lastTimeRef.current = v.currentTime
-    }
-    setCur(v.currentTime)
-    const d = v.duration || dur || 0
-    if (d > 0) {
-      setDur(d)
-      setPct(Math.min(100, Math.round((v.currentTime / d) * 100)))
-    }
-  }
-  function onPause() {
-    const v = vref.current
-    if (v) v.play().catch(() => {})
-  }
-  function onSeeking() {
-    const v = vref.current
-    if (!v) return
-    v.currentTime = lastTimeRef.current
-  }
-  function onEnded() {
-    setEnded(true)
-    const v = vref.current
-    const d = v?.duration || dur || 0
-    setCur(d)
-    setPct(100)
-  }
+  const prog = getProgress(user.id)
+  const unlockedIdx = prog.unlocked - 1
+  const active = accessActive(user)
+
   async function submitQuiz(e) {
     e.preventDefault()
-    const saved = user ? getSavedAnswers(user.id, modules[modIdx].id) : {}
+    const saved = user ? getSavedAnswers(user.id, courseModules[modIdx].id) : {}
     const finalAnswers = { ...saved, ...answers }
-    const res = await verifyModuleAnswersBackend(modules[modIdx].id, finalAnswers)
+    const res = await verifyModuleAnswersBackend(courseModules[modIdx].id, finalAnswers)
     const wrongIds = (res && Array.isArray(res.wrong)) ? res.wrong : []
     setValidated(true)
     if (wrongIds.length > 0) {
@@ -186,67 +105,47 @@ export default function PremiumCourse() {
       }
       return
     }
-    await setSavedAnswersBackend(user.id, modules[modIdx].id, finalAnswers)
+    await setSavedAnswersBackend(user.id, courseModules[modIdx].id, finalAnswers)
     const prog = getProgress(user.id)
     const wasCompleted = !!prog.completed[modIdx]
     prog.completed[modIdx] = true
     if (!wasCompleted) {
       const target = Math.max(prog.unlocked, modIdx + 2)
-      prog.unlocked = Math.min(target, modules.length)
+      prog.unlocked = Math.min(target, courseModules.length)
     }
     await setProgressBackend(user.id, prog)
     if (prog.unlocked - 1 > modIdx) {
       const nextIdx = modIdx + 1
       setModIdx(nextIdx)
-      setRetakeMode(false)
-      setAnswers({})
-      await clearSavedAnswersBackend(user.id, modules[nextIdx].id)
       setEnded(false)
+      setRetakeMode(false)
       setValidated(false)
+      setAnswers({})
+      lastTimeRef.current = 0
+      setCur(0); setDur(0); setPct(0)
+      const v = vref.current
+      if (v) { v.pause(); v.currentTime = 0 }
       setVideoSrc('')
       setVErr('')
-      if (vref.current) { vref.current.currentTime = 0; lastTimeRef.current = 0 }
-      setCur(0); setDur(0); setPct(0)
+    } else {
+      nav('/premium/certificate')
     }
   }
-  if (!user) return null
-  const prog = getProgress(user.id)
-  const currentModule = modules[modIdx]
-  const left = daysLeft(user)
-  const active = accessActive(user)
+
   return (
-    <div>
-      <h1 style={{ color: '#00ddeb' }}>Premium Course</h1>
-      <div className="card" style={{ maxWidth: 680, margin: '0 auto 12px', textAlign: 'center' }}>
-        {active ? (
-          <div>
-            <div style={{ fontSize: 16, marginBottom: 6 }}>Access ends in</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#00ddeb' }}>{Math.max(0, left)} days</div>
-            {!user?.paidAccessUntil && <div style={{ opacity: .85, marginTop: 6 }}>Free trial in progress. Get 70 days full access for ₹499.</div>}
-            {!user?.paidAccessUntil && <button className="btn" style={{ marginTop: 8 }} onClick={activatePaid}>Pay ₹499 for 70 days</button>}
-          </div>
-        ) : (
-          <div>
-            <div style={{ fontSize: 18, marginBottom: 6, color: '#ef4444' }}>Free trial ended</div>
-            <div style={{ opacity: .85 }}>Purchase 70 days access for ₹499 to continue learning.</div>
-            <button className="btn" style={{ marginTop: 8 }} onClick={activatePaid}>Pay ₹499 for 70 days</button>
-          </div>
+    <div className="app-main" style={{ textAlign: 'center' }}>
+      <div style={{ marginBottom: 20 }}>
+        <h1>Premium Trading Course</h1>
+        <div style={{ color: active ? 'var(--brand-accent)' : '#ef4444', fontWeight: 'bold' }}>
+          {active ? `Access Active: ${daysLeft(user)} days remaining` : 'Access Expired'}
+        </div>
+        {!active && (
+          <button className="btn" onClick={activatePaid} style={{ marginTop: 10 }}>Renew Access (70 USDT)</button>
         )}
       </div>
-      {!active && (
-        <div style={{ textAlign: 'center', marginBottom: 12, color: '#ef4444' }}>
-          Access is currently disabled until purchase is completed.
-        </div>
-      )}
-      <div style={{ textAlign: 'center', marginBottom: 8, opacity: 0.9 }}>
-        <span>Video Modules Access: </span>
-        <strong style={{ color: getVideoAccess(user.id) ? '#22c55e' : '#f97316' }}>
-          {getVideoAccess(user.id) ? 'Enabled' : 'Disabled'}
-        </strong>
-      </div>
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
-        {modules.map((m, i) => {
-          const unlockedIdx = prog.unlocked - 1
+
+      <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '10px 0', marginBottom: 20, justifyContent: 'center' }}>
+        {courseModules.map((m, i) => {
           const isUnlocked = i === unlockedIdx
           const isCompleted = !!prog.completed[i]
           const status = isCompleted ? 'Completed' : (isUnlocked ? 'Unlocked' : 'Locked')
@@ -284,98 +183,29 @@ export default function PremiumCourse() {
           )
         })}
       </div>
-      {(getVideoAccess(user.id) || !prog.completed[modules.length - 1]) && (
+      {(getVideoAccess(user.id) || !prog.completed[courseModules.length - 1]) && (
         <div className="card" style={{ maxWidth: 820, margin: '0 auto' }}>
           <h2 style={{ marginTop: 0 }}>{currentModule.title}</h2>
-          {currentModule.ytId ? (
-            <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: 12, overflow: 'hidden' }}>
-              <div ref={ytContainerRef} style={{ position: 'absolute', inset: 0 }} />
-            </div>
-          ) : (
-            <video
-              ref={vref}
-              style={{ width: '100%', borderRadius: 12 }}
-              src={videoSrc || currentModule.src}
-              preload="auto"
-              playsInline
-              controls={false}
-              onLoadedMetadata={() => {
-                const v = vref.current
-                if (v?.duration) setDur(v.duration)
-                setVErr('')
-              }}
-              onTimeUpdate={onTimeUpdate}
-              onPause={onPause}
-              onSeeking={onSeeking}
-              onEnded={onEnded}
-              onCanPlay={() => setVErr('')}
-              onStalled={() => setVErr('Network stalled; trying to resume...')}
-              onError={() => {
-                const m = modules[modIdx]
-                if (m.altSrc && videoSrc !== m.altSrc) {
-                  setVideoSrc(m.altSrc)
-                  setVErr('')
-                  const v = vref.current
-                  if (v) v.play().catch(() => {})
-                } else {
-                  setVErr('Cannot load video. Please check your connection or source URL.')
-                }
-              }}
-            />
-          )}
+          <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: 12, overflow: 'hidden', background: '#000' }}>
+            <iframe
+              src={currentModule.src}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+              loading="lazy"
+              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+              allowFullScreen
+            ></iframe>
+          </div>
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
             <button
               className="btn"
               onClick={() => {
-                setEnded(false)
+                setEnded(true)
                 setRetakeMode(true)
                 setValidated(false)
                 setAnswers({})
-                lastTimeRef.current = 0
-                setCur(0); setPct(0)
-                setVErr('')
-                if (currentModule.ytId && ytPlayerRef.current) ytPlayerRef.current.playVideo()
-                else if (vref.current) {
-                  const v = vref.current
-                  v.pause()
-                  v.currentTime = 0
-                  v.load()
-                  if (v && typeof v.playbackRate === 'number') v.playbackRate = rate
-                  const p = v.play()
-                  if (p && typeof p.catch === 'function') p.catch(() => {})
-                }
               }}
             >
-              Start Lesson
-            </button>
-            <button
-              className="btn secondary"
-              style={{ marginLeft: 8 }}
-              onClick={() => {
-                setEnded(false)
-                setRetakeMode(true)
-                setValidated(false)
-                setAnswers({})
-                lastTimeRef.current = 0
-                setCur(0); setPct(0)
-                if (currentModule.ytId && ytPlayerRef.current) {
-                  ytPlayerRef.current.seekTo(0, true)
-                  ytPlayerRef.current.playVideo()
-                  if (typeof ytPlayerRef.current.setPlaybackRate === 'function') {
-                    ytPlayerRef.current.setPlaybackRate(rate)
-                  }
-                } else if (vref.current) {
-                  const v = vref.current
-                  v.currentTime = 0
-                  v.pause()
-                  v.load()
-                  if (v && typeof v.playbackRate === 'number') v.playbackRate = rate
-                  const p = v.play()
-                  if (p && typeof p.catch === 'function') p.catch(() => {})
-                }
-              }}
-            >
-              Replay
+              Start Lesson Quiz
             </button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 8 }}>

@@ -251,11 +251,16 @@ export async function activatePaidAccessBackend(userId, days = 70) {
   return updated
 }
 
+export async function getModulesAsync() {
+  const list = await api.get('/modules').catch(() => modules)
+  return Array.isArray(list) ? list : modules
+}
+
 export const modules = [
-  { id: 1, title: 'Module 1', src: '/premiumVideo/premium1.mp4' },
-  { id: 2, title: 'Module 2', src: '/premiumVideo/premium2.mp4' },
-  { id: 3, title: 'Module 3', src: '/premiumVideo/premium3.mp4' },
-  { id: 4, title: 'Module 4', src: '/premiumVideo/premium4.mp4' },
+  { id: 1, title: 'Module 1', src: 'https://iframe.mediadelivery.net/play/615839/b37484a0-a4b4-47a5-b608-915cbe977133' },
+  { id: 2, title: 'Module 2', src: 'https://iframe.mediadelivery.net/play/615839/8e967fca-39ff-4587-8e81-b1c2618fb656' },
+  { id: 3, title: 'Module 3', src: 'https://iframe.mediadelivery.net/play/615839/3c8fb6ad-e639-4cb7-8a7a-9fc6b00eedff' },
+  { id: 4, title: 'Module 4', src: 'https://iframe.mediadelivery.net/play/615839/32c12ea9-5388-4a7e-bc65-b8f5ee342113' },
 ]
 
 const ADMIN_EMAIL = 'janagarajbcs@gmail.com'
