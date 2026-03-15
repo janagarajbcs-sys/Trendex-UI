@@ -291,7 +291,16 @@ export default function PremiumAdmin() {
   }
   return (
     <div>
-      <h1 style={{ color: '#00ddeb' }}>Premium Admin</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h1 style={{ color: '#00ddeb', margin: 0 }}>Premium Admin</h1>
+        <button 
+          className="btn secondary" 
+          onClick={() => { signOutAdmin(); nav('/premium/admin-login') }}
+          style={{ padding: '8px 16px', background: '#ef4444', color: '#fff' }}
+        >
+          Logout
+        </button>
+      </div>
       {loading && (
         <div
           style={{
