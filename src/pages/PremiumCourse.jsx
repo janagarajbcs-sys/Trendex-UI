@@ -24,6 +24,7 @@ export default function PremiumCourse() {
   const [vErr, setVErr] = useState('')
   const [retakeMode, setRetakeMode] = useState(false)
   const [validated, setValidated] = useState(false)
+  const [wrongIds, setWrongIds] = useState([])
   const [videoSrc, setVideoSrc] = useState('')
   const [videoFullyWatched, setVideoFullyWatched] = useState(false)
   const [watchTimer, setWatchTimer] = useState(0)
@@ -159,10 +160,20 @@ export default function PremiumCourse() {
     e.preventDefault()
     const saved = user ? getSavedAnswers(user.id, courseModules[modIdx].id) : {}
     const finalAnswers = { ...saved, ...answers }
+    
+    // Check if module was already completed (before saving new answers)
+    const currentProg = getProgress(user.id)
+    const wasCompleted = !!currentProg.completed[modIdx]
+    
     const res = await verifyModuleAnswersBackend(courseModules[modIdx].id, finalAnswers)
-    const wrongIds = (res && Array.isArray(res.wrong)) ? res.wrong : []
+    const wrong = (res && Array.isArray(res.wrong)) ? res.wrong : []
+    
+    setWrongIds(wrong)
     setValidated(true)
-    if (wrongIds.length > 0) {
+    
+    // Strict requirement only on first attempt - after completion, no restriction needed
+    if (!wasCompleted && wrong.length > 0) {
+      alert(`❌ You have ${wrong.length} incorrect answer(s). Please review the highlighted questions and try again.`)
       if (!retakeMode) {
         setEnded(false)
         const v = vref.current
@@ -177,7 +188,6 @@ export default function PremiumCourse() {
     }
     await setSavedAnswersBackend(user.id, courseModules[modIdx].id, finalAnswers)
     const prog = getProgress(user.id)
-    const wasCompleted = !!prog.completed[modIdx]
     prog.completed[modIdx] = true
     if (!wasCompleted) {
       const target = Math.max(prog.unlocked, modIdx + 2)
@@ -206,14 +216,27 @@ export default function PremiumCourse() {
     <div className="app-main" style={{ textAlign: 'center' }}>
       <div style={{ marginBottom: 20 }}>
         <h1>Premium Trading Course</h1>
-        <div style={{ color: active ? 'var(--brand-accent)' : '#ef4444', fontWeight: 'bold' }}>
-          {active ? `Access Active: ${daysLeft(user)} days remaining` : 'Access Expired'}
-        </div>
-        {!active && (
-          <button className="btn" onClick={activatePaid} style={{ marginTop: 10 }}>Renew Access (70 USDT)</button>
+        {active && (
+          <div style={{ color: 'var(--brand-accent)', fontWeight: 'bold' }}>
+            Access Active: {daysLeft(user)} days remaining
+          </div>
         )}
       </div>
 
+      {!active ? (
+        <div className="card" style={{ maxWidth: 560, margin: '0 auto', padding: 40, textAlign: 'center' }}>
+          <div style={{ fontSize: 24, fontWeight: 'bold', color: '#ef4444', marginBottom: 20 }}>
+            🔒 Access Expired
+          </div>
+          <div style={{ fontSize: 16, marginBottom: 20, opacity: 0.8 }}>
+            Your course access has expired. Renew your access to continue learning.
+          </div>
+          <button className="btn" onClick={activatePaid} style={{ marginTop: 10 }}>
+            Renew Access (70 USDT)
+          </button>
+        </div>
+      ) : (
+        <>
       <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '10px 0', marginBottom: 20, justifyContent: 'center' }}>
         {courseModules.map((m, i) => {
           const isUnlocked = i === unlockedIdx
@@ -238,6 +261,7 @@ export default function PremiumCourse() {
                 setEnded(false)
                 setRetakeMode(false)
                 setValidated(false)
+                setWrongIds([])
                 setAnswers({})
                 lastTimeRef.current = 0
                 setCur(0); setDur(0); setPct(0)
@@ -325,6 +349,7 @@ export default function PremiumCourse() {
                       setEnded(true)
                       setRetakeMode(true)
                       setValidated(false)
+                      setWrongIds([])
                       setAnswers({})
                     }}
                     style={{
@@ -386,7 +411,6 @@ export default function PremiumCourse() {
                 try {
                   const saved = user ? getSavedAnswers(user.id, currentModule.id) : {}
                   const reviewMode = getProgress(user.id).completed[modIdx] && !retakeMode
-                  const wrongIds = (reviewMode || !validated) ? [] : qs.filter((q) => (answers[q.id] || '') !== q.answer).map((q) => q.id)
                   console.log('[Quiz Render] qs:', qs.length, 'saved:', Object.keys(saved).length, 'reviewMode:', reviewMode)
                   console.log('[Quiz Debug] First question:', JSON.stringify(qs[0], null, 2))
                   
@@ -399,35 +423,52 @@ export default function PremiumCourse() {
                     <>
                       {qs.map((q) => {
                         console.log('[Question Item]', { id: q.id, q: q.q, choices: q.choices?.length })
+                        const userAnswer = reviewMode ? saved[q.id] : answers[q.id]
+                        const isWrong = wrongIds.includes(q.id)
+                        const showFeedback = validated && isWrong
                         return (
                         <div
                           key={q.id}
-                          className={`card quiz-item ${wrongIds.includes(q.id) ? 'is-wrong' : ''}`}
+                          className="card quiz-item"
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span><strong>Q{q.id}.</strong> {q.q || '(no question text)'}</span>
-                            {wrongIds.includes(q.id) && <span style={{ color: '#ff8b92' }}>Wrong</span>}
                           </div>
                           <div className="quiz-list" style={{ marginTop: 6 }}>
                             {q.choices && q.choices.length > 0 ? (
-                              q.choices.map((c) => (
-                                <label key={c.key} className="quiz-choice">
+                              q.choices.map((c) => {
+                                const isUserSelected = userAnswer === c.key
+                                const isWrongSelected = isUserSelected && isWrong
+                                let choiceStyle = {}
+                                if (showFeedback && isWrongSelected) {
+                                  choiceStyle = { 
+                                    backgroundColor: '#ff8b921a', 
+                                    borderColor: '#ff8b92',
+                                    borderWidth: 2
+                                  }
+                                }
+                                return (
+                                <label key={c.key} className="quiz-choice" style={choiceStyle}>
                                   <input
                                     type="radio"
                                     name={`q_${q.id}`}
                                     value={c.key}
-                                    checked={(reviewMode ? saved[q.id] : answers[q.id]) === c.key}
+                                    checked={isUserSelected}
                                     onChange={() => {
                                       const next = { ...answers, [q.id]: c.key }
                                       setAnswers(next)
+                                      // Remove this question from wrong IDs when user changes answer
+                                      setWrongIds(prev => prev.filter(id => id !== q.id))
                                       if (user) setSavedAnswers(user.id, currentModule.id, { ...saved, ...next })
                                     }}
                                     required
                                     disabled={reviewMode || (!ended && !retakeMode)}
                                   />
                                   <span>{c.key}) {c.text}</span>
+                                  {showFeedback && isWrongSelected && <span style={{ marginLeft: 'auto', color: '#ff8b92' }}>✗ Wrong</span>}
                                 </label>
-                              ))
+                                )
+                              })
                             ) : (
                               <div style={{ color: '#ff8b92' }}>No choices available</div>
                             )}
@@ -436,8 +477,8 @@ export default function PremiumCourse() {
                         )
                       })}
 
-                      {(validated && !!qs.filter((q) => (answers[q.id] || '') !== q.answer).length) && (
-                        <div style={{ textAlign: 'center', color: '#ff8b92' }}>Some answers are incorrect. Please review highlighted questions.</div>
+                      {(validated && wrongIds.length > 0) && (
+                        <div style={{ textAlign: 'center', color: '#ff8b92' }}>❌ Some answers are incorrect. Review the highlighted choices (red = wrong answer).</div>
                       )}
                       {!reviewMode ? (
                         <button className="btn" type="submit" disabled={!ended && !retakeMode}>Submit Answers</button>
@@ -449,6 +490,7 @@ export default function PremiumCourse() {
                             setRetakeMode(true)
                             setEnded(false)
                             setValidated(false)
+                            setWrongIds([])
                             setAnswers({})
                             if (user) clearSavedAnswers(user.id, currentModule.id)
                             // Do not replay video; just clear answers and allow re-answering
@@ -475,6 +517,8 @@ export default function PremiumCourse() {
         </div>
       )}
       <p style={{ marginTop: 10, opacity: 0.7 }}>Place your videos at app/public/premiumVideo/premium1.mp4 to premium4.mp4.</p>
+        </>
+      )}
     </div>
   )
 }
