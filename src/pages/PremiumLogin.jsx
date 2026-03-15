@@ -33,15 +33,39 @@ export default function PremiumLogin() {
       setErr('Please fill all fields.')
       return
     }
-    if (loginAdmin(identifier, password)) { nav('/premium/admin'); return }
+    console.log('[Login] Attempting login with:', identifier)
+    
+    if (loginAdmin(identifier, password)) { 
+      console.log('[Login] Admin login success (local)')
+      nav('/premium/admin')
+      return 
+    }
+    
     const tok = await loginAdminBackend(identifier, password)
-    if (tok) { nav('/premium/admin'); return }
+    if (tok) { 
+      console.log('[Login] Admin login success (backend)')
+      nav('/premium/admin')
+      return 
+    }
+    
     let user = await loginUserBackend(identifier, password)
+    console.log('[Login] Backend login result:', user)
+    
     if (!user) {
       user = loginUser(identifier, password)
+      console.log('[Login] Local login result:', user)
     }
-    if (user) nav('/premium/course')
-    else setErr('Invalid credentials or not approved yet.')
+    
+    if (user) {
+      console.log('[Login] Login successful, navigating to course')
+      // Small delay to ensure localStorage is written
+      await new Promise(resolve => setTimeout(resolve, 100))
+      nav('/premium/course')
+    }
+    else {
+      console.log('[Login] Login failed')
+      setErr('Invalid credentials or not approved yet.')
+    }
   }
   return (
     <div>

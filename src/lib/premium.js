@@ -115,13 +115,38 @@ export async function loginUserBackend(identifier, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ identifier, password }),
   })
-  if (!res.ok) return null
+  console.log('[loginUserBackend] Response status:', res.status)
+  if (!res.ok) {
+    console.log('[loginUserBackend] Login failed, not ok')
+    return null
+  }
   const user = await res.json()
+  console.log('[loginUserBackend] Received user:', user)
   try {
     if (user && user.id) {
-      localStorage.setItem(CURRENT_KEY, user.id)
+      // Always convert ID to string for consistency
+      const userId = String(user.id)
+      localStorage.setItem(CURRENT_KEY, userId)
+      console.log('[loginUserBackend] Set CURRENT_KEY to:', userId)
+      
+      // Also save the full user object to users list so getCurrentUser() can find it
+      const users = getUsers()
+      console.log('[loginUserBackend] Current users in store:', users.length)
+      
+      // Normalize ID comparison to strings
+      const idx = users.findIndex((u) => String(u.id) === userId)
+      if (idx >= 0) {
+        users[idx] = user
+      } else {
+        users.push(user)
+      }
+      saveUsers(users)
+      console.log('[loginUserBackend] Saved users, total count:', users.length)
+      console.log('[loginUserBackend] Verify saved:', localStorage.getItem(CURRENT_KEY), JSON.parse(localStorage.getItem(USERS_KEY)).length)
     }
-  } catch { /* ignore */ }
+  } catch (e) { 
+    console.error('[loginUserBackend] Error:', e)
+  }
   return user
 }
 
@@ -140,8 +165,16 @@ export async function getUsersCountAsync() {
 }
 export function getCurrentUser() {
   const id = localStorage.getItem(CURRENT_KEY)
-  if (!id) return null
-  return getUsers().find((u) => u.id === id) || null
+  if (!id) {
+    console.log('[getCurrentUser] No CURRENT_KEY in localStorage')
+    return null
+  }
+  const users = getUsers()
+  console.log('[getCurrentUser] Looking for id:', id, 'in', users.length, 'users')
+  // Normalize both IDs to strings for comparison
+  const user = users.find((u) => String(u.id) === String(id))
+  console.log('[getCurrentUser] Found user:', user)
+  return user || null
 }
 export function signOut() {
   localStorage.removeItem(CURRENT_KEY)

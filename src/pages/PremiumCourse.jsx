@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getCurrentUser, getProgress, setProgress, modules, getModulesAsync, getQuestionsForModuleAsync, getSavedAnswers, setSavedAnswers, clearSavedAnswers, getVideoAccess, activatePaidAccessBackend, getUsersBackendAsync, setProgressBackend, setSavedAnswersBackend, clearSavedAnswersBackend, verifyModuleAnswersBackend } from '../lib/premium'
 import { Link, useNavigate } from 'react-router-dom'
+import './PremiumCourse.css'
 
 export default function PremiumCourse() {
   const nav = useNavigate()
@@ -24,6 +25,9 @@ export default function PremiumCourse() {
   const [retakeMode, setRetakeMode] = useState(false)
   const [validated, setValidated] = useState(false)
   const [videoSrc, setVideoSrc] = useState('')
+  const [videoFullyWatched, setVideoFullyWatched] = useState(false)
+  const [watchTimer, setWatchTimer] = useState(0)
+  const REQUIRED_WATCH_TIME = 30 // seconds
   function fmt(s) {
     const m = Math.floor(s / 60)
     const sec = Math.floor(s % 60)
@@ -61,7 +65,9 @@ export default function PremiumCourse() {
   }, [])
 
   useEffect(() => {
+    console.log('[PremiumCourse] User effect, user:', user)
     if (!user) {
+      console.log('[PremiumCourse] No user, redirecting to login')
       nav('/premium/login')
     }
   }, [user, nav])
@@ -76,9 +82,73 @@ export default function PremiumCourse() {
     load()
     return () => { cancelled = true }
   }, [modIdx, courseModules])
-  useEffect(() => {}, [modIdx, user])
   
   const currentModule = courseModules[modIdx]
+  
+  useEffect(() => {
+    if (!currentModule) return
+    
+    const isDirectVideo = currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src))
+    
+    if (isDirectVideo) {
+      // Direct video file - track to 95%
+      const videoElement = vref.current
+      if (!videoElement) return
+      
+      const handleLoadedMetadata = () => {
+        setDur(videoElement.duration)
+      }
+      
+      const handleTimeUpdate = () => {
+        const current = videoElement.currentTime
+        const duration = videoElement.duration
+        const percent = duration ? Math.round((current / duration) * 100) : 0
+        
+        setCur(current)
+        setPct(percent)
+        
+        if (percent >= 95 && !videoFullyWatched) {
+          setVideoFullyWatched(true)
+        }
+      }
+      
+      const handleVideoEnd = () => {
+        setVideoFullyWatched(true)
+      }
+      
+      videoElement.addEventListener('loadedmetadata', handleLoadedMetadata)
+      videoElement.addEventListener('timeupdate', handleTimeUpdate)
+      videoElement.addEventListener('ended', handleVideoEnd)
+      
+      return () => {
+        videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        videoElement.removeEventListener('timeupdate', handleTimeUpdate)
+        videoElement.removeEventListener('ended', handleVideoEnd)
+      }
+    } else {
+      // Iframe - use timer-based approach
+      let interval
+      if (watchTimer < REQUIRED_WATCH_TIME) {
+        interval = setInterval(() => {
+          setWatchTimer(t => {
+            const newTime = t + 1
+            if (newTime >= REQUIRED_WATCH_TIME) {
+              setVideoFullyWatched(true)
+            }
+            return newTime
+          })
+        }, 1000)
+      }
+      
+      return () => clearInterval(interval)
+    }
+  }, [modIdx, currentModule, videoFullyWatched, watchTimer])
+  
+  // Reset timer when module changes
+  useEffect(() => {
+    setWatchTimer(0)
+    setVideoFullyWatched(false)
+  }, [modIdx])
   if (!user || !currentModule) return null
 
   const prog = getProgress(user.id)
@@ -187,26 +257,99 @@ export default function PremiumCourse() {
         <div className="card" style={{ maxWidth: 820, margin: '0 auto' }}>
           <h2 style={{ marginTop: 0 }}>{currentModule.title}</h2>
           <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: 12, overflow: 'hidden', background: '#000' }}>
-            <iframe
-              src={currentModule.src}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-              loading="lazy"
-              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-              allowFullScreen
-            ></iframe>
+            {currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src)) ? (
+              // Direct video file
+              <video
+                ref={vref}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+                controls
+                controlsList="nodownload"
+              >
+                <source src={currentModule.src} />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              // Embedded iframe (Vimeo, YouTube, etc.)
+              <iframe
+                src={currentModule.src}
+                className="premium-course-iframe"
+                loading="lazy"
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                allowFullScreen
+              ></iframe>
+            )}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
-            <button
-              className="btn"
-              onClick={() => {
-                setEnded(true)
-                setRetakeMode(true)
-                setValidated(false)
-                setAnswers({})
-              }}
-            >
-              Start Lesson Quiz
-            </button>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8, flexDirection: 'column', gap: 12 }}>
+            {(() => {
+              const progress = getProgress(user.id)
+              const isCompleted = progress.completed[modIdx]
+              const isDirectVideo = currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src))
+              const timeRemaining = Math.max(0, REQUIRED_WATCH_TIME - watchTimer)
+              const canStartQuiz = videoFullyWatched || isCompleted
+              const progressPercent = isDirectVideo ? pct : Math.round((watchTimer / REQUIRED_WATCH_TIME) * 100)
+              
+              return (
+                <>
+                  {/* Progress Bar */}
+                  {!isCompleted && !canStartQuiz && (
+                    <div style={{ maxWidth: 400, margin: '0 auto' }}>
+                      <div style={{ fontSize: 13, marginBottom: 6, color: '#f97316', fontWeight: 500 }}>
+                        ⏱️ Watch video for {timeRemaining}s more
+                      </div>
+                      <div style={{ 
+                        width: '100%', 
+                        height: 8, 
+                        background: '#333', 
+                        borderRadius: 4,
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          height: '100%',
+                          width: `${progressPercent}%`,
+                          background: 'linear-gradient(90deg, #00ddeb, #0099cc)',
+                          transition: 'width 0.3s ease'
+                        }} />
+                      </div>
+                      <div style={{ fontSize: 12, marginTop: 6, opacity: 0.7 }}>
+                        {progressPercent}% watched
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Main Button */}
+                  <button
+                    className="btn"
+                    disabled={!canStartQuiz}
+                    onClick={() => {
+                      console.log('[Quiz] Starting quiz, ended:', true, 'retakeMode:', true)
+                      setEnded(true)
+                      setRetakeMode(true)
+                      setValidated(false)
+                      setAnswers({})
+                    }}
+                    style={{
+                      opacity: canStartQuiz ? 1 : 0.5,
+                      cursor: canStartQuiz ? 'pointer' : 'not-allowed',
+                      maxWidth: 300
+                    }}
+                    title={canStartQuiz ? 'Start the quiz' : `Please watch for ${timeRemaining}s more`}
+                  >
+                    {isCompleted ? '↺ Retake Quiz' : 'Start Lesson Quiz'}
+                  </button>
+                  
+                  {/* Mark as Watched Button */}
+                  {!isCompleted && !isDirectVideo && !videoFullyWatched && watchTimer > 0 && (
+                    <button
+                      className="btn secondary"
+                      onClick={() => setVideoFullyWatched(true)}
+                      style={{ maxWidth: 300 }}
+                    >
+                      ✓ Mark as Watched
+                    </button>
+                  )}
+                </>
+              )
+            })()}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 8 }}>
             <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -226,73 +369,100 @@ export default function PremiumCourse() {
             <span>Played: {fmt(cur)} / {fmt(dur)} ({pct}%)</span>
           </div>
           {(() => {
-            const isCompleted = getProgress(user.id).completed[modIdx]
-            const showQuiz = isCompleted ? true : ended
-            return showQuiz
+            try {
+              const isCompleted = getProgress(user.id).completed[modIdx]
+              const showQuiz = isCompleted ? true : ended
+              console.log('[Quiz Conditional] isCompleted:', isCompleted, 'ended:', ended, 'showQuiz:', showQuiz, 'qs.length:', qs.length)
+              return showQuiz
+            } catch (err) {
+              console.error('[Quiz Conditional Error]', err)
+              return false
+            }
           })() && (
             <form onSubmit={submitQuiz} style={{ marginTop: 12, display: 'grid', gap: 8 }}>
               <div style={{ fontWeight: 800, fontSize: 18, textAlign: 'center' }}>📘 Trendex Training – Assessment (Set {currentModule.id})</div>
               <div><strong>Answer all 25 questions</strong></div>
               {(() => {
-                const saved = user ? getSavedAnswers(user.id, currentModule.id) : {}
-                const reviewMode = getProgress(user.id).completed[modIdx] && !retakeMode
-                const wrongIds = (reviewMode || !validated) ? [] : qs.filter((q) => (answers[q.id] || '') !== q.answer).map((q) => q.id)
-                return (
-                  <>
-              {qs.map((q) => (
-                <div
-                  key={q.id}
-                  className={`card quiz-item ${wrongIds.includes(q.id) ? 'is-wrong' : ''}`}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span><strong>Q{q.id}.</strong> {q.q}</span>
-                    {wrongIds.includes(q.id) && <span style={{ color: '#ff8b92' }}>Wrong</span>}
-                  </div>
-                  <div className="quiz-list" style={{ marginTop: 6 }}>
-                    {q.choices.map((c) => (
-                      <label key={c.key} className="quiz-choice">
-                        <input
-                          type="radio"
-                          name={`q_${q.id}`}
-                          value={c.key}
-                          checked={(reviewMode ? saved[q.id] : answers[q.id]) === c.key}
-                          onChange={() => {
-                            const next = { ...answers, [q.id]: c.key }
-                            setAnswers(next)
-                            if (user) setSavedAnswers(user.id, currentModule.id, { ...saved, ...next })
+                try {
+                  const saved = user ? getSavedAnswers(user.id, currentModule.id) : {}
+                  const reviewMode = getProgress(user.id).completed[modIdx] && !retakeMode
+                  const wrongIds = (reviewMode || !validated) ? [] : qs.filter((q) => (answers[q.id] || '') !== q.answer).map((q) => q.id)
+                  console.log('[Quiz Render] qs:', qs.length, 'saved:', Object.keys(saved).length, 'reviewMode:', reviewMode)
+                  console.log('[Quiz Debug] First question:', JSON.stringify(qs[0], null, 2))
+                  
+                  if (!qs || qs.length === 0) {
+                    console.error('[Quiz Error] qs is empty or undefined')
+                    return <div style={{ color: '#ff8b92' }}>Error: No questions loaded. Please refresh the page.</div>
+                  }
+                  
+                  return (
+                    <>
+                      {qs.map((q) => {
+                        console.log('[Question Item]', { id: q.id, q: q.q, choices: q.choices?.length })
+                        return (
+                        <div
+                          key={q.id}
+                          className={`card quiz-item ${wrongIds.includes(q.id) ? 'is-wrong' : ''}`}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span><strong>Q{q.id}.</strong> {q.q || '(no question text)'}</span>
+                            {wrongIds.includes(q.id) && <span style={{ color: '#ff8b92' }}>Wrong</span>}
+                          </div>
+                          <div className="quiz-list" style={{ marginTop: 6 }}>
+                            {q.choices && q.choices.length > 0 ? (
+                              q.choices.map((c) => (
+                                <label key={c.key} className="quiz-choice">
+                                  <input
+                                    type="radio"
+                                    name={`q_${q.id}`}
+                                    value={c.key}
+                                    checked={(reviewMode ? saved[q.id] : answers[q.id]) === c.key}
+                                    onChange={() => {
+                                      const next = { ...answers, [q.id]: c.key }
+                                      setAnswers(next)
+                                      if (user) setSavedAnswers(user.id, currentModule.id, { ...saved, ...next })
+                                    }}
+                                    required
+                                    disabled={reviewMode || (!ended && !retakeMode)}
+                                  />
+                                  <span>{c.key}) {c.text}</span>
+                                </label>
+                              ))
+                            ) : (
+                              <div style={{ color: '#ff8b92' }}>No choices available</div>
+                            )}
+                          </div>
+                        </div>
+                        )
+                      })}
+
+                      {(validated && !!qs.filter((q) => (answers[q.id] || '') !== q.answer).length) && (
+                        <div style={{ textAlign: 'center', color: '#ff8b92' }}>Some answers are incorrect. Please review highlighted questions.</div>
+                      )}
+                      {!reviewMode ? (
+                        <button className="btn" type="submit" disabled={!ended && !retakeMode}>Submit Answers</button>
+                      ) : (
+                        <button
+                          className="btn secondary"
+                          type="button"
+                          onClick={() => {
+                            setRetakeMode(true)
+                            setEnded(false)
+                            setValidated(false)
+                            setAnswers({})
+                            if (user) clearSavedAnswers(user.id, currentModule.id)
+                            // Do not replay video; just clear answers and allow re-answering
                           }}
-                          required
-                          disabled={reviewMode || (!ended && !retakeMode)}
-                        />
-                        <span>{c.key}) {c.text}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {(validated && !!qs.filter((q) => (answers[q.id] || '') !== q.answer).length) && (
-                <div style={{ textAlign: 'center', color: '#ff8b92' }}>Some answers are incorrect. Please review highlighted questions.</div>
-              )}
-                  {!reviewMode ? (
-                    <button className="btn" type="submit" disabled={!ended && !retakeMode}>Submit Answers</button>
-                  ) : (
-                    <button
-                      className="btn secondary"
-                      type="button"
-                      onClick={() => {
-                        setRetakeMode(true)
-                        setEnded(false)
-                        setValidated(false)
-                        setAnswers({})
-                        if (user) clearSavedAnswers(user.id, currentModule.id)
-                        // Do not replay video; just clear answers and allow re-answering
-                      }}
-                    >
-                      Retake Quiz
-                    </button>
-                  )}
-                  </>
-                )
+                        >
+                          Retake Quiz
+                        </button>
+                      )}
+                    </>
+                  )
+                } catch (err) {
+                  console.error('[Quiz Render Error]', err)
+                  return <div style={{ color: '#ff8b92' }}>Error rendering quiz: {err.message}</div>
+                }
               })()}
             </form>
           )}
