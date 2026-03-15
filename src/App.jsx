@@ -97,7 +97,7 @@ function Layout({ children }) {
           <NavLink to="/premium">Premium Access</NavLink>
         </nav>
       </header>
-      <BannerSlider items={banners} />
+      {location.pathname === '/' && <BannerSlider items={banners} />}
       <div className={`fab-enquiry ${fabOpen ? 'open' : ''}`}>
         <button
           className="enquiry-toggle has-tip"

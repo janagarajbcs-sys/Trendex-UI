@@ -1,0 +1,78 @@
+/* Main Page */
+.cashback-page {
+  width: 100%;
+}
+
+/* Title */
+.cashback-title {
+  color: #00ddeb;
+  text-align: center;
+}
+
+/* Card */
+.cashback-card {
+  overflow: hidden;
+}
+
+/* Video Frame */
+.video-frame {
+  position: relative;
+  padding-top: 56.25%; /* 16:9 video ratio */
+  width: 100%;
+}
+
+/* Base iframe style */
+.video-frame iframe {
+  position: absolute;
+  border: none;
+}
+
+/* Description text */
+.video-note {
+  opacity: 0.8;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* Buttons container */
+.cashback-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+
+/* ---------------- MOBILE ZOOM ---------------- */
+
+@media (max-width: 768px) {
+
+  .video-frame iframe {
+    width: 220%;
+    height: 220%;
+    top: -60%;
+    left: -60%;
+  }
+
+  /* Make buttons smaller on mobile */
+  .cashback-buttons .btn {
+    font-size: 0.85rem;
+    padding: 7px 12px;
+  }
+
+}
+
+
+/* ---------------- LAPTOP / DESKTOP ZOOM ---------------- */
+
+@media (min-width: 769px) {
+
+  .video-frame iframe {
+    width: 250%;
+    height: 250%;
+    top: -75%;
+    left: -75%;
+  }
+
+}

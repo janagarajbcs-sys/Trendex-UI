@@ -52,7 +52,7 @@ export default function Bot() {
   return (
     <div>
       <h1 style={{ color: '#00ddeb' }}>Trading Strategies</h1>
-      <p>Single subscription gives access to 9 strategies for Spot & Futures.</p>
+      <p>Single subscription gives access to 9 strategies for Both Spot & Futures.<br />Keep your Funds in your Own Binance Wallet(Trendex bot Never Store your Trading Funds).</p>
 
       <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', justifyItems: 'center' }}>
         {bots.map((b) => (
@@ -91,22 +91,33 @@ export default function Bot() {
         ))}
       </div>
 
-      <div ref={calculatorRef} className="card" style={{ margin: '16px auto', maxWidth: 520, textAlign: 'center' }}>
+      <div 
+        ref={calculatorRef} 
+        className="card" 
+        style={{ 
+          margin: '16px auto', 
+          maxWidth: 520, 
+          textAlign: 'center',
+          border: '2px solid #00ddeb',
+          boxShadow: '0 0 20px rgba(0, 221, 235, 0.15)',
+          background: 'linear-gradient(145deg, #121212, #1a1a1a)'
+        }}
+      >
         <h2 style={{ marginTop: 0, color: '#cfeef3' }}>Capital & Returns Calculator</h2>
-        <label style={{ display: 'block', marginTop: 8, textAlign: 'center' }}>
+        <label style={{ display: 'block', marginTop: 8, textAlign: 'center', color: '#ffffff' }}>
           Enter Capital in INR
           <input
-            style={{ width: '100%', marginTop: 6, padding: 10, borderRadius: 8 }}
+            style={{ width: '100%', marginTop: 6, padding: 10, borderRadius: 8, border: '1px solid #ccc' }}
             type="number"
             placeholder="₹ INR"
             value={inr}
             onChange={(e) => onInr(e.target.value)}
           />
         </label>
-        <label style={{ display: 'block', marginTop: 8, textAlign: 'center' }}>
+        <label style={{ display: 'block', marginTop: 8, textAlign: 'center', color: '#ffffff' }}>
           Enter Capital in USDT
           <input
-            style={{ width: '100%', marginTop: 6, padding: 10, borderRadius: 8 }}
+            style={{ width: '100%', marginTop: 6, padding: 10, borderRadius: 8, border: '1px solid #ccc' }}
             type="number"
             placeholder="USDT"
             value={usdt}

@@ -336,6 +336,224 @@ export default function PremiumAdmin() {
           {/* <button className="btn" onClick={() => { importApiFolderBackend().then(() => { setLeaders(getLeaders()); setEvents(getEvents()) }) }} style={{ padding: '6px 12px', fontSize: '.85rem', background: '#0ea5e9', color: '#fff', transition: 'transform .15s ease, background-color .15s ease' }}>Import API Folder</button> */}
           {/* <button className="btn secondary" onClick={() => { signOutAdmin(); nav('/premium/admin-login') }} style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>Sign out</button> */}
       </div>
+
+      {/* 1. Pending Users */}
+      <div className="card" style={{ overflowX: 'auto', marginBottom: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Pending Users ({pendingUser.length})</h2>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem' }}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Team</th>
+              <th>Leader</th>
+              <th>Stage</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pendingUser.map((u) => (
+              <tr key={u.id}>
+                <td>{u.name}</td>
+                <td>{u.phone}</td>
+                <td>{u.email}</td>
+                <td>{u.team}</td>
+                <td>{u.leader}</td>
+                <td>
+                  {(() => {
+                    const prog = getProgress(u.id)
+                    return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
+                  })()}
+                </td>
+                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                  <button
+                    className="btn"
+                    style={{ background: '#22c55e', color: '#0b1220', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}
+                    onClick={() => approve(u.id)}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="btn secondary"
+                    style={{ background: '#ef4444', color: '#ffffff', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}
+                    onClick={() => deny(u.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2. Approved Users */}
+      <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Approved Users ({approved.length})</h2>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Team</th>
+              <th>Leader</th>
+              <th>Stage</th>
+              <th>Videos</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {approved.map((u) => (
+              <tr key={u.id}>
+                <td>{u.name}</td>
+                <td>{u.phone}</td>
+                <td>{u.email}</td>
+                <td>{u.team}</td>
+                <td>{u.leader}</td>
+                <td>
+                  {(() => {
+                    const prog = getProgress(u.id)
+                    return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
+                  })()}
+                </td>
+                <td>{getVideoAccess(u.id) ? 'On' : 'Off'}</td>
+                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                  <button className="btn" onClick={() => disable(u.id)}>Disable</button>
+                  <button className="btn" onClick={() => toggleVideos(u.id)}>{getVideoAccess(u.id) ? 'Disable Videos' : 'Enable Videos'}</button>
+                  <button
+                    className="btn secondary"
+                    style={{ background: '#ef4444', color: '#ffffff' }}
+                    onClick={() => deny(u.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 3. Stage Distribution */}
+      <div className="card" style={{ marginTop: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Stage Distribution</h2>
+        <div style={{ display: 'flex', alignItems: 'end', justifyContent: 'center', gap: 8, height: 180, padding: '12px 0' }}>
+          {stats.counts.map((c, i) => (
+            <div
+              key={i}
+              title={`Video ${i + 1}: ${c}`}
+              style={{
+                width: 36,
+                height: `${Math.max(2, Math.round((c / stats.max) * 150))}px`,
+                background: 'color-mix(in srgb, var(--accent) 30%, transparent)',
+                borderRadius: 6,
+              }}
+            />
+          ))}
+          <div
+            title={`Completed: ${stats.completed}`}
+            style={{
+              width: 36,
+              height: `${Math.max(2, Math.round((stats.completed / stats.max) * 150))}px`,
+              background: '#22c55e',
+              borderRadius: 6,
+            }}
+          />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, fontSize: 12, opacity: 0.85 }}>
+          {modules.map((_, i) => <span key={i}>V{i + 1}</span>)}
+          <span>Done</span>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 6, opacity: 0.85 }}>
+          <span>Total Users: {stats.total}</span>
+        </div>
+      </div>
+
+      {/* 4. Join/Subscribe Responses */}
+      <div className="card" style={{ marginTop: 12, overflowX: 'auto' }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Join/Subscribe Responses ({joins.length})</h2>
+        <div style={{ textAlign: 'right', marginBottom: 8 }}>
+          <button
+            className="btn"
+            onClick={() => {
+              const headers = ['Name', 'Mobile', 'Gmail', 'Place', 'Sponsor', 'Source', 'Time']
+              const rows = joins.map((r) => [r.name, r.mobile, r.gmail, r.place, r.sponsor, r.source, new Date(r.ts).toLocaleString()])
+              downloadExcel('join_responses', headers, rows)
+            }}
+          >
+            Export Excel
+          </button>
+        </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Gmail</th>
+              <th>Place</th>
+              <th>Sponsor</th>
+              <th>Source</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {joins.map((r, i) => (
+              <tr key={i}>
+                <td>{r.name}</td>
+                <td>{r.mobile}</td>
+                <td>{r.gmail}</td>
+                <td>{r.place}</td>
+                <td>{r.sponsor}</td>
+                <td>{r.source}</td>
+                <td>{new Date(r.ts).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 5. Complaint/Suggestion Responses */}
+      <div className="card" style={{ marginTop: 12, overflowX: 'auto' }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Complaint/Suggestion Responses ({complaints.length})</h2>
+        <div style={{ textAlign: 'right', marginBottom: 8 }}>
+          <button
+            className="btn"
+            onClick={() => {
+              const headers = ['Type', 'Name', 'Contact', 'Message', 'Time']
+              const rows = complaints.map((r) => [r.type, r.name, r.contact, r.message, new Date(r.ts).toLocaleString()])
+              downloadExcel('complaint_responses', headers, rows)
+            }}
+          >
+            Export Excel
+          </button>
+        </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Message</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {complaints.map((r, i) => (
+              <tr key={i}>
+                <td>{r.type}</td>
+                <td>{r.name}</td>
+                <td>{r.contact}</td>
+                <td>{r.message}</td>
+                <td>{new Date(r.ts).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 6. Homepage Top Slider — Images */}
       <div className="card" style={{ marginTop: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: 'center' }}>Homepage Top Slider — Images</h2>
         <form
@@ -395,184 +613,8 @@ export default function PremiumAdmin() {
           ) : null}
         </div>
       </div>
-      {/* <div className="card" style={{ marginTop: 12 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Meetings & Trips — Photos</h2>
-        <div style={{ textAlign: 'right', marginBottom: 8, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button className="btn" onClick={() => { syncTopSliderEventsBackend().then((list) => setEvents(list)) }} style={{ background: '#15803D', color: '#fff', padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>
-            Import TopSlider Photos
-          </button>
-          <button className="btn secondary" onClick={() => { clearEventsBackend().then((list) => setEvents(list)); setEForm({ sno: '', img: '', date: '' }); setEEditing(null) }} style={{ background: '#ef4444', color: '#fff', padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>
-            Clear All Events
-          </button>
-        </div>
-        <form onSubmit={(e) => {
-          e.preventDefault()
-          if (eEditing) {
-            updateEventBackend(eEditing, eForm).then((list) => setEvents(list))
-            setEForm({ sno: '', img: '', date: '' })
-            setEEditing(null)
-          } else {
-            addEventBackend(eForm).then((list) => setEvents(list))
-            setEForm({ sno: '', img: '', date: '' })
-          }
-        }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 8, alignItems: 'end', marginBottom: 12 }}>
-          <div>
-            <label>S.No</label>
-            <input value={eForm.sno} onChange={(e) => setEForm({ ...eForm, sno: e.target.value })} placeholder="1" />
-          </div>
-          <div>
-            <label>Image URL</label>
-            <input value={eForm.img} onChange={(e) => setEForm({ ...eForm, img: e.target.value })} placeholder="/images/event.jpg" />
-            <div style={{ fontSize: '12px', color: '#6B7280', marginTop: 4 }}>
-              Any size works; image will be center-cropped to fit.
-            </div>
-          </div>
-          <div>
-            <label>Date</label>
-            <input type="date" value={eForm.date} onChange={(e) => setEForm({ ...eForm, date: e.target.value })} />
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button className="btn" type="submit" style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>{eEditing ? 'Update Event' : 'Add Event'}</button>
-            {eEditing ? <button className="btn secondary" type="button" onClick={() => { setEForm({ sno: '', img: '', date: '' }); setEEditing(null) }} style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>Cancel</button> : null}
-          </div>
-        </form>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Image</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {events.map((ev) => (
-                <tr key={ev.id}>
-                  <td>{ev.sno}</td>
-                  <td>{ev.img ? <img src={ev.img} alt={ev.date} style={{ width: 90, height: 54, objectFit: 'cover', borderRadius: 6 }} /> : '-'}</td>
-                  <td>{ev.date || '-'}</td>
-                  <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                    <button className="btn" type="button" onClick={() => { moveEventBackend(ev.id, 'up').then((list) => setEvents(list)) }} style={{ padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Up</button>
-                    <button className="btn" type="button" onClick={() => { moveEventBackend(ev.id, 'down').then((list) => setEvents(list)) }} style={{ padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Down</button>
-                    <button className="btn" type="button" onClick={() => { setEEditing(ev.id); setEForm({ sno: String(ev.sno), img: ev.img, date: ev.date }) }} style={{ padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Edit</button>
-                    <button className="btn secondary" type="button" onClick={() => { deleteEventBackend(ev.id).then((list) => setEvents(list)) }} style={{ background: '#ef4444', color: '#fff', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div> */}
-      {/* <div className="card" style={{ marginTop: 12 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Homepage Slider — Manage Banners</h2>
-        <div style={{ textAlign: 'right', marginBottom: 8, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button className="btn" onClick={undoBanners} disabled={!prevBanners} style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>Undo last change</button>
-          <button className="btn secondary" onClick={() => { saveBanners([]); setBanners(getBanners()); resetBForm() }} style={{ background: '#ef4444', color: '#fff', padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>
-            Clear All Banners
-          </button>
-        </div>
-        <form onSubmit={submitBanner} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 10, alignItems: 'end', marginBottom: 14 }}>
-          <div>
-            <label>S.No</label>
-            <input value={bForm.sno} onChange={(e) => setBForm({ ...bForm, sno: e.target.value })} placeholder="1" />
-          </div>
-          <div>
-            <label>Title</label>
-            <input value={bForm.title} onChange={(e) => setBForm({ ...bForm, title: e.target.value })} placeholder="Headline" />
-          </div>
-          <div>
-            <label>Subtitle</label>
-            <input value={bForm.subtitle} onChange={(e) => setBForm({ ...bForm, subtitle: e.target.value })} placeholder="Sub text" />
-          </div>
-          <div>
-            <label>CTA Text</label>
-            <input value={bForm.ctaText} onChange={(e) => setBForm({ ...bForm, ctaText: e.target.value })} placeholder="Explore" />
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button className="btn" type="submit" style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>{bEditing ? 'Update Banner' : 'Add Banner'}</button>
-            {bEditing ? <button className="btn secondary" type="button" onClick={resetBForm} style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>Cancel</button> : null}
-          </div>
-        </form>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Title</th>
-                <th>Subtitle</th>
-                <th>CTA</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {banners.map((b) => (
-                <tr key={b.id}>
-                  <td>{b.sno}</td>
-                  <td style={{ maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.title}</td>
-                  <td style={{ maxWidth: 260, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.subtitle}</td>
-                  <td>{b.ctaText || '-'}</td>
-                  <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                    <button className="btn" type="button" onClick={() => moveBannerRow(b.id, 'up')} style={{ padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Up</button>
-                    <button className="btn" type="button" onClick={() => moveBannerRow(b.id, 'down')} style={{ padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Down</button>
-                    <button className="btn" type="button" onClick={() => editBanner(b.id)} style={{ padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Edit</button>
-                    <button className="btn secondary" type="button" onClick={() => removeBanner(b.id)} style={{ background: '#ef4444', color: '#fff', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div> */}
-      <div className="card" style={{ overflowX: 'auto', marginBottom: 12 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Pending Users ({pendingUser.length})</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem' }}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Team</th>
-              <th>Leader</th>
-              <th>Stage</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pendingUser.map((u) => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.phone}</td>
-                <td>{u.email}</td>
-                <td>{u.team}</td>
-                <td>{u.leader}</td>
-                <td>
-                  {(() => {
-                    const prog = getProgress(u.id)
-                    return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
-                  })()}
-                </td>
-                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                  <button
-                    className="btn"
-                    style={{ background: '#22c55e', color: '#0b1220', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}
-                    onClick={() => approve(u.id)}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="btn secondary"
-                    style={{ background: '#ef4444', color: '#ffffff', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}
-                    onClick={() => deny(u.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+      {/* 7. Top Team Leaders — Manage Board */}
       <div className="card" style={{ marginTop: 12, padding: 16 }}>
         <h2
           style={{
@@ -782,467 +824,6 @@ export default function PremiumAdmin() {
           </table>
         </div>
       </div>
-      <div className="card" style={{ overflowX: 'auto' }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Approved Users ({approved.length})</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Team</th>
-              <th>Leader</th>
-              <th>Stage</th>
-              <th>Videos</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {approved.map((u) => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.phone}</td>
-                <td>{u.email}</td>
-                <td>{u.team}</td>
-                <td>{u.leader}</td>
-                <td>
-                  {(() => {
-                    const prog = getProgress(u.id)
-                    return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
-                  })()}
-                </td>
-                <td>{getVideoAccess(u.id) ? 'On' : 'Off'}</td>
-                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                  <button className="btn" onClick={() => disable(u.id)}>Disable</button>
-                  <button className="btn" onClick={() => toggleVideos(u.id)}>{getVideoAccess(u.id) ? 'Disable Videos' : 'Enable Videos'}</button>
-                  <button
-                    className="btn secondary"
-                    style={{ background: '#ef4444', color: '#ffffff' }}
-                    onClick={() => deny(u.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="card" style={{ marginTop: 12 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Stage Distribution</h2>
-        <div style={{ display: 'flex', alignItems: 'end', justifyContent: 'center', gap: 8, height: 180, padding: '12px 0' }}>
-          {stats.counts.map((c, i) => (
-            <div
-              key={i}
-              title={`Video ${i + 1}: ${c}`}
-              style={{
-                width: 36,
-                height: `${Math.max(2, Math.round((c / stats.max) * 150))}px`,
-                background: 'color-mix(in srgb, var(--accent) 30%, transparent)',
-                borderRadius: 6,
-              }}
-            />
-          ))}
-          <div
-            title={`Completed: ${stats.completed}`}
-            style={{
-              width: 36,
-              height: `${Math.max(2, Math.round((stats.completed / stats.max) * 150))}px`,
-              background: '#22c55e',
-              borderRadius: 6,
-            }}
-          />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, fontSize: 12, opacity: 0.85 }}>
-          {modules.map((_, i) => <span key={i}>V{i + 1}</span>)}
-          <span>Done</span>
-        </div>
-        <div style={{ textAlign: 'center', marginTop: 6, opacity: 0.85 }}>
-          <span>Total Users: {stats.total}</span>
-        </div>
-      </div>
-      <div className="card" style={{ marginTop: 12, overflowX: 'auto' }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Join/Subscribe Responses ({joins.length})</h2>
-        <div style={{ textAlign: 'right', marginBottom: 8 }}>
-          <button
-            className="btn"
-            onClick={() => {
-              const headers = ['Name', 'Mobile', 'Gmail', 'Place', 'Sponsor', 'Source', 'Time']
-              const rows = joins.map((r) => [r.name, r.mobile, r.gmail, r.place, r.sponsor, r.source, new Date(r.ts).toLocaleString()])
-              downloadExcel('join_responses', headers, rows)
-            }}
-          >
-            Export Excel
-          </button>
-        </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Mobile</th>
-              <th>Gmail</th>
-              <th>Place</th>
-              <th>Sponsor</th>
-              <th>Source</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {joins.map((r, i) => (
-              <tr key={i}>
-                <td>{r.name}</td>
-                <td>{r.mobile}</td>
-                <td>{r.gmail}</td>
-                <td>{r.place}</td>
-                <td>{r.sponsor}</td>
-                <td>{r.source}</td>
-                <td>{new Date(r.ts).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="card" style={{ marginTop: 12, overflowX: 'auto' }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Complaint/Suggestion Responses ({complaints.length})</h2>
-        <div style={{ textAlign: 'right', marginBottom: 8 }}>
-          <button
-            className="btn"
-            onClick={() => {
-              const headers = ['Type', 'Name', 'Contact', 'Message', 'Time']
-              const rows = complaints.map((r) => [r.type, r.name, r.contact, r.message, new Date(r.ts).toLocaleString()])
-              downloadExcel('complaint_responses', headers, rows)
-            }}
-          >
-            Export Excel
-          </button>
-        </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Message</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {complaints.map((r, i) => (
-              <tr key={i}>
-                <td>{r.type}</td>
-                <td>{r.name}</td>
-                <td>{r.contact}</td>
-                <td>{r.message}</td>
-                <td>{new Date(r.ts).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   )
 }
-// import { useEffect, useState } from "react"
-// import {
-//   getLeaders,
-//   saveLeaders,
-//   addLeaderBackend,
-//   updateLeaderBackend,
-//   deleteLeaderBackend,
-//   moveLeaderBackend,
-//   getLeadersAsync
-// } from "../lib/premium"
-
-// export default function LeaderAdmin() {
-
-//   const [leaders, setLeaders] = useState([])
-//   const [editing, setEditing] = useState(null)
-
-//   const [form, setForm] = useState({
-//     sno: "",
-//     name: "",
-//     title: "",
-//     loc: "",
-//     photo: null
-//   })
-
-//   useEffect(() => {
-//     getLeadersAsync().then((list) => {
-//       saveLeaders(list)
-//       setLeaders(list)
-//     })
-//   }, [])
-
-//   function resetForm() {
-//     setEditing(null)
-//     setForm({
-//       sno: "",
-//       name: "",
-//       title: "",
-//       loc: "",
-//       photo: null
-//     })
-//   }
-
-//   function onPhotoFile(e) {
-//     const file = e.target.files && e.target.files[0]
-//     if (!file) return
-
-//     setForm({
-//       ...form,
-//       photo: file
-//     })
-//   }
-
-//   function submitLeader(e) {
-//     e.preventDefault()
-
-//     const fd = new FormData()
-
-//     fd.append("sno", form.sno)
-//     fd.append("name", form.name)
-//     fd.append("title", form.title)
-//     fd.append("loc", form.loc)
-
-//     if (form.photo instanceof File) {
-//       fd.append("photo", form.photo)
-//     }
-
-//     if (editing) {
-//       updateLeaderBackend(editing, fd).then(() => {
-//         getLeadersAsync().then(setLeaders)
-//       })
-//     } else {
-//       console.log(fd,"fd");
-      
-//       addLeaderBackend(fd).then(() => {
-//         getLeadersAsync().then(setLeaders)
-//       })
-//     }
-
-//     resetForm()
-//   }
-
-//   function editLeader(id) {
-//     const l = leaders.find((x) => x.id === id)
-//     if (!l) return
-
-//     setEditing(id)
-
-//     setForm({
-//       sno: String(l.sno),
-//       name: l.name,
-//       title: l.title,
-//       loc: l.loc,
-//       photo: l.photo
-//     })
-//   }
-
-//   function removeLeader(id) {
-//     deleteLeaderBackend(id).then(() => {
-//       getLeadersAsync().then(setLeaders)
-//     })
-//   }
-
-//   function move(id, dir) {
-//     moveLeaderBackend(id, dir).then(() => {
-//       getLeadersAsync().then(setLeaders)
-//     })
-//   }
-
-//   function previewPhoto(photo) {
-//     if (!photo) return ""
-//     if (typeof photo === "string") return photo
-//     return URL.createObjectURL(photo)
-//   }
-
-//   return (
-//     <div className="card">
-
-//       <h2 style={{ textAlign: "center" }}>
-//         Top Team Leaders — Manage Board
-//       </h2>
-
-//       {/* FORM */}
-
-//       <form
-//         onSubmit={submitLeader}
-//         style={{
-//           display: "grid",
-//           gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))",
-//           gap: 10,
-//           marginBottom: 20
-//         }}
-//       >
-
-//         <div>
-//           <label>Photo</label>
-//           <input
-//             type="file"
-//             accept="image/*"
-//             onChange={onPhotoFile}
-//           />
-
-//           {form.photo && (
-//             <div
-//               style={{
-//                 width: 70,
-//                 height: 90,
-//                 marginTop: 8
-//               }}
-//             >
-//               <img
-//                 src={previewPhoto(form.photo)}
-//                 alt="preview"
-//                 style={{
-//                   width: "100%",
-//                   height: "100%",
-//                   objectFit: "cover",
-//                   borderRadius: 6
-//                 }}
-//               />
-//             </div>
-//           )}
-//         </div>
-
-//         <div>
-//           <label>Name</label>
-//           <input
-//             value={form.name}
-//             onChange={(e) =>
-//               setForm({ ...form, name: e.target.value })
-//             }
-//             placeholder="Leader name"
-//           />
-//         </div>
-
-//         <div>
-//           <label>Rank Name</label>
-//           <input
-//             value={form.title}
-//             onChange={(e) =>
-//               setForm({ ...form, title: e.target.value })
-//             }
-//             placeholder="Prime Trader"
-//           />
-//         </div>
-
-//         <div>
-//           <label>Location</label>
-//           <input
-//             value={form.loc}
-//             onChange={(e) =>
-//               setForm({ ...form, loc: e.target.value })
-//             }
-//             placeholder="City"
-//           />
-//         </div>
-
-//         <div style={{ display: "flex", gap: 8 }}>
-//           <button className="btn" type="submit">
-//             {editing ? "Update" : "Add"}
-//           </button>
-
-//           {editing && (
-//             <button
-//               type="button"
-//               className="btn secondary"
-//               onClick={resetForm}
-//             >
-//               Cancel
-//             </button>
-//           )}
-//         </div>
-
-//       </form>
-
-//       {/* TABLE */}
-
-//       <div style={{ overflowX: "auto" }}>
-
-//         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-
-//           <thead>
-//             <tr>
-//               <th>S.No</th>
-//               <th>Photo</th>
-//               <th>Name</th>
-//               <th>Rank</th>
-//               <th>Location</th>
-//               <th>Actions</th>
-//             </tr>
-//           </thead>
-
-//           <tbody>
-
-//             {leaders.map((l) => (
-//               <tr key={l.id}>
-
-//                 <td>{l.sno}</td>
-
-//                 <td>
-//                   {l.photo && (
-//                     <img
-//                       src={l.photo}
-//                       alt={l.name}
-//                       style={{
-//                         width: 40,
-//                         height: 55,
-//                         objectFit: "cover",
-//                         borderRadius: 6
-//                       }}
-//                     />
-//                   )}
-//                 </td>
-
-//                 <td>{l.name}</td>
-
-//                 <td>{l.title}</td>
-
-//                 <td>{l.loc}</td>
-
-//                 <td style={{ display: "flex", gap: 6 }}>
-
-//                   <button
-//                     className="btn"
-//                     onClick={() => move(l.id, "up")}
-//                   >
-//                     Up
-//                   </button>
-
-//                   <button
-//                     className="btn"
-//                     onClick={() => move(l.id, "down")}
-//                   >
-//                     Down
-//                   </button>
-
-//                   <button
-//                     className="btn"
-//                     onClick={() => editLeader(l.id)}
-//                   >
-//                     Edit
-//                   </button>
-
-//                   <button
-//                     className="btn secondary"
-//                     style={{ background: "#ef4444", color: "#fff" }}
-//                     onClick={() => removeLeader(l.id)}
-//                   >
-//                     Delete
-//                   </button>
-
-//                 </td>
-
-//               </tr>
-//             ))}
-
-//           </tbody>
-
-//         </table>
-
-//       </div>
-
-//     </div>
-//   )
-// }
