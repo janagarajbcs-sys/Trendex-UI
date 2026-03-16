@@ -14,7 +14,6 @@ export default function PremiumCourse() {
   const [answers, setAnswers] = useState({})
   const vref = useRef(null)
   const lastTimeRef = useRef(0)
-  const [rate, setRate] = useState(1)
   const ytContainerRef = useRef(null)
   const ytPlayerRef = useRef(null)
   const ytTimerRef = useRef(null)
@@ -27,13 +26,9 @@ export default function PremiumCourse() {
   const [wrongIds, setWrongIds] = useState([])
   const [videoSrc, setVideoSrc] = useState('')
   const [videoFullyWatched, setVideoFullyWatched] = useState(false)
+  const watchTimerRef = useRef(0)
   const [watchTimer, setWatchTimer] = useState(0)
   const REQUIRED_WATCH_TIME = 30 // seconds
-  function fmt(s) {
-    const m = Math.floor(s / 60)
-    const sec = Math.floor(s % 60)
-    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
-  }
   function daysLeft(u) {
     const now = Date.now()
     const paidUntil = u?.paidAccessUntil || null
@@ -214,21 +209,21 @@ export default function PremiumCourse() {
 
   return (
     <div className="app-main" style={{ textAlign: 'center' }}>
-      <div style={{ marginBottom: 20 }}>
+      <div className="course-header">
         <h1>Premium Trading Course</h1>
         {active && (
-          <div style={{ color: 'var(--brand-accent)', fontWeight: 'bold' }}>
+          <div className="access-active-badge">
             Access Active: {daysLeft(user)} days remaining
           </div>
         )}
       </div>
 
       {!active ? (
-        <div className="card" style={{ maxWidth: 560, margin: '0 auto', padding: 40, textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 'bold', color: '#ef4444', marginBottom: 20 }}>
+        <div className="card expired-card">
+          <div className="expired-title">
             🔒 Access Expired
           </div>
-          <div style={{ fontSize: 16, marginBottom: 20, opacity: 0.8 }}>
+          <div className="expired-text">
             Your course access has expired. Renew your access to continue learning.
           </div>
           <button className="btn" onClick={activatePaid} style={{ marginTop: 10 }}>
@@ -237,7 +232,7 @@ export default function PremiumCourse() {
         </div>
       ) : (
         <>
-      <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '10px 0', marginBottom: 20, justifyContent: 'center' }}>
+      <div className="module-nav">
         {courseModules.map((m, i) => {
           const isUnlocked = i === unlockedIdx
           const isCompleted = !!prog.completed[i]
@@ -246,10 +241,8 @@ export default function PremiumCourse() {
           return (
             <div
               key={m.id}
-              className="card"
+              className={`card module-nav-item ${i === modIdx ? 'active-module' : ''}`}
               style={{
-                padding: 8,
-                minWidth: 140,
                 opacity: (canOpen && active) ? 1 : 0.5,
                 cursor: (canOpen && active) ? 'pointer' : 'not-allowed',
                 borderColor: i === modIdx ? 'color-mix(in srgb, var(--accent) 40%, transparent)' : undefined,
@@ -278,14 +271,14 @@ export default function PremiumCourse() {
         })}
       </div>
       {(getVideoAccess(user.id) || !prog.completed[courseModules.length - 1]) && (
-        <div className="card" style={{ maxWidth: 820, margin: '0 auto' }}>
+        <div className="card video-section-card">
           <h2 style={{ marginTop: 0 }}>{currentModule.title}</h2>
-          <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: 12, overflow: 'hidden', background: '#000' }}>
+          <div className="video-wrapper">
             {currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src)) ? (
               // Direct video file
               <video
                 ref={vref}
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+                className="direct-video"
                 controls
                 controlsList="nodownload"
               >
@@ -303,7 +296,7 @@ export default function PremiumCourse() {
               ></iframe>
             )}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8, flexDirection: 'column', gap: 12 }}>
+          <div className="video-controls-row">
             {(() => {
               const progress = getProgress(user.id)
               const isCompleted = progress.completed[modIdx]
@@ -316,207 +309,191 @@ export default function PremiumCourse() {
                 <>
                   {/* Progress Bar */}
                   {!isCompleted && !canStartQuiz && (
-                    <div style={{ maxWidth: 400, margin: '0 auto' }}>
-                      <div style={{ fontSize: 13, marginBottom: 6, color: '#f97316', fontWeight: 500 }}>
+                    <div className="watch-progress-container">
+                      <div className="watch-timer-text">
                         ⏱️ Watch video for {timeRemaining}s more
                       </div>
-                      <div style={{ 
-                        width: '100%', 
-                        height: 8, 
-                        background: '#333', 
-                        borderRadius: 4,
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{
-                          height: '100%',
-                          width: `${progressPercent}%`,
-                          background: 'linear-gradient(90deg, #00ddeb, #0099cc)',
-                          transition: 'width 0.3s ease'
-                        }} />
+                      <div className="progress-bar-bg">
+                        <div 
+                          className="progress-bar-fill"
+                          style={{ width: `${progressPercent}%` }}
+                        />
                       </div>
-                      <div style={{ fontSize: 12, marginTop: 6, opacity: 0.7 }}>
+                      <div className="progress-percent-text">
                         {progressPercent}% watched
                       </div>
                     </div>
-                  )}
-                  
-                  {/* Main Button */}
-                  <button
-                    className="btn"
-                    disabled={!canStartQuiz}
-                    onClick={() => {
-                      console.log('[Quiz] Starting quiz, ended:', true, 'retakeMode:', true)
-                      setEnded(true)
-                      setRetakeMode(true)
-                      setValidated(false)
-                      setWrongIds([])
-                      setAnswers({})
-                    }}
-                    style={{
-                      opacity: canStartQuiz ? 1 : 0.5,
-                      cursor: canStartQuiz ? 'pointer' : 'not-allowed',
-                      maxWidth: 300
-                    }}
-                    title={canStartQuiz ? 'Start the quiz' : `Please watch for ${timeRemaining}s more`}
-                  >
-                    {isCompleted ? '↺ Retake Quiz' : 'Start Lesson Quiz'}
-                  </button>
-                  
-                  {/* Mark as Watched Button */}
-                  {!isCompleted && !isDirectVideo && !videoFullyWatched && watchTimer > 0 && (
-                    <button
-                      className="btn secondary"
-                      onClick={() => setVideoFullyWatched(true)}
-                      style={{ maxWidth: 300 }}
-                    >
-                      ✓ Mark as Watched
-                    </button>
                   )}
                 </>
               )
             })()}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 8 }}>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span>Speed</span>
-              <select value={rate} onChange={(e) => {
-                const r = Number(e.target.value)
-                setRate(r)
-                if (currentModule.ytId && ytPlayerRef.current) ytPlayerRef.current.setPlaybackRate(r)
-                else if (vref.current) vref.current.playbackRate = r
-              }}>
-                {[1, 1.25, 1.5, 1.75, 2].map((r) => <option key={r} value={r}>{r}×</option>)}
-              </select>
-            </label>
-          </div>
-          {!!vErr && <div style={{ textAlign: 'center', marginTop: 6, color: '#ff8b92' }}>{vErr}</div>}
-          <div style={{ textAlign: 'center', marginTop: 6, opacity: 0.85 }}>
-            <span>Played: {fmt(cur)} / {fmt(dur)} ({pct}%)</span>
-          </div>
-          {(() => {
-            try {
-              const isCompleted = getProgress(user.id).completed[modIdx]
-              const showQuiz = isCompleted ? true : ended
-              console.log('[Quiz Conditional] isCompleted:', isCompleted, 'ended:', ended, 'showQuiz:', showQuiz, 'qs.length:', qs.length)
-              return showQuiz
-            } catch (err) {
-              console.error('[Quiz Conditional Error]', err)
-              return false
-            }
-          })() && (
-            <form onSubmit={submitQuiz} style={{ marginTop: 12, display: 'grid', gap: 8 }}>
-              <div style={{ fontWeight: 800, fontSize: 18, textAlign: 'center' }}>📘 Trendex Training – Assessment (Set {currentModule.id})</div>
-              <div><strong>Answer all 25 questions</strong></div>
-              {(() => {
-                try {
-                  const saved = user ? getSavedAnswers(user.id, currentModule.id) : {}
-                  const reviewMode = getProgress(user.id).completed[modIdx] && !retakeMode
-                  console.log('[Quiz Render] qs:', qs.length, 'saved:', Object.keys(saved).length, 'reviewMode:', reviewMode)
-                  console.log('[Quiz Debug] First question:', JSON.stringify(qs[0], null, 2))
-                  
-                  if (!qs || qs.length === 0) {
-                    console.error('[Quiz Error] qs is empty or undefined')
-                    return <div style={{ color: '#ff8b92' }}>Error: No questions loaded. Please refresh the page.</div>
-                  }
-                  
-                  return (
-                    <>
-                      {qs.map((q) => {
-                        console.log('[Question Item]', { id: q.id, q: q.q, choices: q.choices?.length })
-                        const userAnswer = reviewMode ? saved[q.id] : answers[q.id]
-                        const isWrong = wrongIds.includes(q.id)
-                        const showFeedback = validated && isWrong
-                        return (
-                        <div
-                          key={q.id}
-                          className="card quiz-item"
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span><strong>Q{q.id}.</strong> {q.q || '(no question text)'}</span>
-                          </div>
-                          <div className="quiz-list" style={{ marginTop: 6 }}>
-                            {q.choices && q.choices.length > 0 ? (
-                              q.choices.map((c) => {
-                                const isUserSelected = userAnswer === c.key
-                                const isWrongSelected = isUserSelected && isWrong
-                                let choiceStyle = {}
-                                if (showFeedback && isWrongSelected) {
-                                  choiceStyle = { 
-                                    backgroundColor: '#ff8b921a', 
-                                    borderColor: '#ff8b92',
-                                    borderWidth: 2
-                                  }
-                                }
-                                return (
-                                <label key={c.key} className="quiz-choice" style={choiceStyle}>
-                                  <input
-                                    type="radio"
-                                    name={`q_${q.id}`}
-                                    value={c.key}
-                                    checked={isUserSelected}
-                                    onChange={() => {
-                                      const next = { ...answers, [q.id]: c.key }
-                                      setAnswers(next)
-                                      // Remove this question from wrong IDs when user changes answer
-                                      setWrongIds(prev => prev.filter(id => id !== q.id))
-                                      if (user) setSavedAnswers(user.id, currentModule.id, { ...saved, ...next })
-                                    }}
-                                    required
-                                    disabled={reviewMode || (!ended && !retakeMode)}
-                                  />
-                                  <span>{c.key}) {c.text}</span>
-                                  {showFeedback && isWrongSelected && <span style={{ marginLeft: 'auto', color: '#ff8b92' }}>✗ Wrong</span>}
-                                </label>
-                                )
-                              })
-                            ) : (
-                              <div style={{ color: '#ff8b92' }}>No choices available</div>
-                            )}
-                          </div>
-                        </div>
-                        )
-                      })}
-
-                      {(validated && wrongIds.length > 0) && (
-                        <div style={{ textAlign: 'center', color: '#ff8b92' }}>❌ Some answers are incorrect. Review the highlighted choices (red = wrong answer).</div>
-                      )}
-                      {!reviewMode ? (
-                        <button className="btn" type="submit" disabled={!ended && !retakeMode}>Submit Answers</button>
-                      ) : (
-                        <button
-                          className="btn secondary"
-                          type="button"
-                          onClick={() => {
-                            setRetakeMode(true)
-                            setEnded(false)
-                            setValidated(false)
-                            setWrongIds([])
-                            setAnswers({})
-                            if (user) clearSavedAnswers(user.id, currentModule.id)
-                            // Do not replay video; just clear answers and allow re-answering
-                          }}
-                        >
-                          Retake Quiz
-                        </button>
-                      )}
-                    </>
-                  )
-                } catch (err) {
-                  console.error('[Quiz Render Error]', err)
-                  return <div style={{ color: '#ff8b92' }}>Error rendering quiz: {err.message}</div>
-                }
-              })()}
-            </form>
-          )}
+          {!!vErr && <div className="video-error">{vErr}</div>}
         </div>
       )}
+
+      {/* Quiz Buttons Outside the Video Section */}
+      {(getVideoAccess(user.id) || !prog.completed[courseModules.length - 1]) && (
+        <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          {(() => {
+            const progress = getProgress(user.id)
+            const isCompleted = progress.completed[modIdx]
+            const isDirectVideo = currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src))
+            const timeRemaining = Math.max(0, REQUIRED_WATCH_TIME - watchTimer)
+            const canStartQuiz = videoFullyWatched || isCompleted
+            
+            return (
+              <>
+                <button
+                  className="btn main-quiz-btn"
+                  disabled={!canStartQuiz}
+                  onClick={() => {
+                    setEnded(true)
+                    setRetakeMode(true)
+                    setValidated(false)
+                    setWrongIds([])
+                    setAnswers({})
+                  }}
+                  style={{
+                    opacity: canStartQuiz ? 1 : 0.5,
+                    cursor: canStartQuiz ? 'pointer' : 'not-allowed',
+                  }}
+                  title={canStartQuiz ? 'Start the quiz' : `Please watch for ${timeRemaining}s more`}
+                >
+                  {isCompleted ? '↺ Retake Quiz' : 'Start Lesson Quiz'}
+                </button>
+                
+                {!isCompleted && !isDirectVideo && !videoFullyWatched && watchTimer > 0 && (
+                  <button
+                    className="btn secondary mark-watched-btn"
+                    onClick={() => setVideoFullyWatched(true)}
+                  >
+                    ✓ Mark as Watched
+                  </button>
+                )}
+              </>
+            )
+          })()}
+        </div>
+      )}
+
+      {(() => {
+        try {
+          const isCompleted = getProgress(user.id).completed[modIdx]
+          const showQuiz = isCompleted ? true : ended
+          if (!showQuiz) return null
+          
+          return (
+            <div className="card quiz-section-card" style={{ marginTop: 20 }}>
+              <form onSubmit={submitQuiz} className="quiz-form">
+                <div className="quiz-header">📘 Trendex Training – Assessment (Set {currentModule.id})</div>
+                <div><strong>Answer all 25 questions</strong></div>
+                {(() => {
+                  try {
+                    const saved = user ? getSavedAnswers(user.id, currentModule.id) : {}
+                    const reviewMode = getProgress(user.id).completed[modIdx] && !retakeMode
+                    
+                    if (!qs || qs.length === 0) {
+                      return <div className="quiz-feedback-error">Error: No questions loaded. Please refresh the page.</div>
+                    }
+                    
+                    return (
+                      <>
+                        {qs.map((q) => {
+                          const userAnswer = reviewMode ? saved[q.id] : answers[q.id]
+                          const isWrong = wrongIds.includes(q.id)
+                          const showFeedback = validated && isWrong
+                          return (
+                          <div
+                            key={q.id}
+                            className="card quiz-item"
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span><strong>Q{q.id}.</strong> {q.q || '(no question text)'}</span>
+                            </div>
+                            <div className="quiz-list">
+                              {q.choices && q.choices.length > 0 ? (
+                                q.choices.map((c) => {
+                                  const isUserSelected = userAnswer === c.key
+                                  const isWrongSelected = isUserSelected && isWrong
+                                  let choiceStyle = {}
+                                  if (showFeedback && isWrongSelected) {
+                                    choiceStyle = { 
+                                      backgroundColor: '#ff8b921a', 
+                                      borderColor: '#ff8b92',
+                                      borderWidth: 2
+                                    }
+                                  }
+                                  return (
+                                  <label key={c.key} className="quiz-choice" style={choiceStyle}>
+                                    <input
+                                      type="radio"
+                                      name={`q_${q.id}`}
+                                      value={c.key}
+                                      checked={isUserSelected}
+                                      onChange={() => {
+                                        const next = { ...answers, [q.id]: c.key }
+                                        setAnswers(next)
+                                        setWrongIds(prev => prev.filter(id => id !== q.id))
+                                        if (user) setSavedAnswers(user.id, currentModule.id, { ...saved, ...next })
+                                      }}
+                                      required
+                                      disabled={reviewMode || (!ended && !retakeMode)}
+                                    />
+                                    <span>{c.key}) {c.text}</span>
+                                    {showFeedback && isWrongSelected && <span style={{ marginLeft: 'auto', color: '#ff8b92' }}>✗ Wrong</span>}
+                                  </label>
+                                  )
+                                })
+                              ) : (
+                                <div className="quiz-feedback-error">No choices available</div>
+                              )}
+                            </div>
+                          </div>
+                          )
+                        })}
+
+                        {(validated && wrongIds.length > 0) && (
+                          <div className="quiz-feedback-error">❌ Some answers are incorrect. Review the highlighted choices (red = wrong answer).</div>
+                        )}
+                        {!reviewMode ? (
+                          <button className="btn" type="submit" disabled={!ended && !retakeMode}>Submit Answers</button>
+                        ) : (
+                          <button
+                            className="btn secondary"
+                            type="button"
+                            onClick={() => {
+                              setRetakeMode(true)
+                              setEnded(false)
+                              setValidated(false)
+                              setWrongIds([])
+                              setAnswers({})
+                              if (user) clearSavedAnswers(user.id, currentModule.id)
+                            }}
+                          >
+                            Retake Quiz
+                          </button>
+                        )}
+                      </>
+                    )
+                  } catch (err) {
+                    return <div className="quiz-feedback-error">Error rendering quiz: {err.message}</div>
+                  }
+                })()}
+              </form>
+            </div>
+          )
+        } catch (err) {
+          return null
+        }
+      })()}
       {prog.completed[modules.length - 1] && (
-        <div className="card" style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
+        <div className="card course-completed-card">
           <h2 style={{ marginTop: 0 }}>Course Completed</h2>
           <Link className="btn" to="/premium/certificate">Get Certificate →</Link>
         </div>
       )}
-      <p style={{ marginTop: 10, opacity: 0.7 }}>Place your videos at app/public/premiumVideo/premium1.mp4 to premium4.mp4.</p>
+      <p className="video-path-note">Place your videos at app/public/premiumVideo/premium1.mp4 to premium4.mp4.</p>
         </>
       )}
     </div>

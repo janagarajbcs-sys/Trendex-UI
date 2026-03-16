@@ -1,4 +1,4 @@
-export const BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : 'http://localhost:3020/api'
+export const BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : 'http://localhost:4000/api'
 const ADMIN_TOKEN_KEY = 'premium_admin_token'
 
 function getValidAdminToken() {
