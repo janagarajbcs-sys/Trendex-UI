@@ -1,20 +1,39 @@
 .premium-course-iframe {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   border: none;
-  transform: none !important; /* Override any inherited scaling */
+  transform: none; /* Using percentage based zoom for better control responsiveness */
+  transform-origin: center center;
+  pointer-events: auto; /* Ensure interactivity */
 }
 
+/* Base Styles */
 .course-header {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
+}
+
+.access-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .access-active-badge {
   color: var(--brand-accent);
   font-weight: bold;
+}
+
+.access-dates {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .expired-card {
@@ -49,6 +68,7 @@
 .module-nav-item {
   padding: 8px;
   min-width: 140px;
+  transition: all 0.2s ease;
 }
 
 .video-section-card {
@@ -59,7 +79,7 @@
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 56.25%;
+  padding-top: 56.25%; /* 16:9 ratio */
   border-radius: 12px;
   overflow: hidden;
   background: #000;
@@ -84,6 +104,7 @@
 .watch-progress-container {
   max-width: 400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .watch-timer-text {
@@ -109,41 +130,24 @@
 
 .progress-percent-text {
   font-size: 12px;
-  marginTop: 6px;
+  margin-top: 6px;
   opacity: 0.7;
 }
 
 .main-quiz-btn {
+  width: 100%;
   max-width: 300px;
 }
 
 .mark-watched-btn {
+  width: 100%;
   max-width: 300px;
-}
-
-.playback-controls {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.playback-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .video-error {
   text-align: center;
   margin-top: 6px;
   color: #ff8b92;
-}
-
-.video-stats {
-  text-align: center;
-  margin-top: 6px;
-  opacity: 0.85;
 }
 
 .quiz-form {
@@ -179,11 +183,7 @@
 }
 
 .quiz-choice:hover {
-  background: #1a1a1a;
-}
-
-.quiz-choice input {
-  margin: 0;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .quiz-feedback-error {
@@ -200,4 +200,120 @@
 .video-path-note {
   margin-top: 10px;
   opacity: 0.7;
+}
+
+/* Responsive Overrides */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .video-section-card {
+    max-width: 95%;
+  }
+  
+  .premium-course-iframe {
+    width: 230%;
+    height: 230%;
+    top: -65%;
+    left: -65%;
+    transform: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .course-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .module-nav {
+    justify-content: flex-start;
+    padding: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .module-nav-item {
+    min-width: 120px;
+    font-size: 0.9rem;
+  }
+
+  .video-wrapper {
+    border-radius: 8px;
+    padding-top: 65%; /* Taller ratio for mobile to show zoomed content */
+  }
+
+  .premium-course-iframe {
+    width: 220%;
+    height: 220%;
+    top: -60%;
+    left: -60%;
+    transform: none;
+  }
+
+  .watch-progress-container {
+    padding: 0 15px;
+  }
+
+  .quiz-header {
+    font-size: 1.1rem;
+  }
+
+  .quiz-item {
+    padding: 12px;
+  }
+
+  .quiz-choice {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .course-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 5px;
+  }
+
+  .access-info-container {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .course-header h1 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+
+  .access-active-badge {
+    font-size: 0.9rem;
+  }
+
+  .access-dates {
+    font-size: 0.75rem;
+  }
+
+  .video-wrapper {
+    padding-top: 75%; /* Even taller for small screens */
+  }
+
+.premium-course-iframe {
+  position: absolute;
+  width: 170%;
+  height: 170%;
+  top: -35%;
+  left: -35%;
+  border: none;
+}
+
+  .main-quiz-btn, .mark-watched-btn {
+    max-width: 100%;
+  }
+  
+  .expired-card {
+    padding: 20px;
+  }
 }

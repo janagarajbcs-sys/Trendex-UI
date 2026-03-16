@@ -75,6 +75,7 @@ export async function getUsersBackendAsync() {
     createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
     approvedAt: x.approvedAt ? new Date(x.approvedAt).getTime() : null,
     paidAccessUntil: x.paidAccessUntil ? new Date(x.paidAccessUntil).getTime() : null,
+    progress: x.progress || { unlocked: 1, completed: [false, false, false, false] },
   })) : []
   saveUsers(items)
   return items
@@ -120,8 +121,17 @@ export async function loginUserBackend(identifier, password) {
     console.log('[loginUserBackend] Login failed, not ok')
     return null
   }
-  const user = await res.json()
-  console.log('[loginUserBackend] Received user:', user)
+  const rawUser = await res.json()
+  console.log('[loginUserBackend] Received raw user:', rawUser)
+  
+  // Normalize date fields to timestamps
+  const user = {
+    ...rawUser,
+    createdAt: rawUser.createdAt ? new Date(rawUser.createdAt).getTime() : Date.now(),
+    approvedAt: rawUser.approvedAt ? new Date(rawUser.approvedAt).getTime() : null,
+    paidAccessUntil: rawUser.paidAccessUntil ? new Date(rawUser.paidAccessUntil).getTime() : null,
+  }
+  
   try {
     if (user && user.id) {
       // Always convert ID to string for consistency
@@ -132,6 +142,11 @@ export async function loginUserBackend(identifier, password) {
       // Also save the full user object to users list so getCurrentUser() can find it
       const users = getUsers()
       console.log('[loginUserBackend] Current users in store:', users.length)
+      
+      // Save progress if returned
+      if (user.progress) {
+        setProgress(userId, user.progress)
+      }
       
       // Normalize ID comparison to strings
       const idx = users.findIndex((u) => String(u.id) === userId)

@@ -81,12 +81,8 @@ export default function PremiumAdmin() {
       ]),
     )
   }, [nav])
-  useEffect(() => {
-    users.forEach((u) => {
-      getProgressBackend(u.id).catch(() => {})
-    })
-  }, [users.length])
-  const approved = users.filter((u) => u.approved)
+  const approved = users.filter((u) => u.approved && u.videoAccess)
+  const disabledUsers = users.filter((u) => u.approved && !u.videoAccess)
   const pendingUser = users.filter((u) => !u.approved)
   function downloadExcel(filename, headers, rows) {
     const tableHead = `<tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>`
@@ -268,7 +264,7 @@ export default function PremiumAdmin() {
     const counts = Array.from({ length: modules.length }, () => 0)
     let completed = 0
     users.forEach((u) => {
-      const prog = getProgress(u.id)
+      const prog = u.progress || getProgress(u.id)
       if (prog.completed[modules.length - 1]) completed++
       else {
         const st = Math.max(1, Math.min(modules.length, prog.unlocked))
@@ -371,7 +367,7 @@ export default function PremiumAdmin() {
                 <td>{u.leader}</td>
                 <td>
                   {(() => {
-                    const prog = getProgress(u.id)
+                    const prog = u.progress || getProgress(u.id)
                     return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
                   })()}
                 </td>
@@ -397,9 +393,9 @@ export default function PremiumAdmin() {
         </table>
       </div>
 
-      {/* 2. Approved Users */}
+      {/* 2. Approved Users (Video Enabled) */}
       <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Approved Users ({approved.length})</h2>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Approved Users - Video Enabled ({approved.length})</h2>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
@@ -423,14 +419,62 @@ export default function PremiumAdmin() {
                 <td>{u.leader}</td>
                 <td>
                   {(() => {
-                    const prog = getProgress(u.id)
+                    const prog = u.progress || getProgress(u.id)
                     return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
                   })()}
                 </td>
-                <td>{getVideoAccess(u.id) ? 'On' : 'Off'}</td>
+                <td>On</td>
                 <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                  <button className="btn" onClick={() => disable(u.id)}>Disable</button>
-                  <button className="btn" onClick={() => toggleVideos(u.id)}>{getVideoAccess(u.id) ? 'Disable Videos' : 'Enable Videos'}</button>
+                  <button className="btn" onClick={() => disable(u.id)}>Disable User</button>
+                  <button className="btn" onClick={() => toggleVideos(u.id)}>Disable Videos</button>
+                  <button
+                    className="btn secondary"
+                    style={{ background: '#ef4444', color: '#ffffff' }}
+                    onClick={() => deny(u.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 2b. Video Disabled Users */}
+      <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center', color: '#ff8b92' }}>Approved Users - Video Disabled ({disabledUsers.length})</h2>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Team</th>
+              <th>Leader</th>
+              <th>Stage</th>
+              <th>Videos</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {disabledUsers.map((u) => (
+              <tr key={u.id}>
+                <td>{u.name}</td>
+                <td>{u.phone}</td>
+                <td>{u.email}</td>
+                <td>{u.team}</td>
+                <td>{u.leader}</td>
+                <td>
+                  {(() => {
+                    const prog = u.progress || getProgress(u.id)
+                    return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
+                  })()}
+                </td>
+                <td>Off</td>
+                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                  <button className="btn" onClick={() => disable(u.id)}>Disable User</button>
+                  <button className="btn" onClick={() => toggleVideos(u.id)} style={{ background: '#22c55e', color: '#0b1220' }}>Enable Videos</button>
                   <button
                     className="btn secondary"
                     style={{ background: '#ef4444', color: '#ffffff' }}
@@ -448,32 +492,33 @@ export default function PremiumAdmin() {
       {/* 3. Stage Distribution */}
       <div className="card" style={{ marginTop: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: 'center' }}>Stage Distribution</h2>
-        <div style={{ display: 'flex', alignItems: 'end', justifyContent: 'center', gap: 8, height: 180, padding: '12px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 12, height: 200, padding: '12px 0' }}>
           {stats.counts.map((c, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div
+                title={`Video ${i + 1}: ${c}`}
+                style={{
+                  width: 36,
+                  height: `${Math.max(2, Math.round((c / stats.max) * 150))}px`,
+                  background: 'color-mix(in srgb, var(--accent) 30%, transparent)',
+                  borderRadius: '4px 4px 0 0',
+                }}
+              />
+              <span style={{ fontSize: 11, opacity: 0.8, whiteSpace: 'nowrap' }}>V{i + 1}</span>
+            </div>
+          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <div
-              key={i}
-              title={`Video ${i + 1}: ${c}`}
+              title={`Completed: ${stats.completed}`}
               style={{
                 width: 36,
-                height: `${Math.max(2, Math.round((c / stats.max) * 150))}px`,
-                background: 'color-mix(in srgb, var(--accent) 30%, transparent)',
-                borderRadius: 6,
+                height: `${Math.max(2, Math.round((stats.completed / stats.max) * 150))}px`,
+                background: '#22c55e',
+                borderRadius: '4px 4px 0 0',
               }}
             />
-          ))}
-          <div
-            title={`Completed: ${stats.completed}`}
-            style={{
-              width: 36,
-              height: `${Math.max(2, Math.round((stats.completed / stats.max) * 150))}px`,
-              background: '#22c55e',
-              borderRadius: 6,
-            }}
-          />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, fontSize: 12, opacity: 0.85 }}>
-          {modules.map((_, i) => <span key={i}>V{i + 1}</span>)}
-          <span>Done</span>
+            <span style={{ fontSize: 11, opacity: 0.8, whiteSpace: 'nowrap', fontWeight: 'bold', color: '#22c55e' }}>Done</span>
+          </div>
         </div>
         <div style={{ textAlign: 'center', marginTop: 6, opacity: 0.85 }}>
           <span>Total Users: {stats.total}</span>

@@ -1,16 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
-import { getCurrentUser, getProgress, setProgress, modules, getModulesAsync, getQuestionsForModuleAsync, getSavedAnswers, setSavedAnswers, clearSavedAnswers, getVideoAccess, activatePaidAccessBackend, getUsersBackendAsync, setProgressBackend, setSavedAnswersBackend, clearSavedAnswersBackend, verifyModuleAnswersBackend } from '../lib/premium'
+import { getCurrentUser, getProgress, setProgress, modules, getModulesAsync, getQuestionsForModuleAsync, getSavedAnswers, setSavedAnswers, clearSavedAnswers, getVideoAccess, activatePaidAccessBackend, getUsersBackendAsync, setProgressBackend, setSavedAnswersBackend, clearSavedAnswersBackend, verifyModuleAnswersBackend, getProgressBackend, signOut } from '../lib/premium'
 import { Link, useNavigate } from 'react-router-dom'
 import './PremiumCourse.css'
 
 export default function PremiumCourse() {
   const nav = useNavigate()
   const user = getCurrentUser()
-  const initialProg = user ? getProgress(user.id) : null
-  const [modIdx, setModIdx] = useState(() => initialProg ? initialProg.unlocked - 1 : 0)
+  const [prog, setProg] = useState(() => user ? getProgress(user.id) : { unlocked: 1, completed: [false, false, false, false] })
+  const [modIdx, setModIdx] = useState(() => prog ? prog.unlocked - 1 : 0)
   const [courseModules, setCourseModules] = useState(modules)
   const [ended, setEnded] = useState(false)
   const [qs, setQs] = useState([])
+  
+  useEffect(() => {
+    getModulesAsync().then(setCourseModules)
+    if (user) {
+      getProgressBackend(user.id).then(newProg => {
+        setProg(newProg)
+        // If current module is locked in new progress, reset to furthest unlocked
+        if (modIdx >= newProg.unlocked) {
+          setModIdx(newProg.unlocked - 1)
+        }
+      })
+    }
+  }, [])
+  
   const [answers, setAnswers] = useState({})
   const vref = useRef(null)
   const lastTimeRef = useRef(0)
@@ -30,35 +44,38 @@ export default function PremiumCourse() {
   const [watchTimer, setWatchTimer] = useState(0)
   const REQUIRED_WATCH_TIME = 30 // seconds
   function daysLeft(u) {
+    if (!u?.videoAccess) return 0
     const now = Date.now()
-    const paidUntil = u?.paidAccessUntil || null
+    const paidUntil = u?.paidAccessUntil ? new Date(u.paidAccessUntil).getTime() : null
     if (paidUntil && paidUntil > now) return Math.ceil((paidUntil - now) / (24 * 60 * 60 * 1000))
-    const approvedAt = u?.approvedAt || null
+    const approvedAt = u?.approvedAt ? new Date(u.approvedAt).getTime() : null
     if (approvedAt) {
       const end = approvedAt + 7 * 24 * 60 * 60 * 1000
       const diff = end - now
-      return Math.ceil(diff / (24 * 60 * 60 * 1000))
+      return Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)))
     }
     return 0
   }
   function accessActive(u) {
+    // If user is not approved, access is never active
+    if (!u?.approved) return false
+    
+    // Rely primarily on backend videoAccess flag
+    if (u && typeof u.videoAccess === 'boolean') return u.videoAccess
+    
+    // Fallback/Legacy time-based check
     const now = Date.now()
-    const paidUntil = u?.paidAccessUntil || null
+    const paidUntil = u?.paidAccessUntil ? new Date(u.paidAccessUntil).getTime() : null
     if (paidUntil && paidUntil > now) return true
-    const approvedAt = u?.approvedAt || null
+    const approvedAt = u?.approvedAt ? new Date(u.approvedAt).getTime() : null
     if (approvedAt && (approvedAt + 7 * 24 * 60 * 60 * 1000) > now) return true
     return false
   }
-  async function activatePaid() {
-    if (!user?.id) return
-    const updated = await activatePaidAccessBackend(user.id, 70)
-    await getUsersBackendAsync()
-    window.dispatchEvent(new Event('users-updated'))
-  }
+  const WHATSAPP_LINK = "https://wa.me/918012202083?text=i%20am%20ready%20to%20pay%20Rs%20499%20/%205%20usdt%20please%20send%20me%20the%20QR%20or%20payment%20details."
 
-  useEffect(() => {
-    getModulesAsync().then(setCourseModules)
-  }, [])
+  async function activatePaid() {
+    window.open(WHATSAPP_LINK, '_blank')
+  }
 
   useEffect(() => {
     console.log('[PremiumCourse] User effect, user:', user)
@@ -147,8 +164,6 @@ export default function PremiumCourse() {
   }, [modIdx])
   if (!user || !currentModule) return null
 
-  const prog = getProgress(user.id)
-  const unlockedIdx = prog.unlocked - 1
   const active = accessActive(user)
 
   async function submitQuiz(e) {
@@ -157,8 +172,7 @@ export default function PremiumCourse() {
     const finalAnswers = { ...saved, ...answers }
     
     // Check if module was already completed (before saving new answers)
-    const currentProg = getProgress(user.id)
-    const wasCompleted = !!currentProg.completed[modIdx]
+    const wasCompleted = !!prog.completed[modIdx]
     
     const res = await verifyModuleAnswersBackend(courseModules[modIdx].id, finalAnswers)
     const wrong = (res && Array.isArray(res.wrong)) ? res.wrong : []
@@ -182,14 +196,17 @@ export default function PremiumCourse() {
       return
     }
     await setSavedAnswersBackend(user.id, courseModules[modIdx].id, finalAnswers)
-    const prog = getProgress(user.id)
-    prog.completed[modIdx] = true
+    
+    const nextProg = { ...prog }
+    nextProg.completed[modIdx] = true
     if (!wasCompleted) {
-      const target = Math.max(prog.unlocked, modIdx + 2)
-      prog.unlocked = Math.min(target, courseModules.length)
+      const target = Math.max(nextProg.unlocked, modIdx + 2)
+      nextProg.unlocked = Math.min(target, courseModules.length)
     }
-    await setProgressBackend(user.id, prog)
-    if (prog.unlocked - 1 > modIdx) {
+    await setProgressBackend(user.id, nextProg)
+    setProg(nextProg) // Update local state
+    
+    if (nextProg.unlocked - 1 > modIdx) {
       const nextIdx = modIdx + 1
       setModIdx(nextIdx)
       setEnded(false)
@@ -207,13 +224,42 @@ export default function PremiumCourse() {
     }
   }
 
+  function getAccessDates(u) {
+    const approvedAt = u?.approvedAt ? new Date(u.approvedAt).getTime() : null
+    if (!approvedAt) return { start: '-', end: '-' }
+    
+    const formatDate = (ts) => {
+      const d = new Date(ts)
+      const day = String(d.getDate()).padStart(2, '0')
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const year = d.getFullYear()
+      return `${day}/${month}/${year}`
+    }
+    
+    const start = formatDate(approvedAt)
+    
+    const paidUntil = u?.paidAccessUntil ? new Date(u.paidAccessUntil).getTime() : null
+    let endTs = approvedAt + 7 * 24 * 60 * 60 * 1000
+    if (paidUntil && paidUntil > endTs) endTs = paidUntil
+    
+    const end = formatDate(endTs)
+    return { start, end }
+  }
+
   return (
     <div className="app-main" style={{ textAlign: 'center' }}>
       <div className="course-header">
         <h1>Premium Trading Course</h1>
         {active && (
-          <div className="access-active-badge">
-            Access Active: {daysLeft(user)} days remaining
+          <div className="access-info-container">
+            <div className="access-active-badge">
+              Access Active: {daysLeft(user)} days remaining
+            </div>
+            <div className="access-dates">
+              <span>Approved: {getAccessDates(user).start}</span>
+              <span style={{ margin: '0 8px' }}>|</span>
+              <span>Expires: {getAccessDates(user).end}</span>
+            </div>
           </div>
         )}
       </div>
@@ -227,14 +273,14 @@ export default function PremiumCourse() {
             Your course access has expired. Renew your access to continue learning.
           </div>
           <button className="btn" onClick={activatePaid} style={{ marginTop: 10 }}>
-            Renew Access (70 USDT)
+            Renew Access (Rs: 499 / 5 USDT)
           </button>
         </div>
       ) : (
         <>
       <div className="module-nav">
         {courseModules.map((m, i) => {
-          const isUnlocked = i === unlockedIdx
+          const isUnlocked = (i + 1) <= prog.unlocked
           const isCompleted = !!prog.completed[i]
           const status = isCompleted ? 'Completed' : (isUnlocked ? 'Unlocked' : 'Locked')
           const canOpen = isUnlocked || isCompleted
@@ -298,8 +344,7 @@ export default function PremiumCourse() {
           </div>
           <div className="video-controls-row">
             {(() => {
-              const progress = getProgress(user.id)
-              const isCompleted = progress.completed[modIdx]
+              const isCompleted = prog.completed[modIdx]
               const isDirectVideo = currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src))
               const timeRemaining = Math.max(0, REQUIRED_WATCH_TIME - watchTimer)
               const canStartQuiz = videoFullyWatched || isCompleted
@@ -334,10 +379,9 @@ export default function PremiumCourse() {
 
       {/* Quiz Buttons Outside the Video Section */}
       {(getVideoAccess(user.id) || !prog.completed[courseModules.length - 1]) && (
-        <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, position: 'relative', zIndex: 10 }}>
           {(() => {
-            const progress = getProgress(user.id)
-            const isCompleted = progress.completed[modIdx]
+            const isCompleted = prog.completed[modIdx]
             const isDirectVideo = currentModule.src && /\.(mp4|webm|ogg|mov)$/i.test(String(currentModule.src))
             const timeRemaining = Math.max(0, REQUIRED_WATCH_TIME - watchTimer)
             const canStartQuiz = videoFullyWatched || isCompleted
@@ -379,7 +423,7 @@ export default function PremiumCourse() {
 
       {(() => {
         try {
-          const isCompleted = getProgress(user.id).completed[modIdx]
+          const isCompleted = prog.completed[modIdx]
           const showQuiz = isCompleted ? true : ended
           if (!showQuiz) return null
           
@@ -391,7 +435,7 @@ export default function PremiumCourse() {
                 {(() => {
                   try {
                     const saved = user ? getSavedAnswers(user.id, currentModule.id) : {}
-                    const reviewMode = getProgress(user.id).completed[modIdx] && !retakeMode
+                    const reviewMode = prog.completed[modIdx] && !retakeMode
                     
                     if (!qs || qs.length === 0) {
                       return <div className="quiz-feedback-error">Error: No questions loaded. Please refresh the page.</div>
@@ -493,7 +537,14 @@ export default function PremiumCourse() {
           <Link className="btn" to="/premium/certificate">Get Certificate →</Link>
         </div>
       )}
-      <p className="video-path-note">Place your videos at app/public/premiumVideo/premium1.mp4 to premium4.mp4.</p>
+      <p className="video-path-note">Please make an notes of this videos and Q & A,<br />Must needed Knowledge's to Learn more and Earn more,<br /> This section Free to access only for First 7 Days </p>
+      <button 
+        className="btn secondary" 
+        onClick={() => { signOut(); nav('/premium/login') }}
+        style={{ marginTop: 20, marginBottom: 40, padding: '10px 24px' }}
+      >
+        Logout
+      </button>
         </>
       )}
     </div>

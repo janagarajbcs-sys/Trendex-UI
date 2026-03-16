@@ -581,10 +581,28 @@ img, video {
     gap: 8px;
     align-items: center;
     text-align: center;
+    padding: 8px 12px;
   }
   .nav {
-    flex-wrap: wrap;
-    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 4px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+  .nav a {
+    white-space: nowrap;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
   }
   .app-main {
     padding: 12px;
@@ -594,6 +612,7 @@ img, video {
   }
   .brand-link {
     font-size: 1rem;
+    margin-bottom: 4px;
   }
   .card {
     padding: 12px;

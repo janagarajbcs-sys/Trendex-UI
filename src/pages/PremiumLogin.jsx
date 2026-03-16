@@ -6,8 +6,12 @@ export default function PremiumLogin() {
   const [id, setId] = useState('')
   const [pwd, setPwd] = useState('')
   const [err, setErr] = useState('')
+  const [showExpired, setShowExpired] = useState(false)
   const [count, setCount] = useState(0)
   const nav = useNavigate()
+
+  const WHATSAPP_LINK = "https://wa.me/918012202083?text=i%20am%20ready%20to%20pay%20Rs%20499%20/%205%20usdt%20please%20send%20me%20the%20QR%20or%20payment%20details."
+
   useEffect(() => {
     let active = true
     async function loadCount() {
@@ -63,6 +67,13 @@ export default function PremiumLogin() {
         nav('/premium/admin')
         return
       }
+
+      if (user.approved && !user.videoAccess) {
+        console.log('[Login] Video access disabled, showing expired card')
+        setShowExpired(true)
+        return
+      }
+
       console.log('[Login] Login successful, navigating to course')
       // Small delay to ensure localStorage is written
       await new Promise(resolve => setTimeout(resolve, 100))
@@ -80,15 +91,43 @@ export default function PremiumLogin() {
         <div style={{ fontSize: 42, fontWeight: 800, color: 'var(--accent)', textShadow: '0 0 16px rgba(90,224,255,.35)' }}>{count}</div>
         <div style={{ opacity: .8 }}>Registered Users</div>
       </div>
-      <form onSubmit={onSubmit} className="card" style={{ maxWidth: 420, margin: '0 auto', display: 'grid', gap: 10 }}>
-        <input placeholder="Email or Mobile Number" value={id} onChange={(e) => setId(e.target.value)} required style={{ padding: 10, borderRadius: 8 }} />
-        <input placeholder="Password" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} required style={{ padding: 10, borderRadius: 8 }} />
-        <button className="btn" type="submit">Login</button>
-        {!!err && <div style={{ color: '#ff8b92', textAlign: 'center' }}>{err}</div>}
-        <div style={{ textAlign: 'center' }}>
-          <Link className="btn secondary" to="/premium/signup">New here? Sign Up →</Link>
+
+      {showExpired ? (
+        <div className="card" style={{ maxWidth: 420, margin: '0 auto', textAlign: 'center', padding: '30px 20px' }}>
+          <div style={{ fontSize: 24, fontWeight: 'bold', color: '#ef4444', marginBottom: 15 }}>
+            🔒 Access Expired
+          </div>
+          <div style={{ fontSize: 16, marginBottom: 20, opacity: 0.9 }}>
+            Your 7-day free access has expired. Please renew to continue your training.
+          </div>
+          <a 
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noreferrer"
+            className="btn"
+            style={{ display: 'inline-block', width: '100%', marginBottom: 15 }}
+          >
+            Renew Access (Rs: 499 / 5 USDT)
+          </a>
+          <button 
+            className="btn secondary" 
+            onClick={() => setShowExpired(false)}
+            style={{ width: '100%' }}
+          >
+            ← Back to Login
+          </button>
         </div>
-      </form>
+      ) : (
+        <form onSubmit={onSubmit} className="card" style={{ maxWidth: 420, margin: '0 auto', display: 'grid', gap: 10 }}>
+          <input placeholder="Email or Mobile Number" value={id} onChange={(e) => setId(e.target.value)} required style={{ padding: 10, borderRadius: 8 }} />
+          <input placeholder="Password" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} required style={{ padding: 10, borderRadius: 8 }} />
+          <button className="btn" type="submit">Login</button>
+          {!!err && <div style={{ color: '#ff8b92', textAlign: 'center' }}>{err}</div>}
+          <div style={{ textAlign: 'center' }}>
+            <Link className="btn secondary" to="/premium/signup">New here? Sign Up →</Link>
+          </div>
+        </form>
+      )}
     </div>
   )
 }
