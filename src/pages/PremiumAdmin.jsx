@@ -44,10 +44,10 @@ export default function PremiumAdmin() {
   }
   const loading = pending > 0
   useEffect(() => {
-    if (!isAdminLoggedIn()) {
-      nav('/premium/admin-login')
-      return
-    }
+    // if (!isAdminLoggedIn()) {
+    //   nav('/premium/admin-login')
+    //   return
+    // }
     track(
       Promise.all([
         getUsersBackendAsync().then(() => setUsers(getUsers())),

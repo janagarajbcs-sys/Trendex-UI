@@ -35,18 +35,18 @@ export default function PremiumLogin() {
     }
     console.log('[Login] Attempting login with:', identifier)
     
-    if (loginAdmin(identifier, password)) { 
-      console.log('[Login] Admin login success (local)')
-      nav('/premium/admin')
-      return 
-    }
+    // if (loginAdmin(identifier, password)) { 
+    //   console.log('[Login] Admin login success (local)')
+    //   nav('/premium/admin')
+    //   return 
+    // }
     
-    const tok = await loginAdminBackend(identifier, password)
-    if (tok) { 
-      console.log('[Login] Admin login success (backend)')
-      nav('/premium/admin')
-      return 
-    }
+    // const tok = await loginAdminBackend(identifier, password)
+    // if (tok) { 
+    //   console.log('[Login] Admin login success (backend)')
+    //   nav('/premium/admin')
+    //   return 
+    // }
     
     let user = await loginUserBackend(identifier, password)
     console.log('[Login] Backend login result:', user)
@@ -55,8 +55,14 @@ export default function PremiumLogin() {
       user = loginUser(identifier, password)
       console.log('[Login] Local login result:', user)
     }
+    console.log(user,"user");
     
     if (user) {
+      if(user.isAdmin) {
+        console.log('[Login] Admin login successful, navigating to admin dashboard')
+        nav('/premium/admin')
+        return
+      }
       console.log('[Login] Login successful, navigating to course')
       // Small delay to ensure localStorage is written
       await new Promise(resolve => setTimeout(resolve, 100))

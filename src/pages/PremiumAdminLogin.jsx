@@ -11,12 +11,12 @@ export default function PremiumAdminLogin() {
     e.preventDefault()
     const em = email.trim()
     const pw = pwd
-    const okLocal = loginAdmin(em, pw)
-    if (okLocal) { nav('/premium/admin'); return }
-    loginAdminBackend(em, pw).then((token) => {
-      if (token) nav('/premium/admin')
-      else setErr('Invalid admin credentials.')
-    })
+    // const okLocal = loginAdmin(em, pw)
+    // if (okLocal) { nav('/premium/admin'); return }
+    // loginAdminBackend(em, pw).then((token) => {
+    //   if (token) nav('/premium/admin')
+    //   else setErr('Invalid admin credentials.')
+    // })
   }
   return (
     <div style={{ display: 'grid', placeItems: 'center', minHeight: '68vh', padding: 16 }}>
