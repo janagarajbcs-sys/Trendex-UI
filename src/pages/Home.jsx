@@ -33,21 +33,21 @@ export default function Home() {
         widgetRef.current = null
       }
       widgetRef.current = new window.TradingView.widget({
-        container_id: 'tradingview_chart',
-        width: '100%',
-        height: 420,
-        symbol: 'BINANCE:BTCUSDT',
-        interval: '60',
-        timezone: 'Asia/Kolkata',
-        theme: 'dark',
-        style: '1',
-        locale: 'en',
-        toolbar_bg: '#0d1b2a',
-        enable_publishing: false,
-        allow_symbol_change: true,
-        details: true,
-        studies: ['MASimple@tv-basicstudies'],
-      })
+  container_id: 'tradingview_chart',
+  width: '100%',
+  height: 500, // slightly bigger like your HTML
+  symbol: 'BINANCE:BTCUSDT',
+  interval: 'D', // 🔥 changed from 60 → Daily
+  timezone: 'Etc/UTC', // 🔥 from your HTML
+  theme: 'dark',
+  style: '1',
+  locale: 'en',
+  toolbar_bg: '#1b263b', // 🔥 updated color
+  enable_publishing: false,
+  allow_symbol_change: true,
+  details: true,
+  studies: ['MASimple@tv-basicstudies'],
+})
     }
     if (!window.TradingView) {
       const s = document.createElement('script')
@@ -239,7 +239,16 @@ export default function Home() {
       <section style={{ marginBottom: 16 }}>
         <h2 style={{ color: '#cfeef3' }}>Live Crypto Market</h2>
         <div className="card" style={{ overflow: 'hidden', borderRadius: 12 }}>
-          <div id="tradingview_chart" ref={chartRef} style={{ width: '100%', height: 'min(420px, 70vw)' }} />
+          <div
+  id="tradingview_chart"
+  ref={chartRef}
+  style={{
+    width: '100%',
+    height: '500px',
+    borderRadius: '12px',
+    overflow: 'hidden'
+  }}
+/>
         </div>
       </section>
 
