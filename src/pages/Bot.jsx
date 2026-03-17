@@ -51,7 +51,7 @@ export default function Bot() {
 
   return (
     <div>
-      <h1 style={{ color: '#00ddeb' }}>Trading Strategies</h1>
+      <h1 style={{ color: '#00ddeb', textShadow: '0 0 15px rgba(0, 221, 235, 0.4)' }}>Trading Strategies</h1>
       <p>Single subscription gives access to 9 strategies for Both Spot & Futures.<br />Keep your Funds in your Own Binance Wallet(Trendex bot Never Store your Trading Funds).</p>
 
       <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', justifyItems: 'center' }}>
@@ -103,7 +103,7 @@ export default function Bot() {
           background: 'linear-gradient(145deg, #121212, #1a1a1a)'
         }}
       >
-        <h2 style={{ marginTop: 0, color: '#cfeef3' }}>Capital & Returns Calculator</h2>
+        <h2 style={{ marginTop: 0, color: '#2563EB', textShadow: '0 0 12px rgba(37, 99, 235, 0.4)' }}>Capital & Returns Calculator</h2>
         <label style={{ display: 'block', marginTop: 8, textAlign: 'center', color: '#ffffff' }}>
           Enter Capital in INR
           <input
@@ -132,7 +132,7 @@ export default function Bot() {
             <div><strong>Yearly:</strong> USDT {(yearlyRange(usdt)[0]).toFixed(2)} - {(yearlyRange(usdt)[1]).toFixed(2)}</div>
           </div>
         )}
-        <div style={{ marginTop: 10, color: '#2563EB', fontSize: '.9rem', opacity: 0.9 }}>
+        <div style={{ marginTop: 10, color: '#2563EB', fontSize: '.9rem', opacity: 0.9, textShadow: '0 0 10px rgba(37, 99, 235, 0.4)' }}>
           <div>as per the doller price 96 Rs i have calculated.</div>
           <div>Deponds on the market movement <br />The results(returns) will be differ</div>
           <div>so keep your funds atleast for 6 month durations Minimum</div>

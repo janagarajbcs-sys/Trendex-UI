@@ -345,33 +345,33 @@ export default function PremiumAdmin() {
       {/* 1. Pending Users */}
       <div className="card" style={{ overflowX: 'auto', marginBottom: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: 'center' }}>Pending Users ({pendingUser.length})</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem' }}>
+        <table style={{ width: '100%', minWidth: 800, borderCollapse: 'collapse', fontSize: '.9rem' }}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Team</th>
-              <th>Leader</th>
-              <th>Stage</th>
-              <th>Actions</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Phone</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Email</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Team</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Leader</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Stage</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {pendingUser.map((u) => (
               <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.phone}</td>
-                <td>{u.email}</td>
-                <td>{u.team}</td>
-                <td>{u.leader}</td>
-                <td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.name}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.phone}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.email}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.team}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.leader}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>
                   {(() => {
                     const prog = u.progress || getProgress(u.id)
                     return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
                   })()}
                 </td>
-                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                <td style={{ display: 'flex', gap: 6, justifyContent: 'center', whiteSpace: 'nowrap' }}>
                   <button
                     className="btn"
                     style={{ background: '#22c55e', color: '#0b1220', padding: '4px 10px', fontSize: '.8rem', transition: 'transform .15s ease, background-color .15s ease' }}
@@ -396,35 +396,35 @@ export default function PremiumAdmin() {
       {/* 2. Approved Users (Video Enabled) */}
       <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: 'center' }}>Approved Users - Video Enabled ({approved.length})</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Team</th>
-              <th>Leader</th>
-              <th>Stage</th>
-              <th>Videos</th>
-              <th>Actions</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Phone</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Email</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Team</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Leader</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Stage</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Videos</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {approved.map((u) => (
               <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.phone}</td>
-                <td>{u.email}</td>
-                <td>{u.team}</td>
-                <td>{u.leader}</td>
-                <td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.name}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.phone}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.email}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.team}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.leader}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>
                   {(() => {
                     const prog = u.progress || getProgress(u.id)
                     return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
                   })()}
                 </td>
-                <td>On</td>
-                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                <td style={{ whiteSpace: 'nowrap' }}>On</td>
+                <td style={{ display: 'flex', gap: 6, justifyContent: 'center', whiteSpace: 'nowrap' }}>
                   <button className="btn" onClick={() => disable(u.id)}>Disable User</button>
                   <button className="btn" onClick={() => toggleVideos(u.id)}>Disable Videos</button>
                   <button
@@ -444,35 +444,35 @@ export default function PremiumAdmin() {
       {/* 2b. Video Disabled Users */}
       <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: 'center', color: '#ff8b92' }}>Approved Users - Video Disabled ({disabledUsers.length})</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Team</th>
-              <th>Leader</th>
-              <th>Stage</th>
-              <th>Videos</th>
-              <th>Actions</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Phone</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Email</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Team</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Leader</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Stage</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Videos</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {disabledUsers.map((u) => (
               <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.phone}</td>
-                <td>{u.email}</td>
-                <td>{u.team}</td>
-                <td>{u.leader}</td>
-                <td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.name}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.phone}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.email}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.team}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.leader}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>
                   {(() => {
                     const prog = u.progress || getProgress(u.id)
                     return prog.completed[modules.length - 1] ? 'Completed' : `Video ${prog.unlocked}`
                   })()}
                 </td>
-                <td>Off</td>
-                <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                <td style={{ whiteSpace: 'nowrap' }}>Off</td>
+                <td style={{ display: 'flex', gap: 6, justifyContent: 'center', whiteSpace: 'nowrap' }}>
                   <button className="btn" onClick={() => disable(u.id)}>Disable User</button>
                   <button className="btn" onClick={() => toggleVideos(u.id)} style={{ background: '#22c55e', color: '#0b1220' }}>Enable Videos</button>
                   <button
@@ -540,28 +540,28 @@ export default function PremiumAdmin() {
             Export Excel
           </button>
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: 800, borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Mobile</th>
-              <th>Gmail</th>
-              <th>Place</th>
-              <th>Sponsor</th>
-              <th>Source</th>
-              <th>Time</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Mobile</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Gmail</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Place</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Sponsor</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Source</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Time</th>
             </tr>
           </thead>
           <tbody>
             {joins.map((r, i) => (
               <tr key={i}>
-                <td>{r.name}</td>
-                <td>{r.mobile}</td>
-                <td>{r.gmail}</td>
-                <td>{r.place}</td>
-                <td>{r.sponsor}</td>
-                <td>{r.source}</td>
-                <td>{new Date(r.ts).toLocaleString()}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.name}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.mobile}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.gmail}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.place}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.sponsor}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.source}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.ts).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -583,24 +583,24 @@ export default function PremiumAdmin() {
             Export Excel
           </button>
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th>Type</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Message</th>
-              <th>Time</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Type</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Contact</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Message</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Time</th>
             </tr>
           </thead>
           <tbody>
             {complaints.map((r, i) => (
               <tr key={i}>
-                <td>{r.type}</td>
-                <td>{r.name}</td>
-                <td>{r.contact}</td>
-                <td>{r.message}</td>
-                <td>{new Date(r.ts).toLocaleString()}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.type}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.name}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.contact}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r.message}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.ts).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -840,23 +840,23 @@ export default function PremiumAdmin() {
             ) : null}
           </div>
         </form>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem' }}>
+        <div style={{ overflowX: 'auto', marginTop: 12 }}>
+          <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', fontSize: '.9rem' }}>
             <thead>
               <tr>
-                <th>S.No</th>
-                <th>Photo</th>
-                <th>Name</th>
-                <th>Rank Name</th>
-                <th>Location</th>
-                <th>Actions</th>
+                <th style={{ whiteSpace: 'nowrap' }}>S.No</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Photo</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Rank Name</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Location</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {leaders.map((l) => (
                 <tr key={l.id}>
-                  <td>{l.sno}</td>
-                  <td>
+                  <td style={{ whiteSpace: 'nowrap' }}>{l.sno}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     {l.photo ? (
                       <div style={{ width: 42, height: 56, padding: 2, background: '#fff', border: '2px solid #ffffff', borderRadius: 6, display: 'inline-block' }}>
                         <img src={resolvePhoto(l.photo)} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} />
@@ -864,9 +864,9 @@ export default function PremiumAdmin() {
                     ) : '-'}
                   </td>
                   <td style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>{l.name}</td>
-                  <td>{l.title}</td>
-                  <td>{l.loc}</td>
-                  <td style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                  <td style={{ whiteSpace: 'nowrap' }}>{l.title}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>{l.loc}</td>
+                  <td style={{ display: 'flex', gap: 6, justifyContent: 'center', whiteSpace: 'nowrap' }}>
                     <button className="btn" type="button" onClick={() => move(l.id, 'up')}>Up</button>
                     <button className="btn" type="button" onClick={() => move(l.id, 'down')}>Down</button>
                     <button className="btn" type="button" onClick={() => editLeader(l.id)}>Edit</button>

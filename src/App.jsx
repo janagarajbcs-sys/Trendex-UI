@@ -25,6 +25,7 @@ import PremiumAdminLogin from './pages/PremiumAdminLogin.jsx'
 function Layout({ children }) {
   const location = useLocation()
   const [fabOpen, setFabOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [banners, setBanners] = useState([])
   const seg = location.pathname.split('/')[1] || ''
   const theme =
@@ -34,6 +35,12 @@ function Layout({ children }) {
     seg === 'complaint' || seg === 'qanda' ? 'support' :
     seg === 'video' ? 'ai' : 'crypto'
   const joinActive = location.hash === '#join-business'
+
+  // Close menu when location changes
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname, location.hash])
+
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.slice(1)
@@ -90,12 +97,43 @@ function Layout({ children }) {
         <div className="brand">
           <Link to="/" className="brand-link">Trendex AI</Link>
         </div>
-        <nav className="nav">
-          <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/video">Presentation</NavLink>
-          <Link to="/#join-business" className={joinActive ? 'active' : undefined}>Join/Subscribe Now</Link>
-          <NavLink to="/premium">Premium Access</NavLink>
+        <button 
+          className="menu-toggle" 
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {menuOpen ? (
+              <path d="M18 6L6 18M6 6l12 12" />
+            ) : (
+              <>
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </>
+            )}
+          </svg>
+        </button>
+        <nav className={`nav ${menuOpen ? 'open' : ''}`}>
+          <NavLink to="/" end>
+            <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+          </NavLink>
+          <NavLink to="/video">
+            <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><polyline points="10 8 14 12 10 16"/></svg>
+            <span>Presentation</span>
+          </NavLink>
+          <Link to="/#join-business" className={joinActive ? 'active' : undefined}>
+            <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Join/Subscribe Now</span>
+          </Link>
+          <NavLink to="/premium">
+            <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            <span>Premium Access</span>
+          </NavLink>
         </nav>
+        {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)}></div>}
       </header>
       {location.pathname === '/' && <BannerSlider items={banners} />}
       <div className={`fab-enquiry ${fabOpen ? 'open' : ''}`}>

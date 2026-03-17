@@ -22,6 +22,8 @@ export default function Home() {
   const holdTimer = useRef(null)
   const [showAllLeaders, setShowAllLeaders] = useState(false)
   const [events, setEvents] = useState([])
+  const [screen, setScreen] = useState(window.innerWidth);
+
 
   // Load TradingView widget
   useEffect(() => {
@@ -187,6 +189,16 @@ export default function Home() {
     }
   }, [])
 
+useEffect(() => {
+  const handleResize = () => setScreen(window.innerWidth);
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
+const isMobile = screen < 480;
+const isTablet = screen >= 480 && screen < 768;
+const isLaptop = screen >= 768;
+
   // useEffect(() => {
   //   async function loadEvents() {
   //     try {
@@ -254,41 +266,107 @@ export default function Home() {
 
       <section style={{ marginBottom: 16 }}>
         <h2 style={{ color: '#cfeef3' }}>Top Market Updates</h2>
-        <div className="card">
-          {!market ? (
-            <p style={{ color: '#ff8b92' }}>Unable to load market data.</p>
-          ) : (
-            <>
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 10, fontSize: '0.95rem' }}>
-                <thead>
-                  <tr>
-                    <th>Asset</th>
-                    <th>Price (USD)</th>
-                    <th>Price (INR)</th>
-                    <th>24h</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ['Bitcoin (BTC)', market.btc],
-                    ['Ethereum (ETH)', market.eth],
-                    ['Binance Coin (BNB)', market.bnb],
-                  ].map(([label, coin]) => (
-                    <tr key={label}>
-                      <td>{label}</td>
-                      <td>${Number(coin.usd).toLocaleString()}</td>
-                      <td>₹{Number(coin.inr).toLocaleString()}</td>
-                      <td style={{ color: coin.usd_24h_change >= 0 ? '#4ef58b' : '#ff8b92', fontWeight: 700 }}>
-                        {coin.usd_24h_change.toFixed(2)}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p style={{ marginTop: 10, color: '#9fb3bf' }}>Current Market Last updated: <span>{updated || '--'}</span></p>
-            </>
-          )}
-        </div>
+       <div
+  className="card"
+  style={{
+    padding: isMobile ? 8 : 15,
+    borderRadius: 10,
+    background: "#f9fafb",
+    width: "100%",
+  }}
+>
+  {!market ? (
+    <p style={{ color: "#ff8b92", fontSize: isMobile ? "0.8rem" : "1rem" }}>
+      Unable to load market data.
+    </p>
+  ) : (
+    <>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          marginTop: 10,
+          tableLayout: "fixed",
+        }}
+      >
+        <thead>
+          <tr>
+            <th style={{ fontSize: isMobile ? "0.65rem" : "0.9rem" }}>Asset</th>
+            <th style={{ fontSize: isMobile ? "0.65rem" : "0.9rem" }}>USD</th>
+            <th style={{ fontSize: isMobile ? "0.65rem" : "0.9rem" }}>INR</th>
+            <th style={{ fontSize: isMobile ? "0.65rem" : "0.9rem" }}>24h</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {[
+            ["Bitcoin (BTC)", market.btc],
+            ["Ethereum (ETH)", market.eth],
+            ["Binance Coin (BNB)", market.bnb],
+          ].map(([label, coin]) => (
+            <tr key={label}>
+              
+              {/* Asset */}
+              <td
+                style={{
+                  fontSize: isMobile ? "0.65rem" : "0.9rem",
+                  fontWeight: 600,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {isMobile ? label.split(" ")[0] : label}
+              </td>
+
+              {/* USD */}
+              <td
+                style={{
+                  fontSize: isMobile ? "0.65rem" : "0.9rem",
+                }}
+              >
+                ${Number(coin.usd).toLocaleString()}
+              </td>
+
+              {/* INR */}
+              <td
+                style={{
+                  fontSize: isMobile ? "0.65rem" : "0.9rem",
+                }}
+              >
+                ₹{Number(coin.inr).toLocaleString()}
+              </td>
+
+              {/* 24h */}
+              <td
+                style={{
+                  fontSize: isMobile ? "0.65rem" : "0.9rem",
+                  color:
+                    coin.usd_24h_change >= 0 ? "#4ef58b" : "#ff8b92",
+                  fontWeight: 700,
+                }}
+              >
+                {coin.usd_24h_change.toFixed(2)}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Footer */}
+      <p
+        style={{
+          marginTop: 10,
+          color: "#9fb3bf",
+          fontSize: isMobile ? "0.7rem" : "0.9rem",
+          textAlign: "center",
+        }}
+      >
+        Last updated: <span>{updated || "--"}</span>
+      </p>
+    </>
+  )}
+</div>
       </section>
 
       <section style={{ display: 'grid', gap: 12 }}>
@@ -304,76 +382,152 @@ export default function Home() {
           <h2>💰 Share and Earn</h2>
           <Link className="btn" to="/sharing">View Details →</Link>
         </div>
-        <div className="card">
-          <h2 style={{ color: '#111827' }}>Top Team Leaders — Performance Board</h2>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'center' }}>S.No</th>
-                  <th style={{ textAlign: 'center' }}>Photo</th>
-                  <th>Name</th>
-                  <th>Rank Name</th>
-                  <th>Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(showAllLeaders ? leaders : leaders.slice(0, 10)).map((l, i) => (
-                  <tr key={l.id || `${l.name}-${i}`}>
-                    <td style={{ textAlign: 'center', fontWeight: 700 }}>{l.sno ?? (i + 1)}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      {l.photo ? (
-                        <div
-                          style={{ width: 42, height: 56, padding: 2, background: '#fff', border: '2px solid #ffffff', borderRadius: 6, display: 'inline-block' }}
-                          onMouseDown={() => startHold(resolvePhoto(l.photo))}
-                          onMouseUp={cancelHold}
-                          onMouseLeave={cancelHold}
-                          onTouchStart={() => startHold(resolvePhoto(l.photo))}
-                          onTouchEnd={cancelHold}
-                          onTouchCancel={cancelHold}
-                        >
-                          <img
-                            src={resolvePhoto(l.photo)}
-                            alt={l.name || 'leader'}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }}
-                          />
-                        </div>
-                      ) : '-'}
-                    </td>
-                    <td style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220, fontWeight: 800, fontSize: '.9rem' }}>{l.name}</td>
-                    <td style={{ fontSize: '.82rem' }}>{l.title}</td>
-                    <td style={{ fontSize: '.72rem' }}>{l.loc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {leaders.length > 10 && !showAllLeaders && (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
-                <button
-                  className="btn secondary"
-                  onClick={() => setShowAllLeaders(true)}
-                  style={{ padding: '5px 10px', fontSize: '.85rem' }}
+        <div
+  className="card"
+  style={{
+    padding: isMobile ? 10 : 15,
+    borderRadius: 10,
+    background: "#f9fafb",
+  }}
+>
+  <h2
+    style={{
+      color: "#111827",
+      fontSize: isMobile ? "1rem" : isTablet ? "1.2rem" : "1.4rem",
+      textAlign: "center",
+    }}
+  >
+    Top Team Leaders — Performance Board
+  </h2>
+
+  <div style={{ overflowX: "auto" }}>
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        minWidth: isMobile ? 450 : isTablet ? 550 : "100%",
+      }}
+    >
+      <thead>
+        <tr>
+          <th style={{ textAlign: "center", fontSize: isMobile ? "0.7rem" : "0.9rem" }}>S.No</th>
+          <th style={{ textAlign: "center", fontSize: isMobile ? "0.7rem" : "0.9rem" }}>Photo</th>
+          <th style={{ fontSize: isMobile ? "0.7rem" : "0.9rem" }}>Name</th>
+          <th style={{ fontSize: isMobile ? "0.7rem" : "0.9rem" }}>Rank Name</th>
+          <th style={{ fontSize: isMobile ? "0.7rem" : "0.9rem" }}>Location</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {(showAllLeaders ? leaders : leaders.slice(0, 10)).map((l, i) => (
+          <tr key={l.id || `${l.name}-${i}`}>
+            
+            <td style={{ textAlign: "center", fontWeight: 700 }}>
+              {l.sno ?? i + 1}
+            </td>
+
+            <td style={{ textAlign: "center" }}>
+              {l.photo ? (
+                <div
+                  style={{
+                    width: isMobile ? 28 : isTablet ? 36 : 50,
+                    height: isMobile ? 38 : isTablet ? 48 : 65,
+                    padding: 2,
+                    background: "#fff",
+                    borderRadius: 6,
+                    display: "inline-block",
+                  }}
+                  onMouseDown={() => startHold(resolvePhoto(l.photo))}
+                  onMouseUp={cancelHold}
+                  onMouseLeave={cancelHold}
+                  onTouchStart={() => startHold(resolvePhoto(l.photo))}
+                  onTouchEnd={cancelHold}
                 >
-                  More
-                </button>
-              </div>
-            )}
-            {leaders.length > 10 && showAllLeaders && (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
-                <button
-                  className="btn secondary"
-                  onClick={() => setShowAllLeaders(false)}
-                  style={{ padding: '5px 10px', fontSize: '.85rem' }}
-                >
-                  Less
-                </button>
-              </div>
-            )}
-            {leaders.length === 0 && (
-              <div style={{ padding: '10px 14px', opacity: 0.85 }}>No leaders yet. Add entries in the admin dashboard.</div>
-            )}
-          </div>
-        </div>
+                  <img
+                    src={resolvePhoto(l.photo)}
+                    alt={l.name || "leader"}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: 4,
+                    }}
+                  />
+                </div>
+              ) : "-"}
+            </td>
+
+            <td
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: isMobile ? 100 : 180,
+                fontWeight: 800,
+                fontSize: isMobile ? "0.7rem" : "0.9rem",
+              }}
+            >
+              {l.name}
+            </td>
+
+            <td
+              style={{
+                fontSize: isMobile ? "0.7rem" : "0.85rem",
+              }}
+            >
+              {l.title}
+            </td>
+
+            <td
+              style={{
+                fontSize: isMobile ? "0.65rem" : "0.8rem",
+              }}
+            >
+              {l.loc}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    {/* Buttons */}
+    {leaders.length > 10 && !showAllLeaders && (
+      <div style={{ textAlign: "center", padding: 8 }}>
+        <button
+          className="btn secondary"
+          onClick={() => setShowAllLeaders(true)}
+          style={{
+            padding: isMobile ? "4px 8px" : "6px 12px",
+            fontSize: isMobile ? "0.75rem" : "0.9rem",
+          }}
+        >
+          More
+        </button>
+      </div>
+    )}
+
+    {leaders.length > 10 && showAllLeaders && (
+      <div style={{ textAlign: "center", padding: 8 }}>
+        <button
+          className="btn secondary"
+          onClick={() => setShowAllLeaders(false)}
+          style={{
+            padding: isMobile ? "4px 8px" : "6px 12px",
+            fontSize: isMobile ? "0.75rem" : "0.9rem",
+          }}
+        >
+          Less
+        </button>
+      </div>
+    )}
+
+    {leaders.length === 0 && (
+      <div style={{ padding: "10px 14px", fontSize: isMobile ? "0.8rem" : "1rem" }}>
+        No leaders yet. Add entries in admin dashboard.
+      </div>
+    )}
+  </div>
+</div>
         {preview && (
           <div
             onClick={() => setPreview('')}
