@@ -153,7 +153,7 @@ function Layout({ children }) {
           <a
             className="fab-item whatsapp has-tip"
             data-tip="WhatsApp"
-            href="https://wa.me/918012202083"
+            href="https://chat.whatsapp.com/DkSDuHPd8G0JhHQbhxmGD8"
             target="_blank"
             rel="noreferrer"
             role="menuitem"
@@ -182,13 +182,13 @@ function Layout({ children }) {
           <a className="social-link yt has-tip" data-tip="YouTube" href="https://youtube.com/@aitrendex_tamil?si=iCJ9LMew-CB0hvki" target="_blank" rel="noreferrer" aria-label="YouTube">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.2 0 12 0 12s0 3.8.5 5.8a3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-2 .5-5.8.5-5.8s0-3.8-.5-5.8zM9.6 15.5V8.5L15.8 12l-6.2 3.5z"/></svg>
           </a>
-          <a className="social-link ig has-tip" data-tip="Instagram" href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram">
+          <a className="social-link ig has-tip" data-tip="Instagram" rel="noreferrer" aria-label="Instagram">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm0 2h10c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3zm5 3.5A5.5 5.5 0 1 0 17.5 13 5.5 5.5 0 0 0 12 7.5zm0 2A3.5 3.5 0 1 1 8.5 13 3.5 3.5 0 0 1 12 9.5zm5.2-2.8a1.2 1.2 0 1 0 1.2 1.2a1.2 1.2 0 0 0-1.2-1.2z"/></svg>
           </a>
-          <a className="social-link fb has-tip" data-tip="Facebook" href="https://www.facebook.com/" target="_blank" rel="noreferrer" aria-label="Facebook">
+          <a className="social-link fb has-tip" data-tip="Facebook" rel="noreferrer" aria-label="Facebook">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22 12A10 10 0 1 0 10.5 21.9v-6.9H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9c1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12H16l-.5 3h-2v6.9A10 10 0 0 0 22 12"/></svg>
           </a>
-          <a className="social-link wa has-tip" data-tip="WhatsApp Channel" href="https://wa.me/918012202083" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+          <a className="social-link wa has-tip" data-tip="WhatsApp Channel" href="https://whatsapp.com/channel/0029Vb61xAa6hENzJrPD5h1K" target="_blank" rel="noreferrer" aria-label="WhatsApp">
             <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.49c-.26-.13-1.52-.75-1.75-.84c-.23-.09-.4-.13-.57.13c-.17.26-.65.84-.8 1.01c-.15.17-.3.19-.56.06c-.26-.13-1.1-.41-2.1-1.31c-.78-.69-1.3-1.55-1.45-1.81c-.15-.26-.02-.4.11-.53c.11-.11.26-.3.4-.45c.13-.15.17-.26.26-.43c.09-.17.04-.32-.02-.45c-.06-.13-.57-1.37-.78-1.88c-.2-.48-.4-.42-.57-.43h-.49c-.17 0-.45.06-.69.32c-.23.26-.9.88-.9 2.14c0 1.26.92 2.48 1.05 2.65c.13.17 1.82 2.78 4.41 3.9c.62.27 1.1.43 1.48.55c.62.2 1.18.17 1.63.1c.5-.07 1.52-.62 1.73-1.22c.21-.6.21-1.11.15-1.22c-.06-.11-.23-.17-.49-.3zM26.88 5.12C24.15 2.39 20.66 1 16.99 1C8.83 1 2.38 7.45 2.38 15.61c0 2.71.71 5.35 2.07 7.67L2 31l7.93-2.33c2.27 1.24 4.84 1.9 7.05 1.9h.01c8.16 0 14.61-6.45 14.61-14.61c0-3.66-1.39-7.15-4.12-9.88z"/></svg>
           </a>
         </div>

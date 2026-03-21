@@ -566,7 +566,7 @@ const isLaptop = screen >= 768;
           </div>
         ) : null}
         <div className="card">
-          <h2>Frequently asked 100's of Questions & Answers</h2>
+          <h2>100+ Frequently Asked Questions</h2>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Link className="btn secondary" to="/qanda/company">Trendex Basics</Link>
             <Link className="btn secondary" to="/qanda/trading">Trading</Link>
@@ -576,7 +576,7 @@ const isLaptop = screen >= 768;
           </div>
         </div>
         <div className="card" id="join-business" style={{ textAlign: 'left' }}>
-          <h2 style={{ marginTop: 0, textAlign: 'center' }}>Need to start/join this Business</h2>
+          <h2 style={{ marginTop: 0, textAlign: 'center' }}>Interested in starting/joining this Business</h2>
           <form
             onSubmit={async (e) => {
               e.preventDefault()

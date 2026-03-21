@@ -42,7 +42,7 @@ export default function PremiumCourse() {
   const [videoFullyWatched, setVideoFullyWatched] = useState(false)
   const watchTimerRef = useRef(0)
   const [watchTimer, setWatchTimer] = useState(0)
-  const REQUIRED_WATCH_TIME = 30 // seconds
+  const REQUIRED_WATCH_TIME = 1200 // seconds
   function daysLeft(u) {
     if (!u?.videoAccess) return 0
     const now = Date.now()
@@ -406,15 +406,6 @@ export default function PremiumCourse() {
                 >
                   {isCompleted ? '↺ Retake Quiz' : 'Start Lesson Quiz'}
                 </button>
-                
-                {!isCompleted && !isDirectVideo && !videoFullyWatched && watchTimer > 0 && (
-                  <button
-                    className="btn secondary mark-watched-btn"
-                    onClick={() => setVideoFullyWatched(true)}
-                  >
-                    ✓ Mark as Watched
-                  </button>
-                )}
               </>
             )
           })()}

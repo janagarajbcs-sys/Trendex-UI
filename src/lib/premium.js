@@ -83,7 +83,7 @@ export async function getUsersBackendAsync() {
 export async function approveUserBackend(id) {
   const updated = await api.put(`/auth/approve/${encodeURIComponent(id)}`, undefined, { admin: true }).catch(() => null)
   if (!updated) return approveUser(id)
-  const users = getUsers().map((u) => (u.id === id ? { ...u, approved: true } : u))
+  const users = getUsers().map((u) => (u.id === id ? { ...u, approved: true, videoAccess: true } : u))
   saveUsers(users)
   return updated
 }
