@@ -638,7 +638,7 @@ const isLaptop = screen >= 768;
             <label>
               <input
                 required
-                placeholder="Sponsor name / mobile number"
+                placeholder="Sponsor name / Referred by"
                 value={sponsor}
                 onChange={(e) => setSponsor(e.target.value)}
                 style={{ width: '100%', marginTop: 6, padding: 10, borderRadius: 8 }}
