@@ -638,7 +638,7 @@ const isLaptop = screen >= 768;
             <label>
               <input
                 required
-                placeholder="Sponsor name / Referred by"
+                placeholder="COUPON_CODE (referred by)"
                 value={sponsor}
                 onChange={(e) => setSponsor(e.target.value)}
                 style={{ width: '100%', marginTop: 6, padding: 10, borderRadius: 8 }}
