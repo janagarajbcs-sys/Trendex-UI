@@ -5,7 +5,7 @@ export default function Bot() {
   const [inr, setInr] = useState('')
   const [usdt, setUsdt] = useState('')
   const calculatorRef = useRef(null)
-  const rate = 96
+  const rate = 97
   const bots = [
     { name: 'DCA Bot', desc: ['Only runs in top BTC/USDT pair (Spot)', 'Algorithm-based averaging', 'Buys in downtrend, sells on uptrend'], capital: '15 USDT' },
     { name: 'Nero Bot', desc: ['Full averaging system (Futures)', 'Top 25 pairs', '≈95% accuracy / 5% risk'], capital: '700 USDT' },
@@ -14,8 +14,6 @@ export default function Bot() {
     { name: 'Candles Bot', desc: ['Light averaging (Futures)', 'Top 50 pairs', '≈85% accuracy / 15% risk'], capital: '200 USDT' },
     { name: 'Zeno 3x Bot', desc: ['Minimum version of Zeno', 'Top 50 pairs', '≈80% accuracy / 20% risk'], capital: '100 USDT' },
     { name: 'Candle 3x Bot', desc: ['Minimum version of Candles', 'Top 50 pairs', '≈85% accuracy / 15% risk'], capital: '100 USDT' },
-    { name: 'Alpha Bot', desc: ['Scalping trading system', 'Top 50 pairs', '≈80% accuracy / 20% risk'], capital: '300 USDT' },
-    { name: 'Trendex Bot', desc: ['Runs Spot (500 USDT) & Futures (500 USDT)', 'Algorithm + AI', 'Profit in both downtrend & uptrend'], capital: '1000 USDT' },
   ]
   const formatINR = (n) => Number(n).toLocaleString('en-IN')
   const monthlyRange = (x) => [x * 0.10, x * 0.40]
@@ -52,7 +50,7 @@ export default function Bot() {
   return (
     <div>
       <h1 style={{ color: '#00ddeb', textShadow: '0 0 15px rgba(0, 221, 235, 0.4)' }}>Trading Strategies</h1>
-      <p>Single subscription gives access to 9 strategies for Both Spot & Futures.<br />Keep your Funds in your Own Binance Wallet(Trendex bot Never Store your Trading Funds).</p>
+      <p>Single subscription gives access to 7 strategies for Both Spot & Futures.<br />Keep your Funds in your Own Binance Wallet(Trendex bot Never Store your Trading Funds).</p>
 
       <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', justifyItems: 'center' }}>
         {bots.map((b) => (
@@ -133,7 +131,7 @@ export default function Bot() {
           </div>
         )}
         <div style={{ marginTop: 10, color: '#2563EB', fontSize: '.9rem', opacity: 0.9, textShadow: '0 0 10px rgba(37, 99, 235, 0.4)' }}>
-          <div>as per the doller price 96 Rs i have calculated.</div>
+          <div>as per the doller price 97 Rs i have calculated.</div>
           <div>Deponds on the market movement <br />The results(returns) will be differ</div>
           <div>so keep your funds atleast for 6 month durations Minimum</div>
         </div>

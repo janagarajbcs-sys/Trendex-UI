@@ -153,7 +153,7 @@ function Layout({ children }) {
           <a
             className="fab-item whatsapp has-tip"
             data-tip="WhatsApp"
-            href="https://chat.whatsapp.com/DkSDuHPd8G0JhHQbhxmGD8"
+            href="https://chat.whatsapp.com/JzznVDAlnsPImIlws2p3Ig"
             target="_blank"
             rel="noreferrer"
             role="menuitem"

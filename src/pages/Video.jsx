@@ -15,7 +15,7 @@ export default function Video() {
         {/* Responsive Video */}
         <div className="video-container">
           <iframe
-            src="https://iframe.mediadelivery.net/play/615839/9b655ee4-cf57-4122-8cdd-e9e946719f7d"
+            src="https://iframe.mediadelivery.net/play/615839/b4c25acb-c8ac-4e0b-8f7a-8176fcf6cd8e"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
             allowFullScreen
             className="video-iframe"

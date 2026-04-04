@@ -235,7 +235,7 @@ const isLaptop = screen >= 768;
     <div>
       <section className="card" style={{ marginBottom: 16 }}>
         <h1 style={{ color: '#00ddeb', margin: 6 }}>AI Trendex - Tamil(Support & Guide)</h1>
-        <h3>Automated Cryptocurrency Trading with 9 strategies</h3>
+        <h3>Automated Cryptocurrency Trading with 7 strategies</h3>
         <p>The first real-time spot & futures bots with AI-driven risk management.</p>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginTop: 12 }}>
           <a className="btn" href="https://aitrendex.com/" target="_blank" rel="noreferrer">Visit Trendex Website</a>
@@ -657,6 +657,7 @@ const isLaptop = screen >= 768;
                 <option value="youtube">YouTube</option>
                 <option value="instagram">Instagram</option>
                 <option value="telegram">Telegram</option>
+              <option value="My Friend">My Friend</option>
               </select>
             </label>
             <label>

@@ -15,7 +15,7 @@ export default function SharingCashback() {
         {/* Video Frame */}
         <div className="video-frame">
           <iframe
-            src="https://iframe.mediadelivery.net/play/615839/b8957b74-f2a1-44bb-8d0a-2a23e1f7f600"
+            src="https://iframe.mediadelivery.net/play/615839/fa9a0fab-432a-4f80-a190-1482348e5208"
             loading="lazy"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
