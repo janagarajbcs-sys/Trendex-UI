@@ -21,6 +21,8 @@ import PremiumCourse from './pages/PremiumCourse.jsx'
 import PremiumAdmin from './pages/PremiumAdmin.jsx'
 import PremiumCertificate from './pages/PremiumCertificate.jsx'
 import PremiumAdminLogin from './pages/PremiumAdminLogin.jsx'
+import Terms from './pages/Terms.jsx'
+import Privacy from './pages/Privacy.jsx'
 
 function Layout({ children }) {
   const location = useLocation()
@@ -192,7 +194,7 @@ function Layout({ children }) {
             <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.49c-.26-.13-1.52-.75-1.75-.84c-.23-.09-.4-.13-.57.13c-.17.26-.65.84-.8 1.01c-.15.17-.3.19-.56.06c-.26-.13-1.1-.41-2.1-1.31c-.78-.69-1.3-1.55-1.45-1.81c-.15-.26-.02-.4.11-.53c.11-.11.26-.3.4-.45c.13-.15.17-.26.26-.43c.09-.17.04-.32-.02-.45c-.06-.13-.57-1.37-.78-1.88c-.2-.48-.4-.42-.57-.43h-.49c-.17 0-.45.06-.69.32c-.23.26-.9.88-.9 2.14c0 1.26.92 2.48 1.05 2.65c.13.17 1.82 2.78 4.41 3.9c.62.27 1.1.43 1.48.55c.62.2 1.18.17 1.63.1c.5-.07 1.52-.62 1.73-1.22c.21-.6.21-1.11.15-1.22c-.06-.11-.23-.17-.49-.3zM26.88 5.12C24.15 2.39 20.66 1 16.99 1C8.83 1 2.38 7.45 2.38 15.61c0 2.71.71 5.35 2.07 7.67L2 31l7.93-2.33c2.27 1.24 4.84 1.9 7.05 1.9h.01c8.16 0 14.61-6.45 14.61-14.61c0-3.66-1.39-7.15-4.12-9.88z"/></svg>
           </a>
         </div>
-        <div>© 2026 Trendex · <span>All rights reserved</span></div>
+        <div>© 2026 Trendex · <Link to="/terms" style={{ color: 'var(--neon)', textDecoration: 'none' }}>Terms</Link> · <Link to="/privacy" style={{ color: 'var(--neon)', textDecoration: 'none' }}>Privacy</Link> · <span>All rights reserved</span></div>
       </footer>
     </div>
   )
@@ -230,6 +232,8 @@ export default function App() {
         <Route path="/qanda/refer" element={<QARefer />} />
         <Route path="/qanda/pricing" element={<QAPricing />} />
         <Route path="/qanda/support" element={<QASupport />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
