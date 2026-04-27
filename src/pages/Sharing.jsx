@@ -63,6 +63,7 @@ export default function Sharing() {
         >
           Trading
         </Link>
+        <Link to="/#join-business" className="btn">Join/Subscribe Now →</Link>
       </div>
       
     </div>

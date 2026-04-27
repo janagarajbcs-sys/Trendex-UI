@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { getLeaders, getLeadersAsync, getEvents, getEventsAsync, submitJoinResponse } from '../lib/premium'
+import { getLeaders, getLeadersAsync, getEvents, getEventsAsync, submitJoinResponse, getAchievements, getAchievementsAsync } from '../lib/premium'
 import EventSlider from '../components/EventSlider.jsx'
+import AchievementSlider from '../components/AchievementSlider.jsx'
+import RegisterPopup from '../components/RegisterPopup.jsx'
 
 export default function Home() {
   const location = useLocation()
@@ -18,6 +20,7 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false)
   const [leaders, setLeaders] = useState([])
   console.log('leaders', leaders)
+  const [achievements, setAchievements] = useState([])
   const [preview, setPreview] = useState('')
   const holdTimer = useRef(null)
   const [showAllLeaders, setShowAllLeaders] = useState(false)
@@ -168,7 +171,19 @@ export default function Home() {
         setLeaders([])
       }
     }
+    async function loadAchievements() {
+      try {
+        let list = await getAchievementsAsync()
+        if (!Array.isArray(list) || list.length === 0) {
+          list = getAchievements()
+        }
+        setAchievements(list || [])
+      } catch {
+        setAchievements([])
+      }
+    }
     load()
+    loadAchievements()
     const onStorage = (e) => {
       if (e.key === 'leaders') load()
     }
@@ -382,6 +397,9 @@ const isLaptop = screen >= 768;
           <h2>💰 Share and Earn</h2>
           <Link className="btn" to="/sharing">View Details →</Link>
         </div>
+
+        <AchievementSlider achievements={achievements} />
+
         <div
   className="card"
   style={{
@@ -704,6 +722,9 @@ const isLaptop = screen >= 768;
           <Link className="btn" to="/premium">Go to Premium →</Link>
         </div>
       </section>
+      
+      {/* Registration Popup for New Users */}
+      <RegisterPopup />
     </div>
   )
 }

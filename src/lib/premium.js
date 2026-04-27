@@ -726,6 +726,62 @@ export function clearLeaders() {
   saveLeaders([])
 }
 
+// --- Achievements ---
+const ACHIEVEMENTS_KEY = 'achievements'
+export function getAchievements() {
+  const v = localStorage.getItem(ACHIEVEMENTS_KEY)
+  return v ? JSON.parse(v) : []
+}
+export async function getAchievementsAsync() {
+  try {
+    const res = await api.get('/achievements')
+    const list = res || []
+    const normalized = list.map((x) => ({
+      id: x.id,
+      sno: Number(x.sno),
+      image: x.image || '',
+    })).sort((a, b) => a.sno - b.sno)
+    saveAchievements(normalized)
+    return normalized
+  } catch {
+    return getAchievements()
+  }
+}
+export function saveAchievements(items) {
+  const arr = Array.isArray(items) ? items.slice() : []
+  arr.sort((a, b) => (Number(a.sno || 0) - Number(b.sno || 0)))
+  localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(arr))
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('achievements-updated', { detail: arr }))
+    }
+  } catch (e) { void e }
+}
+export async function addAchievementBackend(fd) {
+  try {
+    await api.post('/achievements', fd, { admin: true })
+    return await getAchievementsAsync()
+  } catch {
+    return getAchievements()
+  }
+}
+export async function deleteAchievementBackend(id) {
+  try {
+    await api.del(`/achievements/${encodeURIComponent(id)}`, { admin: true })
+    return await getAchievementsAsync()
+  } catch {
+    return getAchievements()
+  }
+}
+export async function moveAchievementBackend(id, direction) {
+  try {
+    await api.put('/achievements/move', { id, direction }, { admin: true })
+    return await getAchievementsAsync()
+  } catch {
+    return getAchievements()
+  }
+}
+
 const BANNERS_KEY = 'banners'
 export function getBanners() {
   const v = localStorage.getItem(BANNERS_KEY)

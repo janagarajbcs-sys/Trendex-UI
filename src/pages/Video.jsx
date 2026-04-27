@@ -29,7 +29,7 @@ export default function Video() {
       </div>
 
       {/* Buttons */}
-      <div className="buttons-container">
+      <div className="buttons-container" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
         <Link className="btn" to="/bot">
           Trading Strategies
         </Link>
@@ -40,6 +40,10 @@ export default function Video() {
 
         <Link className="btn secondary" to="/sharing/cashback">
           Cashback Offer
+        </Link>
+
+        <Link className="btn" to="/#join-business" style={{ background: '#22C55E' }}>
+          Join/Subscribe Now →
         </Link>
       </div>
     </div>
