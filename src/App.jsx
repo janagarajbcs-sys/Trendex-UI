@@ -2,6 +2,7 @@ import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import './App.css'
 import BannerSlider from './components/BannerSlider.jsx'
+import RegisterPopup from './components/RegisterPopup.jsx'
 import { getBannersAsync } from './lib/premium'
 import Home from './pages/Home.jsx'
 import Bot from './pages/Bot.jsx'
@@ -179,6 +180,7 @@ function Layout({ children }) {
         </div>
       </div>
       <main className="app-main">{children}</main>
+      <RegisterPopup />
       <footer className="app-footer">
         <div className="social-bar" aria-label="Social links">
           <a className="social-link yt has-tip" data-tip="YouTube" href="https://youtube.com/@aitrendex_tamil?si=iCJ9LMew-CB0hvki" target="_blank" rel="noreferrer" aria-label="YouTube">

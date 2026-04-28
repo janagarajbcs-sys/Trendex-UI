@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import { submitJoinResponse } from '../lib/premium'
+import { submitJoinResponse, getCurrentUser } from '../lib/premium'
+
+const SKIP_COUNT_KEY = 'register_popup_skip_count'
+const SKIPPED_AT_KEY = 'register_popup_skipped_at'
 
 export default function RegisterPopup() {
   const [showPopup, setShowPopup] = useState(false)
@@ -18,7 +21,17 @@ export default function RegisterPopup() {
   const showPopupAfterDelay = (delayMs) => {
     return setTimeout(() => {
       const hasRegistered = localStorage.getItem('user_joined_business')
-      if (!hasRegistered) {
+      // Check if user is logged in with premium access
+      const currentUser = getCurrentUser()
+      // Check if popup was skipped and can show once more
+      const skipCount = parseInt(localStorage.getItem(SKIP_COUNT_KEY) || '0')
+      const skippedAt = localStorage.getItem(SKIPPED_AT_KEY)
+      const canShowAfterSkip = skipCount === 1 && skippedAt && (Date.now() - parseInt(skippedAt)) < 10 * 60 * 1000 // Within 10 min of skip
+      
+      if (!hasRegistered && !currentUser) {
+        setShowPopup(true)
+      } else if (canShowAfterSkip && !hasRegistered && !currentUser) {
+        // Allow showing once after skip
         setShowPopup(true)
       }
     }, delayMs)
@@ -27,8 +40,10 @@ export default function RegisterPopup() {
   useEffect(() => {
     // Check if user has already registered in this session or device
     const hasRegistered = localStorage.getItem('user_joined_business')
+    // Check if user is logged in with premium access
+    const currentUser = getCurrentUser()
 
-    if (!hasRegistered) {
+    if (!hasRegistered && !currentUser) {
       // Show popup after 30 seconds initially
       const timer = showPopupAfterDelay(30000)
       return () => clearTimeout(timer)
@@ -44,9 +59,15 @@ export default function RegisterPopup() {
   const closePopup = () => {
     setShowPopup(false)
     
-    // If user closed without submitting, show again after 5 minutes
+    // If user closed without submitting, track skip and show again after 5 minutes (once only)
     const hasRegistered = localStorage.getItem('user_joined_business')
-    if (!hasRegistered) {
+    const currentUser = getCurrentUser()
+    const skipCount = parseInt(localStorage.getItem(SKIP_COUNT_KEY) || '0')
+    
+    if (!hasRegistered && !currentUser && skipCount < 1) {
+      // Track that user skipped, allow one more show after 5 minutes
+      localStorage.setItem(SKIP_COUNT_KEY, '1')
+      localStorage.setItem(SKIPPED_AT_KEY, Date.now().toString())
       showPopupAfterDelay(5 * 60 * 1000) // 5 minutes = 300,000 ms
     }
   }
@@ -67,6 +88,9 @@ export default function RegisterPopup() {
     if (ok) {
       setSubmitted(true)
       localStorage.setItem('user_joined_business', 'true')
+      // Clear skip tracking on successful submission
+      localStorage.removeItem(SKIP_COUNT_KEY)
+      localStorage.removeItem(SKIPPED_AT_KEY)
       setTimeout(() => {
         setShowPopup(false)
       }, 2000)
@@ -86,7 +110,6 @@ export default function RegisterPopup() {
         justifyContent: 'center',
         zIndex: 100000,
         padding: isMobile ? '0' : '20px',
-        overflowY: 'auto',
         backdropFilter: 'blur(6px)',
         animation: 'fadeIn 0.4s ease-out',
       }}
@@ -94,17 +117,16 @@ export default function RegisterPopup() {
       <div
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fbff 100%)',
-          borderRadius: isMobile ? '0' : '24px',
-          padding: isMobile ? '40px 20px' : '40px',
-          maxWidth: '540px',
+          borderRadius: isMobile ? '0' : '16px',
+          padding: isMobile ? '20px 14px' : '24px',
+          maxWidth: '420px',
           width: '100%',
-          minHeight: isMobile ? '100vh' : 'auto',
+          maxHeight: '70vh',
           boxShadow: '0 25px 50px -12px rgba(30, 58, 138, 0.25)',
           border: isMobile ? 'none' : '1px solid rgba(37, 99, 235, 0.2)',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
           animation: 'slideUp 0.5s ease-out',
         }}
       >
@@ -113,15 +135,15 @@ export default function RegisterPopup() {
           onClick={closePopup}
           style={{
             position: 'absolute',
-            top: '20px',
-            right: '20px',
+            top: '12px',
+            right: '12px',
             background: '#eff6ff',
             border: 'none',
             color: '#3b82f6',
-            width: '36px',
-            height: '36px',
+            width: '28px',
+            height: '28px',
             borderRadius: '999px',
-            fontSize: '16px',
+            fontSize: '14px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -144,32 +166,32 @@ export default function RegisterPopup() {
           ✕
         </button>
 
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <h2 style={{ 
             color: '#1e3a8a', 
-            fontSize: isMobile ? '1.8rem' : '2.2rem', 
-            margin: '0 0 12px 0', 
+            fontSize: isMobile ? '1.4rem' : '1.6rem', 
+            margin: '0 0 8px 0', 
             fontWeight: '800',
             letterSpacing: '-0.02em'
           }}>
             Join AI Trendex Business 🚀
           </h2>
-          <p style={{ color: '#475569', fontSize: '1.05rem', lineHeight: '1.6', maxWidth: '400px', margin: '0 auto' }}>
+          <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: '1.4', maxWidth: '340px', margin: '0 auto' }}>
             Enter your details to join our elite AI-powered trading community.
           </p>
         </div>
 
         {submitted ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ fontSize: '72px', marginBottom: '24px', animation: 'scaleUp 0.5s ease-out' }}>✅</div>
-            <h3 style={{ color: '#059669', fontSize: '1.75rem', fontWeight: '800', marginBottom: '8px' }}>Success!</h3>
-            <p style={{ color: '#475569', fontSize: '1.1rem' }}>Your registration is received. We'll be in touch soon.</p>
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px', animation: 'scaleUp 0.5s ease-out' }}>✅</div>
+            <h3 style={{ color: '#059669', fontSize: '1.25rem', fontWeight: '800', marginBottom: '6px' }}>Success!</h3>
+            <p style={{ color: '#475569', fontSize: '0.9rem' }}>Your registration is received. We'll be in touch soon.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '20px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Full Name</label>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Full Name</label>
                 <input
                   required
                   placeholder="John Doe"
@@ -177,19 +199,19 @@ export default function RegisterPopup() {
                   onChange={(e) => setName(e.target.value)}
                   style={{ 
                     width: '100%', 
-                    padding: '14px 18px', 
-                    borderRadius: '14px', 
+                    padding: '10px 14px', 
+                    borderRadius: '10px', 
                     background: '#ffffff', 
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Mobile Number</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Mobile Number</label>
                 <input
                   required
                   placeholder="10-digit number"
@@ -200,12 +222,12 @@ export default function RegisterPopup() {
                   maxLength={10}
                   style={{ 
                     width: '100%', 
-                    padding: '14px 18px', 
-                    borderRadius: '14px', 
+                    padding: '10px 14px', 
+                    borderRadius: '10px', 
                     background: '#ffffff', 
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
@@ -213,8 +235,8 @@ export default function RegisterPopup() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.9rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Gmail ID</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Gmail ID</label>
               <input
                 required
                 type="email"
@@ -224,21 +246,21 @@ export default function RegisterPopup() {
                 pattern="^[a-zA-Z0-9._%+-]+@gmail\\.com$"
                 style={{ 
                   width: '100%', 
-                  padding: '14px 18px', 
-                  borderRadius: '14px', 
+                  padding: '10px 14px', 
+                  borderRadius: '10px', 
                   background: '#ffffff', 
                   border: '1.5px solid #e2e8f0',
                   color: '#0f172a',
-                  fontSize: '1rem',
+                  fontSize: '0.9rem',
                   transition: 'all 0.2s',
                   boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                 }}
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Coupon Code</label>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Coupon Code</label>
                 <input
                   required
                   placeholder="Referral Code"
@@ -246,31 +268,31 @@ export default function RegisterPopup() {
                   onChange={(e) => setSponsor(e.target.value)}
                   style={{ 
                     width: '100%', 
-                    padding: '14px 18px', 
-                    borderRadius: '14px', 
+                    padding: '10px 14px', 
+                    borderRadius: '10px', 
                     background: '#ffffff', 
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Source</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Source</label>
                 <select
                   required
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
                   style={{ 
                     width: '100%', 
-                    padding: '14px 18px', 
-                    borderRadius: '14px', 
+                    padding: '10px 14px', 
+                    borderRadius: '10px', 
                     background: '#ffffff', 
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                     cursor: 'pointer'
@@ -287,8 +309,8 @@ export default function RegisterPopup() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.9rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Requirement Message</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Requirement Message</label>
               <textarea
                 required
                 rows={2}
@@ -297,12 +319,12 @@ export default function RegisterPopup() {
                 onChange={(e) => setMessage(e.target.value)}
                 style={{ 
                   width: '100%', 
-                  padding: '14px 18px', 
-                  borderRadius: '14px', 
+                  padding: '10px 14px', 
+                  borderRadius: '10px', 
                   background: '#ffffff', 
                   border: '1.5px solid #e2e8f0',
                   color: '#0f172a',
-                  fontSize: '1rem',
+                  fontSize: '0.9rem',
                   resize: 'none',
                   transition: 'all 0.2s',
                   boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
@@ -315,14 +337,14 @@ export default function RegisterPopup() {
               type="submit"
               disabled={loading || !name || !mobile || !email || !sponsor || !source || !message}
               style={{ 
-                padding: '18px', 
-                fontSize: '1.15rem', 
+                padding: '14px', 
+                fontSize: '1rem', 
                 fontWeight: '800',
-                marginTop: '10px',
+                marginTop: '8px',
                 background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
                 color: '#ffffff',
                 border: 'none',
-                borderRadius: '16px',
+                borderRadius: '12px',
                 cursor: 'pointer',
                 boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
                 opacity: (loading || !name || !mobile || !email || !sponsor || !source || !message) ? 0.6 : 1,
