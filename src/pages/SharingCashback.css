@@ -43,11 +43,9 @@
   margin-top: 12px;
 }
 
-
 /* ---------------- MOBILE ZOOM ---------------- */
 
 @media (max-width: 768px) {
-
   .video-frame iframe {
     width: 220%;
     height: 220%;
@@ -60,19 +58,15 @@
     font-size: 0.85rem;
     padding: 7px 12px;
   }
-
 }
-
 
 /* ---------------- LAPTOP / DESKTOP ZOOM ---------------- */
 
 @media (min-width: 769px) {
-
   .video-frame iframe {
     width: 250%;
     height: 250%;
     top: -75%;
     left: -75%;
   }
-
 }

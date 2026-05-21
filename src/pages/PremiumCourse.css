@@ -209,7 +209,7 @@
   .video-section-card {
     max-width: 95%;
   }
-  
+
   .premium-course-iframe {
     width: 230%;
     height: 230%;
@@ -300,19 +300,20 @@
     padding-top: 75%; /* Even taller for small screens */
   }
 
-.premium-course-iframe {
-  position: absolute;
-  width: 170%;
-  height: 170%;
-  top: -35%;
-  left: -35%;
-  border: none;
-}
+  .premium-course-iframe {
+    position: absolute;
+    width: 170%;
+    height: 170%;
+    top: -35%;
+    left: -35%;
+    border: none;
+  }
 
-  .main-quiz-btn, .mark-watched-btn {
+  .main-quiz-btn,
+  .mark-watched-btn {
     max-width: 100%;
   }
-  
+
   .expired-card {
     padding: 20px;
   }

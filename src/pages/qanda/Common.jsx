@@ -1,23 +1,41 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function QASection({ title, items = [] }) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState('');
   const list = query
     ? items.filter((x) => {
-        const t = query.trim().toLowerCase()
-        return x.q.toLowerCase().includes(t) || x.a.toLowerCase().includes(t)
+        const t = query.trim().toLowerCase();
+        return x.q.toLowerCase().includes(t) || x.a.toLowerCase().includes(t);
       })
-    : items
+    : items;
   return (
     <div>
       <h1 style={{ color: '#00ddeb' }}>{title}</h1>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 12 }}>
-        <Link className="btn secondary" to="/qanda/company">Trendex Basics</Link>
-        <Link className="btn secondary" to="/qanda/trading">Trading</Link>
-        <Link className="btn secondary" to="/qanda/refer">Referral</Link>
-        <Link className="btn secondary" to="/qanda/pricing">Payments</Link>
-        <Link className="btn secondary" to="/qanda/support">Support</Link>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          marginBottom: 12,
+        }}
+      >
+        <Link className="btn secondary" to="/qanda/company">
+          Trendex Basics
+        </Link>
+        <Link className="btn secondary" to="/qanda/trading">
+          Trading
+        </Link>
+        <Link className="btn secondary" to="/qanda/refer">
+          Referral
+        </Link>
+        <Link className="btn secondary" to="/qanda/pricing">
+          Payments
+        </Link>
+        <Link className="btn secondary" to="/qanda/support">
+          Support
+        </Link>
       </div>
       <div className="card" style={{ marginBottom: 12 }}>
         <input
@@ -42,5 +60,5 @@ export default function QASection({ title, items = [] }) {
         )}
       </div>
     </div>
-  )
+  );
 }

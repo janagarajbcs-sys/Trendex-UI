@@ -1,80 +1,83 @@
-import { useEffect, useState } from 'react'
-import { submitJoinResponse, getCurrentUser } from '../lib/premium'
+import { useEffect, useState } from 'react';
+import { submitJoinResponse, getCurrentUser } from '../lib/premium';
 
-const SKIP_COUNT_KEY = 'register_popup_skip_count'
-const SKIPPED_AT_KEY = 'register_popup_skipped_at'
+const SKIP_COUNT_KEY = 'register_popup_skip_count';
+const SKIPPED_AT_KEY = 'register_popup_skipped_at';
 
 export default function RegisterPopup() {
-  const [showPopup, setShowPopup] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 480)
-  
+  const [showPopup, setShowPopup] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 480);
+
   // Form states
-  const [name, setName] = useState('')
-  const [mobile, setMobile] = useState('')
-  const [email, setEmail] = useState('')
-  const [sponsor, setSponsor] = useState('')
-  const [source, setSource] = useState('')
-  const [message, setMessage] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [name, setName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
+  const [sponsor, setSponsor] = useState('');
+  const [source, setSource] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const showPopupAfterDelay = (delayMs) => {
     return setTimeout(() => {
-      const hasRegistered = localStorage.getItem('user_joined_business')
+      const hasRegistered = localStorage.getItem('user_joined_business');
       // Check if user is logged in with premium access
-      const currentUser = getCurrentUser()
+      const currentUser = getCurrentUser();
       // Check if popup was skipped and can show once more
-      const skipCount = parseInt(localStorage.getItem(SKIP_COUNT_KEY) || '0')
-      const skippedAt = localStorage.getItem(SKIPPED_AT_KEY)
-      const canShowAfterSkip = skipCount === 1 && skippedAt && (Date.now() - parseInt(skippedAt)) < 10 * 60 * 1000 // Within 10 min of skip
-      
+      const skipCount = parseInt(localStorage.getItem(SKIP_COUNT_KEY) || '0');
+      const skippedAt = localStorage.getItem(SKIPPED_AT_KEY);
+      const canShowAfterSkip =
+        skipCount === 1 &&
+        skippedAt &&
+        Date.now() - parseInt(skippedAt) < 10 * 60 * 1000; // Within 10 min of skip
+
       if (!hasRegistered && !currentUser) {
-        setShowPopup(true)
+        setShowPopup(true);
       } else if (canShowAfterSkip && !hasRegistered && !currentUser) {
         // Allow showing once after skip
-        setShowPopup(true)
+        setShowPopup(true);
       }
-    }, delayMs)
-  }
+    }, delayMs);
+  };
 
   useEffect(() => {
     // Check if user has already registered in this session or device
-    const hasRegistered = localStorage.getItem('user_joined_business')
+    const hasRegistered = localStorage.getItem('user_joined_business');
     // Check if user is logged in with premium access
-    const currentUser = getCurrentUser()
+    const currentUser = getCurrentUser();
 
     if (!hasRegistered && !currentUser) {
       // Show popup after 30 seconds initially
-      const timer = showPopupAfterDelay(30000)
-      return () => clearTimeout(timer)
+      const timer = showPopupAfterDelay(30000);
+      return () => clearTimeout(timer);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 480)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    const handleResize = () => setIsMobile(window.innerWidth < 480);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const closePopup = () => {
-    setShowPopup(false)
-    
+    setShowPopup(false);
+
     // If user closed without submitting, track skip and show again after 5 minutes (once only)
-    const hasRegistered = localStorage.getItem('user_joined_business')
-    const currentUser = getCurrentUser()
-    const skipCount = parseInt(localStorage.getItem(SKIP_COUNT_KEY) || '0')
-    
+    const hasRegistered = localStorage.getItem('user_joined_business');
+    const currentUser = getCurrentUser();
+    const skipCount = parseInt(localStorage.getItem(SKIP_COUNT_KEY) || '0');
+
     if (!hasRegistered && !currentUser && skipCount < 1) {
       // Track that user skipped, allow one more show after 5 minutes
-      localStorage.setItem(SKIP_COUNT_KEY, '1')
-      localStorage.setItem(SKIPPED_AT_KEY, Date.now().toString())
-      showPopupAfterDelay(5 * 60 * 1000) // 5 minutes = 300,000 ms
+      localStorage.setItem(SKIP_COUNT_KEY, '1');
+      localStorage.setItem(SKIPPED_AT_KEY, Date.now().toString());
+      showPopupAfterDelay(5 * 60 * 1000); // 5 minutes = 300,000 ms
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     const ok = await submitJoinResponse({
       name,
       mobile,
@@ -83,21 +86,21 @@ export default function RegisterPopup() {
       sponsor,
       source,
       message,
-    })
-    setLoading(false)
+    });
+    setLoading(false);
     if (ok) {
-      setSubmitted(true)
-      localStorage.setItem('user_joined_business', 'true')
+      setSubmitted(true);
+      localStorage.setItem('user_joined_business', 'true');
       // Clear skip tracking on successful submission
-      localStorage.removeItem(SKIP_COUNT_KEY)
-      localStorage.removeItem(SKIPPED_AT_KEY)
+      localStorage.removeItem(SKIP_COUNT_KEY);
+      localStorage.removeItem(SKIPPED_AT_KEY);
       setTimeout(() => {
-        setShowPopup(false)
-      }, 2000)
+        setShowPopup(false);
+      }, 2000);
     }
-  }
+  };
 
-  if (!showPopup) return null
+  if (!showPopup) return null;
 
   return (
     <div
@@ -153,65 +156,125 @@ export default function RegisterPopup() {
             boxShadow: '0 2px 8px rgba(59, 130, 246, 0.1)',
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = '#dbeafe'
-            e.target.style.color = '#1e40af'
-            e.target.style.transform = 'rotate(90deg)'
+            e.target.style.background = '#dbeafe';
+            e.target.style.color = '#1e40af';
+            e.target.style.transform = 'rotate(90deg)';
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = '#eff6ff'
-            e.target.style.color = '#3b82f6'
-            e.target.style.transform = 'rotate(0deg)'
+            e.target.style.background = '#eff6ff';
+            e.target.style.color = '#3b82f6';
+            e.target.style.transform = 'rotate(0deg)';
           }}
         >
           ✕
         </button>
 
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <h2 style={{ 
-            color: '#1e3a8a', 
-            fontSize: isMobile ? '1.4rem' : '1.6rem', 
-            margin: '0 0 8px 0', 
-            fontWeight: '800',
-            letterSpacing: '-0.02em'
-          }}>
+          <h2
+            style={{
+              color: '#1e3a8a',
+              fontSize: isMobile ? '1.4rem' : '1.6rem',
+              margin: '0 0 8px 0',
+              fontWeight: '800',
+              letterSpacing: '-0.02em',
+            }}
+          >
             Join AI Trendex Business 🚀
           </h2>
-          <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: '1.4', maxWidth: '340px', margin: '0 auto' }}>
+          <p
+            style={{
+              color: '#475569',
+              fontSize: '0.9rem',
+              lineHeight: '1.4',
+              maxWidth: '340px',
+              margin: '0 auto',
+            }}
+          >
             Enter your details to join our elite AI-powered trading community.
           </p>
         </div>
 
         {submitted ? (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px', animation: 'scaleUp 0.5s ease-out' }}>✅</div>
-            <h3 style={{ color: '#059669', fontSize: '1.25rem', fontWeight: '800', marginBottom: '6px' }}>Success!</h3>
-            <p style={{ color: '#475569', fontSize: '0.9rem' }}>Your registration is received. We'll be in touch soon.</p>
+            <div
+              style={{
+                fontSize: '48px',
+                marginBottom: '16px',
+                animation: 'scaleUp 0.5s ease-out',
+              }}
+            >
+              ✅
+            </div>
+            <h3
+              style={{
+                color: '#059669',
+                fontSize: '1.25rem',
+                fontWeight: '800',
+                marginBottom: '6px',
+              }}
+            >
+              Success!
+            </h3>
+            <p style={{ color: '#475569', fontSize: '0.9rem' }}>
+              Your registration is received. We'll be in touch soon.
+            </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '14px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Full Name</label>
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: 'grid', gap: '14px' }}
+          >
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                gap: '14px',
+              }}
+            >
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+              >
+                <label
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#1e3a8a',
+                    marginLeft: '4px',
+                  }}
+                >
+                  Full Name
+                </label>
                 <input
                   required
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  style={{ 
-                    width: '100%', 
-                    padding: '10px 14px', 
-                    borderRadius: '10px', 
-                    background: '#ffffff', 
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: '#ffffff',
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
                     fontSize: '0.9rem',
                     transition: 'all 0.2s',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Mobile Number</label>
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+              >
+                <label
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#1e3a8a',
+                    marginLeft: '4px',
+                  }}
+                >
+                  Mobile Number
+                </label>
                 <input
                   required
                   placeholder="10-digit number"
@@ -220,23 +283,34 @@ export default function RegisterPopup() {
                   inputMode="numeric"
                   pattern="^[0-9]{10}$"
                   maxLength={10}
-                  style={{ 
-                    width: '100%', 
-                    padding: '10px 14px', 
-                    borderRadius: '10px', 
-                    background: '#ffffff', 
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: '#ffffff',
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
                     fontSize: '0.9rem',
                     transition: 'all 0.2s',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                   }}
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Gmail ID</label>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+            >
+              <label
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  color: '#1e3a8a',
+                  marginLeft: '4px',
+                }}
+              >
+                Gmail ID
+              </label>
               <input
                 required
                 type="email"
@@ -244,58 +318,86 @@ export default function RegisterPopup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 pattern="^[a-zA-Z0-9._%+-]+@gmail\\.com$"
-                style={{ 
-                  width: '100%', 
-                  padding: '10px 14px', 
-                  borderRadius: '10px', 
-                  background: '#ffffff', 
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  background: '#ffffff',
                   border: '1.5px solid #e2e8f0',
                   color: '#0f172a',
                   fontSize: '0.9rem',
                   transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                 }}
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Coupon Code</label>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                gap: '14px',
+              }}
+            >
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+              >
+                <label
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#1e3a8a',
+                    marginLeft: '4px',
+                  }}
+                >
+                  Coupon Code
+                </label>
                 <input
                   required
                   placeholder="Referral Code"
                   value={sponsor}
                   onChange={(e) => setSponsor(e.target.value)}
-                  style={{ 
-                    width: '100%', 
-                    padding: '10px 14px', 
-                    borderRadius: '10px', 
-                    background: '#ffffff', 
-                    border: '1.5px solid #e2e8f0',
-                    color: '#0f172a',
-                    fontSize: '0.9rem',
-                    transition: 'all 0.2s',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-                  }}
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Source</label>
-                <select
-                  required
-                  value={source}
-                  onChange={(e) => setSource(e.target.value)}
-                  style={{ 
-                    width: '100%', 
-                    padding: '10px 14px', 
-                    borderRadius: '10px', 
-                    background: '#ffffff', 
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: '#ffffff',
                     border: '1.5px solid #e2e8f0',
                     color: '#0f172a',
                     fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                    cursor: 'pointer'
+                  }}
+                />
+              </div>
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+              >
+                <label
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#1e3a8a',
+                    marginLeft: '4px',
+                  }}
+                >
+                  Source
+                </label>
+                <select
+                  required
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    color: '#0f172a',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                    cursor: 'pointer',
                   }}
                 >
                   <option value="">Select Source</option>
@@ -309,25 +411,36 @@ export default function RegisterPopup() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e3a8a', marginLeft: '4px' }}>Requirement Message</label>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+            >
+              <label
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  color: '#1e3a8a',
+                  marginLeft: '4px',
+                }}
+              >
+                Requirement Message
+              </label>
               <textarea
                 required
                 rows={2}
                 placeholder="Tell us about your requirements..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                style={{ 
-                  width: '100%', 
-                  padding: '10px 14px', 
-                  borderRadius: '10px', 
-                  background: '#ffffff', 
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  background: '#ffffff',
                   border: '1.5px solid #e2e8f0',
                   color: '#0f172a',
                   fontSize: '0.9rem',
                   resize: 'none',
                   transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                 }}
               />
             </div>
@@ -335,10 +448,18 @@ export default function RegisterPopup() {
             <button
               className="btn"
               type="submit"
-              disabled={loading || !name || !mobile || !email || !sponsor || !source || !message}
-              style={{ 
-                padding: '14px', 
-                fontSize: '1rem', 
+              disabled={
+                loading ||
+                !name ||
+                !mobile ||
+                !email ||
+                !sponsor ||
+                !source ||
+                !message
+              }
+              style={{
+                padding: '14px',
+                fontSize: '1rem',
                 fontWeight: '800',
                 marginTop: '8px',
                 background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
@@ -347,24 +468,35 @@ export default function RegisterPopup() {
                 borderRadius: '12px',
                 cursor: 'pointer',
                 boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
-                opacity: (loading || !name || !mobile || !email || !sponsor || !source || !message) ? 0.6 : 1,
+                opacity:
+                  loading ||
+                  !name ||
+                  !mobile ||
+                  !email ||
+                  !sponsor ||
+                  !source ||
+                  !message
+                    ? 0.6
+                    : 1,
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px'
+                gap: '10px',
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
-                  e.target.style.transform = 'translateY(-3px)'
-                  e.target.style.boxShadow = '0 15px 30px -5px rgba(37, 99, 235, 0.5)'
-                  e.target.style.filter = 'brightness(1.1)'
+                  e.target.style.transform = 'translateY(-3px)';
+                  e.target.style.boxShadow =
+                    '0 15px 30px -5px rgba(37, 99, 235, 0.5)';
+                  e.target.style.filter = 'brightness(1.1)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)'
-                e.target.style.boxShadow = '0 10px 25px -5px rgba(37, 99, 235, 0.4)'
-                e.target.style.filter = 'brightness(1)'
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow =
+                  '0 10px 25px -5px rgba(37, 99, 235, 0.4)';
+                e.target.style.filter = 'brightness(1)';
               }}
             >
               {loading ? 'Processing...' : 'Register Now →'}
@@ -405,6 +537,5 @@ export default function RegisterPopup() {
         }
       `}</style>
     </div>
-  )
+  );
 }
-

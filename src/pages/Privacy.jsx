@@ -4,7 +4,12 @@ export default function Privacy() {
       <h1 style={{ color: '#00ddeb' }}>Privacy Policy</h1>
       <div className="card">
         <h2>1. Introduction</h2>
-        <p>Trendex AI ("we", "us", or "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
+        <p>
+          Trendex AI ("we", "us", or "our") respects your privacy and is
+          committed to protecting your personal information. This Privacy Policy
+          explains how we collect, use, disclose, and safeguard your information
+          when you use our website and services.
+        </p>
 
         <h2>2. Information We Collect</h2>
         <h3>Personal Information</h3>
@@ -41,7 +46,10 @@ export default function Privacy() {
         </ul>
 
         <h2>4. Information Sharing</h2>
-        <p>We do not sell, trade, or otherwise transfer your personal information to third parties except:</p>
+        <p>
+          We do not sell, trade, or otherwise transfer your personal information
+          to third parties except:
+        </p>
         <ul>
           <li>With your explicit consent</li>
           <li>To trusted service providers who assist our operations</li>
@@ -50,7 +58,11 @@ export default function Privacy() {
         </ul>
 
         <h2>5. Data Security</h2>
-        <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. This includes:</p>
+        <p>
+          We implement appropriate technical and organizational measures to
+          protect your personal information against unauthorized access,
+          alteration, disclosure, or destruction. This includes:
+        </p>
         <ul>
           <li>Encryption of sensitive data</li>
           <li>Secure server infrastructure</li>
@@ -70,28 +82,55 @@ export default function Privacy() {
         </ul>
 
         <h2>7. Cookies and Tracking</h2>
-        <p>We use cookies and similar technologies to enhance your experience, analyze usage, and provide personalized content. You can control cookie settings through your browser preferences.</p>
+        <p>
+          We use cookies and similar technologies to enhance your experience,
+          analyze usage, and provide personalized content. You can control
+          cookie settings through your browser preferences.
+        </p>
 
         <h2>8. Third-Party Services</h2>
-        <p>Our service integrates with cryptocurrency exchanges and payment processors. These third parties have their own privacy policies, and we encourage you to review them.</p>
+        <p>
+          Our service integrates with cryptocurrency exchanges and payment
+          processors. These third parties have their own privacy policies, and
+          we encourage you to review them.
+        </p>
 
         <h2>9. Data Retention</h2>
-        <p>We retain your information for as long as necessary to provide our services and comply with legal obligations. You can request data deletion at any time.</p>
+        <p>
+          We retain your information for as long as necessary to provide our
+          services and comply with legal obligations. You can request data
+          deletion at any time.
+        </p>
 
         <h2>10. International Data Transfers</h2>
-        <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for such transfers.</p>
+        <p>
+          Your information may be transferred to and processed in countries
+          other than your own. We ensure appropriate safeguards are in place for
+          such transfers.
+        </p>
 
         <h2>11. Children's Privacy</h2>
-        <p>Our services are not intended for children under 18. We do not knowingly collect personal information from children under 18.</p>
+        <p>
+          Our services are not intended for children under 18. We do not
+          knowingly collect personal information from children under 18.
+        </p>
 
         <h2>12. Changes to This Policy</h2>
-        <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on our website.</p>
+        <p>
+          We may update this Privacy Policy from time to time. We will notify
+          you of any material changes by posting the new policy on our website.
+        </p>
 
         <h2>13. Contact Us</h2>
-        <p>If you have questions about this Privacy Policy or our data practices, please contact us through our support channels.</p>
+        <p>
+          If you have questions about this Privacy Policy or our data practices,
+          please contact us through our support channels.
+        </p>
 
-        <p><em>Last updated: April 2026</em></p>
+        <p>
+          <em>Last updated: April 2026</em>
+        </p>
       </div>
     </div>
-  )
+  );
 }

@@ -1,16 +1,13 @@
-import { Link } from "react-router-dom";
-import "./video.css";
+import { Link } from 'react-router-dom';
+import './video.css';
 
 export default function Video() {
   return (
     <div className="video-page-container">
-
       {/* Video Container */}
       <div className="video-section-wrapper">
         {/* Title inside video section */}
-        <h1 className="video-title">
-          Plan Presentation
-        </h1>
+        <h1 className="video-title">Plan Presentation</h1>
 
         {/* Responsive Video */}
         <div className="video-container">
@@ -23,13 +20,21 @@ export default function Video() {
         </div>
 
         <p className="video-note">
-          Please Watch this full video to understand how to earn in Tamil Language
+          Please Watch this full video to understand how to earn in Tamil
+          Language
         </p>
-
       </div>
 
       {/* Buttons */}
-      <div className="buttons-container" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div
+        className="buttons-container"
+        style={{
+          display: 'flex',
+          gap: 10,
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+        }}
+      >
         <Link className="btn" to="/bot">
           Trading Strategies
         </Link>
@@ -42,7 +47,11 @@ export default function Video() {
           Cashback Offer
         </Link>
 
-        <Link className="btn" to="/#join-business" style={{ background: '#22C55E' }}>
+        <Link
+          className="btn"
+          to="/#join-business"
+          style={{ background: '#22C55E' }}
+        >
           Join/Subscribe Now →
         </Link>
       </div>

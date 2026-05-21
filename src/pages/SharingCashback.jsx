@@ -1,17 +1,13 @@
-import { Link } from "react-router-dom";
-import "./SharingCashback.css";
+import { Link } from 'react-router-dom';
+import './SharingCashback.css';
 
 export default function SharingCashback() {
   return (
     <div className="cashback-page">
-
-      <h1 className="cashback-title">
-        Cashback & Gadget Fund Offer
-      </h1>
+      <h1 className="cashback-title">Cashback & Gadget Fund Offer</h1>
 
       {/* Video Card */}
       <div className="cashback-card">
-
         {/* Video Frame */}
         <div className="video-frame">
           <iframe
@@ -23,9 +19,10 @@ export default function SharingCashback() {
         </div>
 
         <p className="video-note">
-          Please Watch this full video to get your subscription cash return back <br />to use this bot Free
+          Please Watch this full video to get your subscription cash return back{' '}
+          <br />
+          to use this bot Free
         </p>
-
       </div>
 
       {/* Buttons */}
@@ -38,7 +35,6 @@ export default function SharingCashback() {
           Join/Subscribe Now →
         </Link>
       </div>
-
     </div>
   );
 }
