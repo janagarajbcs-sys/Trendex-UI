@@ -70,7 +70,7 @@
   z-index: 1000;
 }
 .menu-toggle {
-  display: none;
+  display: block; /* Always show on both mobile and desktop */
   background: none;
   border: none;
   color: var(--brand-primary);
@@ -84,45 +84,57 @@
   background: rgba(0, 0, 0, 0.3);
   z-index: 999;
 }
+.nav {
+  display: none; /* Hide by default */
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 18px;
+  width: 220px;
+  height: auto;
+  background: #ffffff;
+  flex-direction: column;
+  padding: 12px;
+  gap: 8px;
+  z-index: 1000;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border);
+  transform: translateY(-10px);
+  opacity: 0;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+  pointer-events: none;
+}
+.nav.open {
+  display: flex; /* Show when open */
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.nav a {
+  width: 100%;
+  text-align: left;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.nav a:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.nav a.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--brand-secondary);
+  font-weight: 600;
+}
 @media (max-width: 850px) {
-  .menu-toggle {
-    display: block;
-  }
-  .nav {
-    display: none; /* Hide by default on mobile */
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 18px;
-    width: 220px;
-    height: auto;
-    background: #ffffff;
-    flex-direction: column;
-    padding: 12px;
-    gap: 8px;
-    z-index: 1000;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--border);
-    transform: translateY(-10px);
-    opacity: 0;
-    transition:
-      transform 0.2s ease,
-      opacity 0.2s ease;
-    pointer-events: none;
-  }
-  .nav.open {
-    display: flex; /* Show when open */
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .nav a {
-    width: 100%;
-    text-align: left;
-    font-size: 0.95rem;
-    padding: 10px 14px;
-    border-radius: 8px;
-  }
+  /* Mobile specific adjustments if any, but base styles are now unified */
 }
 .banner-shell {
   position: relative;

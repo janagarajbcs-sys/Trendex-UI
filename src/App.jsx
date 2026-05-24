@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import BannerSlider from './components/BannerSlider.jsx';
 import RegisterPopup from './components/RegisterPopup.jsx';
+import LanguageTranslate from './components/LanguageTranslate.jsx';
 import { getBannersAsync } from './lib/premium';
 import Home from './pages/Home.jsx';
 import Bot from './pages/Bot.jsx';
@@ -110,33 +111,39 @@ function Layout({ children }) {
             Trendex AI
           </Link>
         </div>
-        <button
-          className="menu-toggle"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
+        <div
+          className="header-actions"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <LanguageTranslate />
+          <button
+            className="menu-toggle"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
-            {menuOpen ? (
-              <path d="M18 6L6 18M6 6l12 12" />
-            ) : (
-              <>
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </>
-            )}
-          </svg>
-        </button>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {menuOpen ? (
+                <path d="M18 6L6 18M6 6l12 12" />
+              ) : (
+                <>
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
+        </div>
         <nav className={`nav ${menuOpen ? 'open' : ''}`}>
           <NavLink to="/" end>
             <svg
