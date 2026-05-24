@@ -1,6 +1,23 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { getMPRAchievements, getMPRAchievementsAsync } from '../lib/premium';
+import MPRAchievementSlider from '../components/MPRAchievementSlider.jsx';
 
 export default function Sharing() {
+  const [mprAchievements, setMPRAchievements] = useState([]);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const list = await getMPRAchievementsAsync();
+        setMPRAchievements(list || []);
+      } catch {
+        setMPRAchievements(getMPRAchievements());
+      }
+    }
+    load();
+  }, []);
+
   return (
     <div>
       <h1 style={{ color: '#00ddeb' }}>Binary Referral Income</h1>
@@ -88,6 +105,8 @@ export default function Sharing() {
           <strong>🎯 Total for 4 Referrals → 305 USDT (₹29,280)</strong>
         </p>
       </div>
+
+      <MPRAchievementSlider achievements={mprAchievements} />
 
       <div
         style={{

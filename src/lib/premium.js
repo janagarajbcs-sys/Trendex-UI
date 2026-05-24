@@ -940,6 +940,7 @@ export function clearLeaders() {
 
 // --- Achievements ---
 const ACHIEVEMENTS_KEY = 'achievements';
+const MPR_ACHIEVEMENTS_KEY = 'mpr_achievements';
 export function getAchievements() {
   const v = localStorage.getItem(ACHIEVEMENTS_KEY);
   return v ? JSON.parse(v) : [];
@@ -999,6 +1000,74 @@ export async function moveAchievementBackend(id, direction) {
     return getAchievements();
   }
 }
+
+// --- MPR Achievers ---
+export function getMPRAchievements() {
+  const v = localStorage.getItem(MPR_ACHIEVEMENTS_KEY);
+  return v ? JSON.parse(v) : [];
+}
+export async function getMPRAchievementsAsync() {
+  try {
+    const res = await api.get('/mpr-achievements');
+    const list = res || [];
+    const normalized = list
+      .map((x) => ({
+        id: x.id,
+        sno: Number(x.sno),
+        image: x.image || '',
+      }))
+      .sort((a, b) => a.sno - b.sno);
+    saveMPRAchievements(normalized);
+    return normalized;
+  } catch {
+    return getMPRAchievements();
+  }
+}
+export function saveMPRAchievements(items) {
+  const arr = Array.isArray(items) ? items.slice() : [];
+  arr.sort((a, b) => Number(a.sno || 0) - Number(b.sno || 0));
+  localStorage.setItem(MPR_ACHIEVEMENTS_KEY, JSON.stringify(arr));
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('mpr-achievements-updated', { detail: arr })
+      );
+    }
+  } catch (e) {
+    void e;
+  }
+}
+export async function addMPRAchievementBackend(fd) {
+  try {
+    await api.post('/mpr-achievements', fd, { admin: true });
+    return await getMPRAchievementsAsync();
+  } catch {
+    return getMPRAchievements();
+  }
+}
+export async function deleteMPRAchievementBackend(id) {
+  try {
+    await api.del(`/mpr-achievements/${encodeURIComponent(id)}`, {
+      admin: true,
+    });
+    return await getMPRAchievementsAsync();
+  } catch {
+    return getMPRAchievements();
+  }
+}
+export async function moveMPRAchievementBackend(id, direction) {
+  try {
+    await api.put(
+      '/mpr-achievements/move',
+      { id, direction },
+      { admin: true }
+    );
+    return await getMPRAchievementsAsync();
+  } catch {
+    return getMPRAchievements();
+  }
+}
+
 
 const BANNERS_KEY = 'banners';
 export function getBanners() {
@@ -1328,231 +1397,6 @@ export async function getBannersAsync() {
   }
 }
 
-const EVENTS_KEY = 'events';
-export function getEvents() {
-  const v = localStorage.getItem(EVENTS_KEY);
-  return v ? JSON.parse(v) : [];
-}
-export function saveEvents(items) {
-  const arr = Array.isArray(items) ? items.slice() : [];
-  arr.sort((a, b) => Number(a.sno || 0) - Number(b.sno || 0));
-  const normalized = arr.map((x, i) => ({ ...x, sno: i + 1 }));
-  localStorage.setItem(EVENTS_KEY, JSON.stringify(normalized));
-  try {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(
-        new CustomEvent('events-updated', { detail: normalized })
-      );
-      if (typeof BroadcastChannel !== 'undefined') {
-        const ch = new BroadcastChannel('events');
-        ch.postMessage({ type: 'events-updated', payload: normalized });
-        ch.close();
-      }
-    }
-  } catch {
-    /* ignore */
-  }
-}
-export function addEvent(item) {
-  const items = getEvents();
-  const id = 'e_' + Math.random().toString(36).slice(2);
-  const sno = Number(item.sno) || items.length + 1;
-  const next = { id, sno, img: item.img || '', date: item.date || '' };
-  items.push(next);
-  items.sort((a, b) => Number(a.sno || 0) - Number(b.sno || 0));
-  saveEvents(items);
-  return next;
-}
-export function updateEvent(id, patch) {
-  const items = getEvents();
-  const idx = items.findIndex((x) => x.id === id);
-  if (idx >= 0) {
-    const a = items[idx];
-    const sno = patch.sno != null ? Number(patch.sno) : a.sno;
-    items[idx] = { ...a, ...(patch || {}), sno };
-    items.sort((x, y) => Number(x.sno || 0) - Number(y.sno || 0));
-    saveEvents(items);
-    return items[idx];
-  }
-  return null;
-}
-export function deleteEvent(id) {
-  const items = getEvents().filter((x) => x.id !== id);
-  saveEvents(items);
-}
-export function moveEvent(id, dir) {
-  const items = getEvents();
-  const idx = items.findIndex((x) => x.id === id);
-  if (idx < 0) return;
-  const j = dir === 'up' ? idx - 1 : idx + 1;
-  if (j < 0 || j >= items.length) return;
-  const tmp = items[idx];
-  items[idx] = items[j];
-  items[j] = tmp;
-  const renum = items.map((x, i) => ({ ...x, sno: i + 1 }));
-  saveEvents(renum);
-}
-export function clearEvents() {
-  saveEvents([]);
-}
-
-export async function getEventsAsync() {
-  try {
-    const res = await fetch(BASE + '/events', { cache: 'no-store' });
-    if (!res.ok) throw new Error('not_ok');
-    const data = await res.json().catch(() => []);
-    const normalized = Array.isArray(data)
-      ? data
-          .map((x, i) => ({
-            id: x._id || x.id || 'e_' + (i + 1),
-            sno: Number(x.sno || i + 1),
-            img: x.img || '',
-            date: x.date || '',
-          }))
-          .sort((a, b) => Number(a.sno || 0) - Number(b.sno || 0))
-      : [];
-    saveEvents(normalized);
-    return normalized;
-  } catch {
-    return getEvents();
-  }
-}
-
-export async function addEventBackend(item) {
-  try {
-    const res = await fetch(BASE + '/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() },
-      body: JSON.stringify(item),
-    });
-    if (!res.ok) throw new Error('fail');
-    await res.json().catch(() => null);
-    const list = await getEventsAsync();
-    saveEvents(list);
-    return list;
-  } catch {
-    addEvent(item);
-    const list = getEvents();
-    saveEvents(list);
-    return list;
-  }
-}
-
-export async function updateEventBackend(id, patch) {
-  try {
-    const res = await fetch(BASE + `/events/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() },
-      body: JSON.stringify(patch),
-    });
-    if (!res.ok) throw new Error('fail');
-    await res.json().catch(() => null);
-    const list = await getEventsAsync();
-    saveEvents(list);
-    return list;
-  } catch {
-    updateEvent(id, patch);
-    const list = getEvents();
-    saveEvents(list);
-    return list;
-  }
-}
-
-export async function deleteEventBackend(id) {
-  try {
-    const res = await fetch(BASE + `/events/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: getAdminAuthHeaders(),
-    });
-    if (!res.ok) throw new Error('fail');
-    await res.json().catch(() => null);
-    const list = await getEventsAsync();
-    saveEvents(list);
-    return list;
-  } catch {
-    deleteEvent(id);
-    const list = getEvents();
-    saveEvents(list);
-    return list;
-  }
-}
-
-export async function moveEventBackend(id, dir) {
-  try {
-    const list = await getEventsAsync();
-    const idx = list.findIndex((x) => x.id === id);
-    if (idx < 0) return list;
-    const j = dir === 'up' ? idx - 1 : idx + 1;
-    if (j < 0 || j >= list.length) return list;
-    const a = list[idx];
-    const b = list[j];
-    await fetch(BASE + `/events/${encodeURIComponent(a.id)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() },
-      body: JSON.stringify({ sno: b.sno }),
-    });
-    await fetch(BASE + `/events/${encodeURIComponent(b.id)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...getAdminAuthHeaders() },
-      body: JSON.stringify({ sno: a.sno }),
-    });
-    const next = await getEventsAsync();
-    saveEvents(next);
-    return next;
-  } catch {
-    moveEvent(id, dir);
-    const list = getEvents();
-    saveEvents(list);
-    return list;
-  }
-}
-
-export async function clearEventsBackend() {
-  try {
-    const list = await getEventsAsync();
-    await Promise.all(
-      list.map((ev) =>
-        fetch(BASE + `/events/${encodeURIComponent(ev.id)}`, {
-          method: 'DELETE',
-          headers: getAdminAuthHeaders(),
-        }).catch(() => null)
-      )
-    );
-    const empty = await getEventsAsync();
-    saveEvents(empty);
-    return empty;
-  } catch {
-    clearEvents();
-    const empty = getEvents();
-    saveEvents(empty);
-    return empty;
-  }
-}
-
-export async function syncTopSliderEventsBackend() {
-  try {
-    const res = await fetch(BASE + '/admin/sync-topslider-events', {
-      method: 'POST',
-      headers: getAdminAuthHeaders(),
-    });
-    if (!res.ok) throw new Error('fail');
-    const list = await res.json().catch(() => []);
-    const normalized = Array.isArray(list)
-      ? list
-          .map((x, i) => ({
-            id: x._id || x.id || 'e_' + (i + 1),
-            sno: Number(x.sno || i + 1),
-            img: x.img || '',
-            date: x.date || '',
-          }))
-          .sort((a, b) => Number(a.sno || 0) - Number(b.sno || 0))
-      : [];
-    saveEvents(normalized);
-    return normalized;
-  } catch {
-    return getEvents();
-  }
-}
 export async function submitJoinResponse(payload) {
   try {
     const res = await fetch(BASE + '/join', {
@@ -1592,13 +1436,10 @@ export async function importApiFolderBackend() {
     const summary = await res.json().catch(() => ({}));
     const leaders = await getLeadersAsync().catch(() => getLeaders());
     saveLeaders(leaders);
-    const events = await getEventsAsync().catch(() => getEvents());
-    saveEvents(events);
     return {
       ok: true,
       summary,
       leadersCount: leaders.length,
-      eventsCount: events.length,
     };
   } catch {
     return { ok: false };

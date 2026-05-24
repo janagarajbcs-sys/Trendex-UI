@@ -3,15 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   getLeaders,
   getLeadersAsync,
-  getEvents,
-  getEventsAsync,
   submitJoinResponse,
   getAchievements,
   getAchievementsAsync,
 } from '../lib/premium';
-import EventSlider from '../components/EventSlider.jsx';
 import AchievementSlider from '../components/AchievementSlider.jsx';
-import RegisterPopup from '../components/RegisterPopup.jsx';
 
 export default function Home() {
   const location = useLocation();
@@ -32,7 +28,6 @@ export default function Home() {
   const [preview, setPreview] = useState('');
   const holdTimer = useRef(null);
   const [showAllLeaders, setShowAllLeaders] = useState(false);
-  const [events, setEvents] = useState([]);
   const [screen, setScreen] = useState(window.innerWidth);
 
   // Load TradingView widget
@@ -244,45 +239,13 @@ export default function Home() {
   const isTablet = screen >= 480 && screen < 768;
   const isLaptop = screen >= 768;
 
-  // useEffect(() => {
-  //   async function loadEvents() {
-  //     try {
-  //       let list = await getEventsAsync()
-  //       if (!Array.isArray(list) || list.length === 0) {
-  //         list = getEvents()
-  //       }
-  //       if (Array.isArray(list)) setEvents(list)
-  //       else setEvents([])
-  //     } catch { setEvents([]) }
-  //   }
-  //   loadEvents()
-  //   const onStorage = (e) => {
-  //     if (e.key === 'events') loadEvents()
-  //   }
-  //   const onLocal = () => loadEvents()
-  //   let ch
-  //   if (typeof BroadcastChannel !== 'undefined') {
-  //     ch = new BroadcastChannel('events')
-  //     ch.onmessage = (msg) => {
-  //       if (msg && msg.data && msg.data.type === 'events-updated') loadEvents()
-  //     }
-  //   }
-  //   window.addEventListener('storage', onStorage)
-  //   window.addEventListener('events-updated', onLocal)
-  //   return () => {
-  //     window.removeEventListener('storage', onStorage)
-  //     window.removeEventListener('events-updated', onLocal)
-  //     if (ch) ch.close()
-  //   }
-  // }, [])
-
   return (
     <div>
       <section className="card" style={{ marginBottom: 16 }}>
         <h1 style={{ color: '#00ddeb', margin: 6 }}>
           AI Trendex - Tamil(Support & Guide)
         </h1>
-        <h3>Automated Cryptocurrency Trading with 7 strategies</h3>
+        <h3>Automated Cryptocurrency Trading with 8 strategies</h3>
         <p>
           The first real-time spot & futures bots with AI-driven risk
           management.
@@ -691,12 +654,6 @@ export default function Home() {
             Type Now →
           </Link>
         </div>
-        {events.length ? (
-          <div className="card">
-            <h2>Meetings & Trips</h2>
-            <EventSlider items={events} />
-          </div>
-        ) : null}
         <div className="card">
           <h2>100+ Frequently Asked Questions</h2>
           <div
@@ -895,9 +852,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-
-      {/* Registration Popup for New Users */}
-      <RegisterPopup />
     </div>
   );
 }

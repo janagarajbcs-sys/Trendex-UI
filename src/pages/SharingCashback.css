@@ -25,6 +25,9 @@
 .video-frame iframe {
   position: absolute;
   border: none;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Description text */

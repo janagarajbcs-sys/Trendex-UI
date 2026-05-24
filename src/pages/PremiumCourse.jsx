@@ -412,9 +412,10 @@ export default function PremiumCourse() {
                 ) : (
                   // Embedded iframe (Vimeo, YouTube, etc.)
                   <iframe
-                    src={currentModule.src}
+                    src={`${currentModule.src}${currentModule.src.includes('?') ? '&' : '?'}preload=true`}
                     className="premium-course-iframe"
-                    loading="lazy"
+                    loading="eager"
+                    fetchpriority="high"
                     allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
                     allowFullScreen
                   ></iframe>

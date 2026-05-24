@@ -12,8 +12,6 @@ import {
   saveLeaders,
   getBanners,
   saveBanners,
-  getEvents,
-  saveEvents,
   getUsersBackendAsync,
   approveUserBackend,
   disableUserBackend,
@@ -29,16 +27,9 @@ import {
   setVideoAccessBackend,
   getLeadersAsync,
   getBannersAsync,
-  getEventsAsync,
-  addEventBackend,
-  updateEventBackend,
-  deleteEventBackend,
-  moveEventBackend,
-  clearEventsBackend,
   getJoinResponsesBackend,
   getComplaintResponsesBackend,
   getProgressBackend,
-  syncTopSliderEventsBackend,
   importApiFolderBackend,
   getTopSliderImagesBackend,
   addTopSliderImageBackend,
@@ -49,6 +40,12 @@ import {
   addAchievementBackend,
   deleteAchievementBackend,
   moveAchievementBackend,
+  getMPRAchievements,
+  saveMPRAchievements,
+  getMPRAchievementsAsync,
+  addMPRAchievementBackend,
+  deleteMPRAchievementBackend,
+  moveMPRAchievementBackend,
 } from '../lib/premium';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -76,9 +73,6 @@ export default function PremiumAdmin() {
   });
   const [prevLeaders, setPrevLeaders] = useState(null);
   const [prevBanners, setPrevBanners] = useState(null);
-  const [events, setEvents] = useState(() => getEvents());
-  const [eForm, setEForm] = useState({ sno: '', img: '', date: '' });
-  const [eEditing, setEEditing] = useState(null);
   const [joins, setJoins] = useState(() => getJoinResponses());
   const [complaints, setComplaints] = useState(() => getComplaintResponses());
   const [slides, setSlides] = useState([]);
@@ -89,6 +83,12 @@ export default function PremiumAdmin() {
   const [achievements, setAchievements] = useState(() => getAchievements());
   const [achFile, setAchFile] = useState(null);
   const [achUploading, setAchUploading] = useState(false);
+
+  const [mprAchievements, setMPRAchievements] = useState(() =>
+    getMPRAchievements()
+  );
+  const [mprFile, setMPRFile] = useState(null);
+  const [mprUploading, setMPRUploading] = useState(false);
   console.log(complaints, 'complaints');
   const nav = useNavigate();
   function resolvePhoto(val) {
@@ -137,10 +137,6 @@ export default function PremiumAdmin() {
           );
           setBanners(getBanners());
         }),
-        getEventsAsync().then((list) => {
-          saveEvents(list);
-          setEvents(list);
-        }),
         getJoinResponsesBackend().then((list) => setJoins(list)),
         getComplaintResponsesBackend().then((list) => setComplaints(list)),
         getTopSliderImagesBackend().then((list) =>
@@ -149,6 +145,10 @@ export default function PremiumAdmin() {
         getAchievementsAsync().then((list) => {
           saveAchievements(list);
           setAchievements(list);
+        }),
+        getMPRAchievementsAsync().then((list) => {
+          saveMPRAchievements(list);
+          setMPRAchievements(list);
         }),
       ])
     );
@@ -386,6 +386,37 @@ export default function PremiumAdmin() {
       setAchievements(list)
     );
   }
+
+  // --- MPR Achievers Handlers ---
+  function onMPRFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setMPRFile(file);
+  }
+  function uploadMPR(e) {
+    e.preventDefault();
+    if (!mprFile) return;
+    setMPRUploading(true);
+    const fd = new FormData();
+    fd.append('image', mprFile);
+    track(addMPRAchievementBackend(fd))
+      .then((list) => setMPRAchievements(list))
+      .finally(() => {
+        setMPRUploading(false);
+        setMPRFile(null);
+        if (e.target && e.target.reset) e.target.reset();
+      });
+  }
+  function removeMPR(id) {
+    track(deleteMPRAchievementBackend(id)).then((list) =>
+      setMPRAchievements(list)
+    );
+  }
+  function moveMPR(id, dir) {
+    track(moveMPRAchievementBackend(id, dir)).then((list) =>
+      setMPRAchievements(list)
+    );
+  }
   const stats = (() => {
     const counts = Array.from({ length: modules.length }, () => 0);
     let completed = 0;
@@ -405,10 +436,8 @@ export default function PremiumAdmin() {
     try {
       saveLeaders(getLeaders());
       saveBanners(getBanners());
-      saveEvents(getEvents());
       setLeaders(getLeaders());
       setBanners(getBanners());
-      setEvents(getEvents());
     } catch {
       /* noop */
     }
@@ -483,9 +512,6 @@ export default function PremiumAdmin() {
           justifyContent: 'center',
         }}
       >
-        {/* <button className="btn" onClick={updateAll} style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>Update All</button> */}
-        {/* <button className="btn" onClick={() => { importApiFolderBackend().then(() => { setLeaders(getLeaders()); setEvents(getEvents()) }) }} style={{ padding: '6px 12px', fontSize: '.85rem', background: '#0ea5e9', color: '#fff', transition: 'transform .15s ease, background-color .15s ease' }}>Import API Folder</button> */}
-        {/* <button className="btn secondary" onClick={() => { signOutAdmin(); nav('/premium/admin-login') }} style={{ padding: '6px 12px', fontSize: '.85rem', transition: 'transform .15s ease, background-color .15s ease' }}>Sign out</button> */}
       </div>
 
       {/* 1. Pending Users */}
@@ -1142,6 +1168,131 @@ export default function PremiumAdmin() {
               }}
             >
               No achievement images yet.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* MPR Achievers Management */}
+      <div className="card" style={{ marginTop: 12, padding: 16 }}>
+        <h2
+          style={{
+            marginTop: 0,
+            textAlign: 'center',
+            fontSize: '1.25rem',
+            fontWeight: 600,
+          }}
+        >
+          MPR Achievers — Manage Slider
+        </h2>
+        <form
+          onSubmit={uploadMPR}
+          style={{
+            display: 'flex',
+            gap: 12,
+            alignItems: 'flex-end',
+            marginBottom: 20,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <label
+              style={{ display: 'block', fontSize: '.85rem', marginBottom: 4 }}
+            >
+              Upload New MPR Achiever Image (Cloudinary)
+            </label>
+            <input
+              type="file"
+              onChange={onMPRFile}
+              accept="image/*"
+              style={{ width: '100%' }}
+            />
+          </div>
+          <button
+            className="btn"
+            type="submit"
+            disabled={!mprFile || mprUploading}
+            style={{ padding: '8px 16px' }}
+          >
+            {mprUploading ? 'Uploading...' : 'Upload Image'}
+          </button>
+        </form>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+            gap: 16,
+          }}
+        >
+          {mprAchievements.map((ach) => (
+            <div
+              key={ach.id}
+              style={{
+                border: '1px solid #334155',
+                borderRadius: 8,
+                padding: 8,
+                position: 'relative',
+                background: '#0f172a',
+              }}
+            >
+              <img
+                src={ach.image}
+                alt="MPR Achiever"
+                style={{
+                  width: '100%',
+                  height: 100,
+                  objectFit: 'cover',
+                  borderRadius: 4,
+                }}
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: 8,
+                }}
+              >
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button
+                    onClick={() => moveMPR(ach.id, 'up')}
+                    style={{ padding: '2px 6px', fontSize: '.7rem' }}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveMPR(ach.id, 'down')}
+                    style={{ padding: '2px 6px', fontSize: '.7rem' }}
+                  >
+                    ↓
+                  </button>
+                </div>
+                <button
+                  onClick={() => removeMPR(ach.id)}
+                  style={{
+                    padding: '2px 6px',
+                    fontSize: '.7rem',
+                    background: '#ef4444',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 4,
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+          {mprAchievements.length === 0 && (
+            <div
+              style={{
+                fontSize: '.85rem',
+                opacity: 0.7,
+                textAlign: 'center',
+                gridColumn: '1/-1',
+              }}
+            >
+              No MPR achiever images yet.
             </div>
           )}
         </div>

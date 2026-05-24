@@ -115,22 +115,25 @@ export default function RegisterPopup() {
         padding: isMobile ? '0' : '20px',
         backdropFilter: 'blur(6px)',
         animation: 'fadeIn 0.4s ease-out',
+        overflowY: 'auto', // Allow scrolling the overlay if needed
       }}
     >
       <div
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fbff 100%)',
           borderRadius: isMobile ? '0' : '16px',
-          padding: isMobile ? '20px 14px' : '24px',
+          padding: isMobile ? '20px 14px 60px' : '24px 24px 40px', // Added extra bottom padding for mobile
           maxWidth: '420px',
           width: '100%',
-          maxHeight: '70vh',
+          maxHeight: isMobile ? '100%' : '85vh',
+          overflowY: 'auto',
           boxShadow: '0 25px 50px -12px rgba(30, 58, 138, 0.25)',
           border: isMobile ? 'none' : '1px solid rgba(37, 99, 235, 0.2)',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           animation: 'slideUp 0.5s ease-out',
+          transform: isMobile ? 'none' : 'translateY(-40px)', // Move up more on desktop
         }}
       >
         {/* Close Button */}

@@ -12,10 +12,12 @@ export default function Video() {
         {/* Responsive Video */}
         <div className="video-container">
           <iframe
-            src="https://iframe.mediadelivery.net/play/615839/b4c25acb-c8ac-4e0b-8f7a-8176fcf6cd8e"
+            src="https://iframe.mediadelivery.net/play/615839/b4c25acb-c8ac-4e0b-8f7a-8176fcf6cd8e?preload=true"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
             allowFullScreen
             className="video-iframe"
+            loading="eager"
+            fetchpriority="high"
           ></iframe>
         </div>
 

@@ -5,9 +5,11 @@
   width: 200%;
   height: 200%;
   border: none;
-  transform: none; /* Using percentage based zoom for better control responsiveness */
+  transform: translateZ(0); /* Using percentage based zoom for better control responsiveness */
   transform-origin: center center;
   pointer-events: auto; /* Ensure interactivity */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Base Styles */

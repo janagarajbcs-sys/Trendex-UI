@@ -15,6 +15,7 @@ export default function Bot() {
         'Buys in downtrend, sells on uptrend',
       ],
       capital: '15 USDT',
+      risk: 'Low Risk',
     },
     {
       name: 'Nero Bot',
@@ -24,15 +25,29 @@ export default function Bot() {
         '≈95% accuracy / 5% risk',
       ],
       capital: '700 USDT',
+      risk: 'Low Risk',
     },
     {
       name: 'Quent Bot',
       desc: [
         'Gold Based trading pair (Futures)',
-        'Top 50 pairs',
+        'Paxg/usdt pairs',
         '≈99% accuracy / 1% risk',
       ],
       capital: '500 USDT',
+      isGold: true,
+      risk: 'Medium Risk',
+    },
+    {
+      name: 'Fin Bot',
+      desc: [
+        'Gold Based trading pair (Futures)',
+        'Paxg/usdt pairs',
+        '≈99% accuracy / 1% risk',
+      ],
+      capital: '200 USDT',
+      isGold: true,
+      risk: 'Medium Risk',
     },
     {
       name: 'Zeno Bot',
@@ -42,6 +57,7 @@ export default function Bot() {
         '≈80% accuracy / 20% risk',
       ],
       capital: '200 USDT',
+      risk: 'High Risk',
     },
     {
       name: 'Candles Bot',
@@ -51,6 +67,7 @@ export default function Bot() {
         '≈85% accuracy / 15% risk',
       ],
       capital: '200 USDT',
+      risk: 'High Risk',
     },
     {
       name: 'Zeno 3x Bot',
@@ -60,6 +77,7 @@ export default function Bot() {
         '≈80% accuracy / 20% risk',
       ],
       capital: '100 USDT',
+      risk: 'High Risk',
     },
     {
       name: 'Candle 3x Bot',
@@ -69,6 +87,7 @@ export default function Bot() {
         '≈85% accuracy / 15% risk',
       ],
       capital: '100 USDT',
+      risk: 'High Risk',
     },
   ];
   const formatINR = (n) => Number(n).toLocaleString('en-IN');
@@ -114,7 +133,7 @@ export default function Bot() {
         Trading Strategies
       </h1>
       <p>
-        Single subscription gives access to 7 strategies for Both Spot &
+        Single subscription gives access to 8 strategies for Both Spot &
         Futures.
         <br />
         Keep your Funds in your Own Binance Wallet(Trendex bot Never Store your
@@ -133,9 +152,44 @@ export default function Bot() {
           <div
             key={b.name}
             className="card"
-            style={{ textAlign: 'center', width: '100%' }}
+            style={{
+              textAlign: 'center',
+              width: '100%',
+            }}
           >
-            <h3 style={{ color: '#cfeef3', marginTop: 0 }}>{b.name}</h3>
+            <h3
+              style={{
+                color: '#cfeef3',
+                marginTop: 0,
+                marginBottom: 4,
+              }}
+            >
+              {b.name}
+            </h3>
+            <div
+              style={{
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                color:
+                  b.risk === 'Low Risk'
+                    ? '#22C55E'
+                    : b.risk === 'Medium Risk'
+                      ? '#F59E0B'
+                      : '#EF4444',
+                marginBottom: 12,
+                display: 'inline-block',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                background:
+                  b.risk === 'Low Risk'
+                    ? 'rgba(34, 197, 94, 0.1)'
+                    : b.risk === 'Medium Risk'
+                      ? 'rgba(245, 158, 11, 0.1)'
+                      : 'rgba(239, 68, 68, 0.1)',
+              }}
+            >
+              {b.risk}
+            </div>
             <ul
               style={{
                 listStylePosition: 'inside',
@@ -152,23 +206,31 @@ export default function Bot() {
               <button
                 onClick={() => handleBotClick(b.capital)}
                 style={{
-                  background: '#2563EB',
-                  color: '#fff',
+                  background: b.isGold
+                    ? 'linear-gradient(135deg, #ffd700 0%, #b8860b 100%)'
+                    : '#2563EB',
+                  color: b.isGold ? '#000' : '#fff',
                   border: 'none',
                   padding: '8px 16px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                  boxShadow: b.isGold
+                    ? '0 4px 12px rgba(218, 165, 32, 0.4)'
+                    : '0 4px 12px rgba(37, 99, 235, 0.25)',
                   transition: 'all 0.2s',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.background = '#1D4ED8';
+                  e.currentTarget.style.background = b.isGold
+                    ? 'linear-gradient(135deg, #ffed4a 0%, #daa520 100%)'
+                    : '#1D4ED8';
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.background = '#2563EB';
+                  e.currentTarget.style.background = b.isGold
+                    ? 'linear-gradient(135deg, #ffd700 0%, #b8860b 100%)'
+                    : '#2563EB';
                 }}
               >
                 Start with {b.capital}
@@ -294,7 +356,48 @@ export default function Bot() {
         </div>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 40 }}>
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: 32,
+          marginBottom: 40,
+          display: 'flex',
+          gap: 16,
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
+        <a
+          className="btn"
+          href="tel:+918012202083"
+          style={{
+            display: 'inline-block',
+            padding: '12px 28px',
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
+            borderRadius: '30px',
+            textDecoration: 'none',
+            background: '#3B82F6',
+            color: '#fff',
+            boxShadow: '0 6px 20px rgba(59, 130, 246, 0.3)',
+            transition: 'all 0.3s ease',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px)';
+            e.currentTarget.style.background = '#2563EB';
+            e.currentTarget.style.boxShadow =
+              '0 10px 25px rgba(59, 130, 246, 0.4)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.background = '#3B82F6';
+            e.currentTarget.style.boxShadow =
+              '0 6px 20px rgba(59, 130, 246, 0.3)';
+          }}
+        >
+          📞 Call Now
+        </a>
+
         <Link
           className="btn"
           to="/#join-business"
