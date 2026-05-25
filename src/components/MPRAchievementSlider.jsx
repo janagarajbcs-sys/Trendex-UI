@@ -164,8 +164,8 @@ export default function MPRAchievementSlider({ achievements }) {
 
   if (!items.length) return null;
 
-  // Split items into multiple rows (exactly 8 per row as requested)
-  const itemsPerRow = 8;
+  // Split items into multiple rows (exactly 5 per row as requested)
+  const itemsPerRow = 5;
   const rows = [];
   for (let i = 0; i < items.length; i += itemsPerRow) {
     rows.push(items.slice(i, i + itemsPerRow));
