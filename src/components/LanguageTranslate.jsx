@@ -50,15 +50,49 @@ export default function LanguageTranslate({ inMenu = false }) {
   ];
 
   const changeLanguage = (langCode) => {
-    document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname};`;
+    // 1. Determine the domain for the cookie
+    const hostname = window.location.hostname;
+    const parts = hostname.split('.');
+    const baseDomain = parts.length > 2 ? '.' + parts.slice(-2).join('.') : '';
+
+    // 2. Function to set cookie
+    const setCookie = (name, value, domain) => {
+      let cookieStr = `${name}=${value}; path=/;`;
+      if (domain) cookieStr += ` domain=${domain};`;
+      // For production (HTTPS), add Secure and SameSite if possible
+      if (window.location.protocol === 'https:') {
+        cookieStr += ' Secure; SameSite=None;';
+      }
+      document.cookie = cookieStr;
+    };
+
+    // 3. Clear existing cookies and set new one
+    // We set it on both the exact hostname and the base domain to be safe
+    const cookieValue = langCode === 'en' ? '' : `/en/${langCode}`;
+    
+    // Set for current session
+    setCookie('googtrans', cookieValue, '');
+    setCookie('googtrans', cookieValue, hostname);
+    if (baseDomain) {
+      setCookie('googtrans', cookieValue, baseDomain);
+    }
+
+    // 4. Try to trigger the Google Translate dropdown directly
     const select = document.querySelector('.goog-te-combo');
     if (select) {
       select.value = langCode;
       select.dispatchEvent(new Event('change'));
-    }
-    setIsOpen(false);
-    if (!select) {
+      
+      // Close menu
+      setIsOpen(false);
+      
+      // If it's English, we might need a reload to fully clear the Google UI
+      if (langCode === 'en') {
+        setTimeout(() => window.location.reload(), 300);
+      }
+    } else {
+      // If the dropdown isn't found, reload is the only way to apply the cookie
+      setIsOpen(false);
       window.location.reload();
     }
   };
