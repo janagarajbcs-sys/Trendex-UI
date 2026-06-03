@@ -10,7 +10,20 @@ export default function Premium() {
           This Premium Access is designed to train members who have already
           joined the program.
         </li>
-        <li>
+        <li
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#EF4444',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            marginTop: 4,
+            marginBottom: 4,
+          }}
+        >
           It is exclusively designed for the individuals who are a part of
           Janagaraj Sir's community.
         </li>
@@ -22,7 +35,20 @@ export default function Premium() {
           You will learn through a perfectly structured system designed to help
           you improve your knowledge and earn more.
         </li>
-        <li>
+        <li
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#22C55E',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            marginTop: 4,
+            marginBottom: 4,
+          }}
+        >
           After the approval date, you will receive 7 days of free access.
         </li>
         <li>

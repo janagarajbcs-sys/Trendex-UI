@@ -851,6 +851,25 @@ export default function Home() {
             Go to Premium →
           </Link>
         </div>
+        <div
+          style={{
+            marginTop: 12,
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#EF4444',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            display: 'block',
+            textAlign: 'center',
+          }}
+        >
+          Real trading does not provide stable, guaranteed, or assured returns
+        </div>
       </section>
     </div>
   );

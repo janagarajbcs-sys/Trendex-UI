@@ -91,8 +91,8 @@ export default function Bot() {
     },
   ];
   const formatINR = (n) => Number(n).toLocaleString('en-IN');
-  const monthlyRange = (x) => [x * 0.1, x * 0.4];
-  const yearlyRange = (x) => [x * 1.2, x * 4.8];
+  const monthlyRange = (x) => [x * 0.05, x * 0.3];
+  const yearlyRange = (x) => [x * 0.6, x * 3.6];
   const onInr = (v) => {
     const val = parseFloat(v || 0);
     if (val > 0) {
@@ -136,8 +136,24 @@ export default function Bot() {
         Single subscription gives access to 8 strategies for Both Spot &
         Futures.
         <br />
-        Keep your Funds in your Own Binance Wallet(Trendex bot Never Store your
-        Trading Funds).
+        <span
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#22C55E',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            marginTop: 8,
+            marginBottom: 8,
+          }}
+        >
+          Keep your Funds in your Own Binance Wallet
+        </span>
+        <br />
+        (Trendex bot Never Store your Trading Funds).
       </p>
 
       <div
@@ -247,16 +263,16 @@ export default function Bot() {
           margin: '16px auto',
           maxWidth: 520,
           textAlign: 'center',
-          border: '2px solid #00ddeb',
-          boxShadow: '0 0 20px rgba(0, 221, 235, 0.15)',
-          background: 'linear-gradient(145deg, #121212, #1a1a1a)',
+          border: '2px solid #d1d5db',
+          boxShadow: '0 0 20px rgba(209, 213, 219, 0.15)',
+          background: 'linear-gradient(145deg, #f3f4f6, #e5e7eb)',
         }}
       >
         <h2
           style={{
             marginTop: 0,
-            color: '#2563EB',
-            textShadow: '0 0 12px rgba(37, 99, 235, 0.4)',
+            color: '#1f2937',
+            textShadow: '0 0 12px rgba(31, 41, 55, 0.1)',
           }}
         >
           Capital & Returns Calculator
@@ -266,7 +282,7 @@ export default function Bot() {
             display: 'block',
             marginTop: 8,
             textAlign: 'center',
-            color: '#ffffff',
+            color: '#1f2937',
           }}
         >
           Enter Capital in INR
@@ -276,7 +292,9 @@ export default function Bot() {
               marginTop: 6,
               padding: 10,
               borderRadius: 8,
-              border: '1px solid #ccc',
+              border: '1px solid #9ca3af',
+              background: '#ffffff',
+              color: '#1f2937',
             }}
             type="number"
             placeholder="₹ INR"
@@ -289,7 +307,7 @@ export default function Bot() {
             display: 'block',
             marginTop: 8,
             textAlign: 'center',
-            color: '#ffffff',
+            color: '#1f2937',
           }}
         >
           Enter Capital in USDT
@@ -299,7 +317,9 @@ export default function Bot() {
               marginTop: 6,
               padding: 10,
               borderRadius: 8,
-              border: '1px solid #ccc',
+              border: '1px solid #9ca3af',
+              background: '#ffffff',
+              color: '#1f2937',
             }}
             type="number"
             placeholder="USDT"
@@ -313,9 +333,9 @@ export default function Bot() {
               marginTop: 12,
               padding: 12,
               borderRadius: 8,
-              background: '#101010',
-              border: '1px solid rgba(0,255,255,0.2)',
-              color: '#ffffff',
+              background: '#ffffff',
+              border: '1px solid rgba(156, 163, 175, 0.3)',
+              color: '#1f2937',
             }}
           >
             <div>
@@ -340,19 +360,70 @@ export default function Bot() {
         )}
         <div
           style={{
+            marginTop: 12,
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#22C55E',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+          }}
+        >
+          Monthly 5% to 30%<br />
+          Yearly 60% to 360%
+        </div>
+        <div
+          style={{
             marginTop: 10,
-            color: '#2563EB',
+            color: '#4b5563',
             fontSize: '.9rem',
             opacity: 0.9,
-            textShadow: '0 0 10px rgba(37, 99, 235, 0.4)',
           }}
         >
           <div>as per the doller price 97 Rs i have calculated.</div>
-          <div>
-            Deponds on the market movement <br />
-            The results(returns) will be differ
-          </div>
+        </div>
+        <div
+          style={{
+            marginTop: 12,
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#F59E0B',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+          }}
+        >
+          Deponds on the market movement<br />
+          The results(returns) will be differ
+        </div>
+        <div
+          style={{
+            marginTop: 10,
+            color: '#4b5563',
+            fontSize: '.9rem',
+            opacity: 0.9,
+          }}
+        >
           <div>so keep your funds atleast for 6 month durations Minimum</div>
+        </div>
+        <div
+          style={{
+            marginTop: 12,
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: '#EF4444',
+            display: 'inline-block',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+          }}
+        >
+          Real trading does not provide stable, guaranteed, or assured returns
         </div>
       </div>
 
