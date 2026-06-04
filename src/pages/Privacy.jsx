@@ -5,130 +5,192 @@ export default function Privacy() {
       <div className="card">
         <h2>1. Introduction</h2>
         <p>
-          Trendex AI ("we", "us", or "our") respects your privacy and is
-          committed to protecting your personal information. This Privacy Policy
-          explains how we collect, use, disclose, and safeguard your information
-          when you use our website and services.
+          Trendex AI ("we", "us", or "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services. Please read this Privacy Policy carefully. If you do not agree with the terms of this Privacy Policy, please do not access or use our services.
         </p>
 
         <h2>2. Information We Collect</h2>
         <h3>Personal Information</h3>
+        <p>We may collect the following types of personal information:</p>
         <ul>
-          <li>Name, email address, phone number</li>
-          <li>Payment information (processed securely by third parties)</li>
-          <li>Account credentials and preferences</li>
-          <li>Communication records with our support team</li>
+          <li><strong>Contact Information:</strong> Name, email address, phone number</li>
+          <li><strong>Payment Information:</strong> Payment details (processed securely by third-party payment processors, we do not store full credit card numbers)</li>
+          <li><strong>Account Information:</strong> Username, account preferences, and security questions</li>
+          <li><strong>Communication Data:</strong> Records of your communications with our support team</li>
+          <li><strong>Trading Preferences:</strong> Your trading strategy preferences and settings</li>
         </ul>
 
         <h3>Technical Information</h3>
+        <p>We automatically collect certain information when you visit our website:</p>
         <ul>
-          <li>IP address and location data</li>
-          <li>Device and browser information</li>
-          <li>Usage patterns and analytics</li>
-          <li>Cookies and similar technologies</li>
+          <li>IP address and approximate location data</li>
+          <li>Device type, operating system, and browser information</li>
+          <li>Usage patterns and analytics data</li>
+          <li>Cookies and similar tracking technologies (see Section 7 below)</li>
+          <li>Pages visited and time spent on our website</li>
         </ul>
 
         <h3>Trading Data</h3>
+        <p>When you use our trading services:</p>
         <ul>
-          <li>Exchange API keys (encrypted and stored securely)</li>
+          <li>Exchange API keys (encrypted and stored securely - we never store your private keys or funds)</li>
           <li>Trading preferences and settings</li>
-          <li>Performance metrics (aggregated and anonymized)</li>
+          <li>Performance metrics (aggregated and anonymized for improvement purposes)</li>
         </ul>
+        <p>
+          <strong>Important:</strong> We never store your cryptocurrency funds. Your funds always remain in your own exchange wallet.
+        </p>
 
         <h2>3. How We Use Your Information</h2>
+        <p>We use your information for the following purposes:</p>
         <ul>
-          <li>To provide and maintain our services</li>
+          <li>To provide, maintain, and improve our services</li>
           <li>To process payments and manage subscriptions</li>
-          <li>To communicate with you about our services</li>
-          <li>To improve and personalize your experience</li>
-          <li>To ensure security and prevent fraud</li>
+          <li>To communicate with you about our services, updates, and support</li>
+          <li>To personalize and enhance your user experience</li>
+          <li>To ensure security, prevent fraud, and enforce our Terms of Service</li>
           <li>To comply with legal obligations</li>
+          <li>To analyze usage patterns and improve our services</li>
         </ul>
 
-        <h2>4. Information Sharing</h2>
+        <h2>4. Legal Basis for Processing (Where Applicable)</h2>
+        <p>We process your personal information based on:</p>
+        <ul>
+          <li><strong>Performance of a contract:</strong> To provide you with our services</li>
+          <li><strong>Consent:</strong> Where you have given us explicit consent</li>
+          <li><strong>Legitimate interests:</strong> To improve our services and protect our business</li>
+          <li><strong>Legal obligation:</strong> To comply with applicable laws</li>
+        </ul>
+
+        <h2>5. Information Sharing and Disclosure</h2>
         <p>
-          We do not sell, trade, or otherwise transfer your personal information
-          to third parties except:
+          We do not sell, trade, or rent your personal information to third parties for marketing purposes. We may share your information with third parties only in the following circumstances:
         </p>
         <ul>
-          <li>With your explicit consent</li>
-          <li>To trusted service providers who assist our operations</li>
-          <li>When required by law or to protect our rights</li>
-          <li>In connection with a business transfer or merger</li>
+          <li><strong>Service Providers:</strong> We may share information with trusted service providers who assist us in operating our website and providing our services (e.g., payment processors, cloud hosting providers, analytics services)</li>
+          <li><strong>With Your Consent:</strong> We may share information with third parties if you have given us explicit permission</li>
+          <li><strong>Legal Requirements:</strong> We may disclose information if required by law, court order, or government request</li>
+          <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of all or part of our business</li>
+          <li><strong>Protection of Rights:</strong> To protect the rights, property, or safety of Trendex AI, our users, or others</li>
         </ul>
-
-        <h2>5. Data Security</h2>
         <p>
-          We implement appropriate technical and organizational measures to
-          protect your personal information against unauthorized access,
-          alteration, disclosure, or destruction. This includes:
+          All service providers are bound by strict confidentiality obligations and may only use your information as necessary to provide services to us.
+        </p>
+
+        <h2>6. Data Security</h2>
+        <p>
+          We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:
         </p>
         <ul>
-          <li>Encryption of sensitive data</li>
-          <li>Secure server infrastructure</li>
-          <li>Regular security audits</li>
-          <li>Access controls and authentication</li>
+          <li>Encryption of sensitive data in transit and at rest</li>
+          <li>Secure server infrastructure with industry-standard security protocols</li>
+          <li>Regular security audits and updates</li>
+          <li>Access controls and authentication mechanisms</li>
+          <li>Employee training on data security and privacy</li>
         </ul>
-
-        <h2>6. Your Rights</h2>
-        <p>You have the right to:</p>
-        <ul>
-          <li>Access your personal information</li>
-          <li>Correct inaccurate information</li>
-          <li>Request deletion of your data</li>
-          <li>Object to or restrict processing</li>
-          <li>Data portability</li>
-          <li>Withdraw consent where applicable</li>
-        </ul>
-
-        <h2>7. Cookies and Tracking</h2>
         <p>
-          We use cookies and similar technologies to enhance your experience,
-          analyze usage, and provide personalized content. You can control
-          cookie settings through your browser preferences.
+          While we strive to use commercially acceptable means to protect your personal information, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security.
+        </p>
+
+        <h2>7. Cookies and Tracking Technologies</h2>
+        <p>
+          We use cookies and similar tracking technologies to enhance your experience on our website. These technologies help us:
+        </p>
+        <ul>
+          <li>Remember your preferences and settings</li>
+          <li>Analyze website traffic and usage patterns</li>
+          <li>Improve our website functionality</li>
+          <li>Personalize content and recommendations</li>
+        </ul>
+        <p>
+          You can control cookie settings through your browser preferences. Please note that disabling cookies may affect the functionality of our website.
+        </p>
+        <p>
+          For more detailed information about our use of cookies, please contact us.
         </p>
 
         <h2>8. Third-Party Services</h2>
         <p>
-          Our service integrates with cryptocurrency exchanges and payment
-          processors. These third parties have their own privacy policies, and
-          we encourage you to review them.
+          Our website and services may contain links to third-party websites or integrate with third-party services (such as cryptocurrency exchanges and payment processors). These third parties have their own privacy policies, and we encourage you to review them. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
         </p>
+        <p>
+          Our service integrates with:
+        </p>
+        <ul>
+          <li>Cryptocurrency exchanges (for trading bot functionality)</li>
+          <li>Payment processors (for subscription payments)</li>
+          <li>Analytics services (to improve our website)</li>
+        </ul>
 
         <h2>9. Data Retention</h2>
         <p>
-          We retain your information for as long as necessary to provide our
-          services and comply with legal obligations. You can request data
-          deletion at any time.
+          We retain your personal information only for as long as necessary to provide our services and comply with legal obligations. Specifically:
+        </p>
+        <ul>
+          <li>Account information is retained while your account is active</li>
+          <li>Payment records are retained in accordance with applicable tax and accounting laws</li>
+          <li>Communication records are retained as long as necessary for support and legal purposes</li>
+        </ul>
+        <p>
+          When we no longer need your information, we will delete it or anonymize it. You can request deletion of your data at any time (see Section 10 below).
         </p>
 
-        <h2>10. International Data Transfers</h2>
+        <h2>10. Your Rights</h2>
         <p>
-          Your information may be transferred to and processed in countries
-          other than your own. We ensure appropriate safeguards are in place for
-          such transfers.
+          Depending on your jurisdiction, you may have the following rights regarding your personal information:
+        </p>
+        <ul>
+          <li><strong>Access:</strong> Request a copy of the personal information we hold about you</li>
+          <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
+          <li><strong>Deletion:</strong> Request deletion of your personal information</li>
+          <li><strong>Restriction:</strong> Request restriction of processing</li>
+          <li><strong>Portability:</strong> Request transfer of your data to another organization</li>
+          <li><strong>Objection:</strong> Object to processing of your personal information</li>
+          <li><strong>Withdraw Consent:</strong> Withdraw consent where processing is based on consent</li>
+        </ul>
+        <p>
+          To exercise these rights, please contact us using the contact information provided in Section 15.
         </p>
 
-        <h2>11. Children's Privacy</h2>
+        <h2>11. International Data Transfers</h2>
         <p>
-          Our services are not intended for children under 18. We do not
-          knowingly collect personal information from children under 18.
+          Your information may be transferred to and processed in countries other than your own. These countries may have different data protection laws than your country. We ensure appropriate safeguards are in place for such transfers, including:
+        </p>
+        <ul>
+          <li>Use of standard contractual clauses</li>
+          <li>Reliance on adequacy decisions</li>
+          <li>Other legally permitted safeguards</li>
+        </ul>
+
+        <h2>12. Children's Privacy</h2>
+        <p>
+          Our services are not intended for individuals under the age of 18. We do not knowingly collect personal information from children under 18. If we become aware that we have collected personal information from a child under 18, we will take steps to delete that information as soon as possible. If you believe we may have information from a child under 18, please contact us immediately.
         </p>
 
-        <h2>12. Changes to This Policy</h2>
+        <h2>13. Changes to This Privacy Policy</h2>
         <p>
-          We may update this Privacy Policy from time to time. We will notify
-          you of any material changes by posting the new policy on our website.
+          We may update this Privacy Policy from time to time. We will notify you of material changes by posting the updated policy on our website with an updated effective date. Your continued use of our services after the changes constitute acceptance of the updated policy. We encourage you to review this Privacy Policy periodically.
         </p>
 
-        <h2>13. Contact Us</h2>
+        <h2>14. Do Not Track Signals</h2>
         <p>
-          If you have questions about this Privacy Policy or our data practices,
-          please contact us through our support channels.
+          Some browsers support "Do Not Track" (DNT) signals. Our website does not currently respond to DNT signals. However, you can configure your browser settings to refuse cookies or alert you when cookies are being sent.
         </p>
 
+        <h2>15. Contact Us</h2>
         <p>
-          <em>Last updated: April 2026</em>
+          If you have questions about this Privacy Policy, our data practices, or wish to exercise your rights, please contact us using the following information:
+        </p>
+        <ul>
+          <li><strong>Phone:</strong> +91 80122 02083</li>
+          <li><strong>WhatsApp:</strong> <a href="https://chat.whatsapp.com/JzznVDAlnsPImIlws2p3Ig" target="_blank" rel="noreferrer" style={{ color: 'var(--neon)' }}>Join our group</a></li>
+          <li><strong>Website:</strong> <a href="https://aitrendex.com" target="_blank" rel="noreferrer" style={{ color: 'var(--neon)' }}>aitrendex.com</a></li>
+        </ul>
+        <p>
+          We will respond to your request within a reasonable timeframe, typically within 30 days.
+        </p>
+
+        <p style={{ marginTop: '24px' }}>
+          <em>Last updated: June 2026</em>
         </p>
       </div>
     </div>

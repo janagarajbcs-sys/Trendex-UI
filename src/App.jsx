@@ -25,6 +25,10 @@ import PremiumCertificate from './pages/PremiumCertificate.jsx';
 import PremiumAdminLogin from './pages/PremiumAdminLogin.jsx';
 import Terms from './pages/Terms.jsx';
 import Privacy from './pages/Privacy.jsx';
+import AboutUs from './pages/AboutUs.jsx';
+import RiskDisclosure from './pages/RiskDisclosure.jsx';
+import HowItWorks from './pages/HowItWorks.jsx';
+import Contact from './pages/Contact.jsx';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -357,22 +361,104 @@ function Layout({ children }) {
             </svg>
           </a>
         </div>
-        <div>
-          © 2026 Trendex ·{' '}
-          <Link
-            to="/terms"
-            style={{ color: 'var(--neon)', textDecoration: 'none' }}
-          >
-            Terms
-          </Link>{' '}
-          ·{' '}
-          <Link
-            to="/privacy"
-            style={{ color: 'var(--neon)', textDecoration: 'none' }}
-          >
-            Privacy
-          </Link>{' '}
-          · <span>All rights reserved</span>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          gap: '12px' 
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            justifyContent: 'center', 
+            gap: '16px' 
+          }}>
+            <Link
+              to="/about-us"
+              style={{ 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/how-it-works"
+              style={{ 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              How It Works
+            </Link>
+            <Link
+              to="/risk-disclosure"
+              style={{ 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Risk Disclosure
+            </Link>
+            <Link
+              to="/terms"
+              style={{ 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Terms
+            </Link>
+            <Link
+              to="/privacy"
+              style={{ 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/contact"
+              style={{ 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Contact
+            </Link>
+          </div>
+          <div style={{ 
+            color: 'var(--text-muted)', 
+            fontSize: '0.85rem',
+            textAlign: 'center'
+          }}>
+            © 2026 Trendex. All rights reserved.
+          </div>
         </div>
       </footer>
     </div>
@@ -413,6 +499,10 @@ export default function App() {
         <Route path="/qanda/support" element={<QASupport />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/risk-disclosure" element={<RiskDisclosure />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
