@@ -241,22 +241,28 @@ export default function Home() {
 
   return (
     <div>
-      <section className="card" style={{ marginBottom: 16 }}>
-        <h1 style={{ color: '#00ddeb', margin: 6 }}>
-          AI Trendex - Tamil(Support & Guide)
-        </h1>
-        <h3>Automated Cryptocurrency Trading with 8 strategies</h3>
-        <p>
-          The first real-time spot & futures bots with AI-driven risk
-          management.
-        </p>
+      {/* Hero Section */}
+      <section className="card" style={{ marginBottom: 24, textAlign: 'center' }}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ color: '#00ddeb', margin: 6, fontSize: isLaptop ? '3rem' : isTablet ? '2.5rem' : '2rem' }}>
+            AI Trendex - Tamil(Support & Guide)
+          </h1>
+          <h3 style={{ marginBottom: 16, fontSize: isLaptop ? '1.5rem' : '1.2rem' }}>
+            Automated Cryptocurrency Trading with 8 strategies
+          </h3>
+          <p style={{ fontSize: isLaptop ? '1.1rem' : '1rem', maxWidth: 800, margin: '0 auto' }}>
+            The first real-time spot & futures bots with AI-driven risk management. 
+            Experience professional-grade trading automation for both beginners and advanced traders.
+          </p>
+        </div>
+        
         <div
           style={{
             display: 'flex',
-            gap: 12,
+            gap: 16,
             flexWrap: 'wrap',
             justifyContent: 'center',
-            marginTop: 12,
+            marginTop: 24,
           }}
         >
           <a
@@ -264,9 +270,17 @@ export default function Home() {
             href="https://aitrendex.com/"
             target="_blank"
             rel="noreferrer"
+            style={{ padding: '14px 28px', fontSize: '1.1rem' }}
           >
-            Visit Trendex Website
+            🚀 Visit Trendex Website
           </a>
+          <Link
+            className="btn secondary"
+            to="/how-it-works"
+            style={{ padding: '14px 28px', fontSize: '1.1rem' }}
+          >
+            📖 How It Works
+          </Link>
           <a
             className="btn secondary"
             href="https://play.google.com/store/apps/details?id=com.binance.dev"
@@ -285,6 +299,86 @@ export default function Home() {
           </a>
         </div>
       </section>
+
+      {/* Why Choose Trendex Section */}
+      <section style={{ marginBottom: 24 }}>
+        <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: 20 }}>
+          Why Choose Trendex AI?
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(4, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: 16 }}>
+          {[
+            { icon: '🤖', title: '8 Unique Strategies', desc: 'Spot and Futures trading strategies for every market condition' },
+            { icon: '🔒', title: 'Your Funds Stay Yours', desc: 'Never give up control - funds always stay in your Binance wallet' },
+            { icon: '⚡', title: '24/7 Automation', desc: 'Bots execute trades automatically around the clock' },
+            { icon: '🛡️', title: 'AI Risk Management', desc: 'Smart risk controls to protect your capital' }
+          ].map((item, i) => (
+            <div key={i} className="card" style={{ textAlign: 'center', padding: 20 }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>{item.icon}</div>
+              <h3 style={{ marginBottom: 8, color: '#00ddeb' }}>{item.title}</h3>
+              <p style={{ fontSize: '0.95rem' }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Quick Start Guide */}
+      <section style={{ marginBottom: 24 }}>
+        <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: 20 }}>
+          Quick Start Guide
+        </h2>
+        <div className="card" style={{ padding: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(4, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: 20, textAlign: 'center' }}>
+            {[
+              { 
+                step: 1, 
+                title: 'Explore Platform', 
+                desc: 'Watch the presentation and explore the platform completely' 
+              },
+              { 
+                step: 2, 
+                title: 'Clear Your Doubts', 
+                desc: 'Contact your referrer or support team for guidance' 
+              },
+              { 
+                step: 3, 
+                title: 'Register & Subscribe', 
+                desc: 'Create accounts and activate your subscription' 
+              },
+              { 
+                step: 4, 
+                title: 'Start Earning', 
+                desc: 'Get Premium Access and start bot trading or referrals' 
+              }
+            ].map((item, i) => (
+              <div key={i}>
+                <div style={{ 
+                  width: 60, height: 60, 
+                  borderRadius: '50%', 
+                  background: '#00ddeb', 
+                  color: '#000', 
+                  fontSize: '1.8rem', 
+                  fontWeight: 'bold', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 16px auto'
+                }}>
+                  {item.step}
+                </div>
+                <h3 style={{ marginBottom: 8 }}>{item.title}</h3>
+                <p style={{ fontSize: '0.95rem' }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <Link className="btn" to="/video">
+              📹 Watch Presentation Video
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
 
       {/* Leaders board moved to Share & Earn page */}
 
@@ -845,6 +939,55 @@ export default function Home() {
             )}
           </form>
         </div>
+        
+        {/* Testimonials Section */}
+        <section style={{ marginBottom: 12 }}>
+          <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: 12 }}>
+            What Our Traders Say
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(3, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: 12 }}>
+            {[
+              { 
+                name: 'Arun K.', 
+                location: 'Erode', 
+                quote: 'Compared to traditional saving methods, this gave me a better way to grow my funds while keeping full control since my funds remain in my own trading account. That gave me confidence.' 
+              },
+              { 
+                name: 'Praveen S.', 
+                location: 'Coimbatore', 
+                quote: 'I lost money before by blindly trusting others and joining random opportunities. What impressed me here was the ability to build capital gradually while also having referral opportunities.' 
+              },
+              { 
+                name: 'Dinesh R.', 
+                location: 'Salem', 
+                quote: 'What I liked most is that this is not a quick-profit platform. The long-term approach, multiple strategies, regular achievers meetups, and continuous updates make it feel like a system focused on learning and steady growth.' 
+              },
+              { 
+                name: 'Kavya M.', 
+                location: 'Tiruppur', 
+                quote: 'Before this, I tried multiple ways to grow my savings but never found something I could understand and follow consistently. Here, having control over my own account gave me more confidence.' 
+              },
+              { 
+                name: 'Priyadharshini S.', 
+                location: 'Chennai', 
+                quote: 'I was hesitant because of my previous experiences, but the step-by-step approach and learning process made it easier. I like that this focuses on gradual growth rather than unrealistic promises.' 
+              },
+              { 
+                name: 'Nivetha R.', 
+                location: 'Karur', 
+                quote: 'What impressed me most was the community support, regular updates, and events. It feels more like learning and growing together rather than simply joining another platform.' 
+              }
+            ].map((testimonial, i) => (
+              <div key={i} className="card" style={{ padding: 16 }}>
+                <div style={{ fontSize: '2rem', marginBottom: 10 }}>"</div>
+                <p style={{ fontSize: '0.9rem', marginBottom: 12, fontStyle: 'italic' }}>{testimonial.quote}</p>
+                <div style={{ fontWeight: 'bold', color: '#00ddeb' }}>{testimonial.name}</div>
+                <div style={{ fontSize: '0.8rem', color: '#9fb3bf' }}>{testimonial.location}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+        
         <div className="card" style={{ marginTop: 12 }}>
           <h2>Premium Access</h2>
           <Link className="btn" to="/premium">

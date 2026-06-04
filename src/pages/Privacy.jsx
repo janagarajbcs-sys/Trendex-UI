@@ -92,20 +92,31 @@ export default function Privacy() {
         </p>
 
         <h2>7. Cookies and Tracking Technologies</h2>
+        <h3>What are cookies?</h3>
         <p>
-          We use cookies and similar tracking technologies to enhance your experience on our website. These technologies help us:
+          Cookies are small text files that are stored on your device when you visit a website. They help us provide you with a better experience and allow us to understand how our website is used.
         </p>
+        <h3>Types of cookies we use</h3>
+        <ul>
+          <li><strong>Essential Cookies:</strong> These cookies are necessary for the website to function properly and cannot be switched off.</li>
+          <li><strong>Performance Cookies:</strong> These cookies help us understand how visitors interact with our website, helping us improve performance.</li>
+          <li><strong>Functionality Cookies:</strong> These cookies enable enhanced functionality and personalization, such as remembering your preferences.</li>
+          <li><strong>Targeting/Advertising Cookies:</strong> These cookies may be set through our site by our advertising partners to build a profile of your interests.</li>
+        </ul>
+        <h3>How we use cookies</h3>
         <ul>
           <li>Remember your preferences and settings</li>
           <li>Analyze website traffic and usage patterns</li>
           <li>Improve our website functionality</li>
           <li>Personalize content and recommendations</li>
+          <li>Enable third-party services (e.g., YouTube, social media)</li>
         </ul>
+        <h3>Managing cookies</h3>
         <p>
-          You can control cookie settings through your browser preferences. Please note that disabling cookies may affect the functionality of our website.
+          You can control and manage cookies through your browser settings. Please note that disabling cookies may affect the functionality of our website. You can usually find these settings in the "Options" or "Preferences" menu of your browser.
         </p>
         <p>
-          For more detailed information about our use of cookies, please contact us.
+          By continuing to use our website, you consent to our use of cookies as described in this policy.
         </p>
 
         <h2>8. Third-Party Services</h2>

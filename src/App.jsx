@@ -4,6 +4,7 @@ import './App.css';
 import BannerSlider from './components/BannerSlider.jsx';
 import RegisterPopup from './components/RegisterPopup.jsx';
 import LanguageTranslate from './components/LanguageTranslate.jsx';
+import CookieConsent from './components/CookieConsent.jsx';
 import { getBannersAsync } from './lib/premium';
 import Home from './pages/Home.jsx';
 import Bot from './pages/Bot.jsx';
@@ -166,6 +167,40 @@ function Layout({ children }) {
             </svg>
             <span>Home</span>
           </NavLink>
+          <NavLink to="/about-us">
+            <svg
+              className="nav-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>About Us</span>
+          </NavLink>
+          <NavLink to="/how-it-works">
+            <svg
+              className="nav-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span>How It Works</span>
+          </NavLink>
           <NavLink to="/video">
             <svg
               className="nav-icon"
@@ -182,6 +217,25 @@ function Layout({ children }) {
               <polyline points="10 8 14 12 10 16" />
             </svg>
             <span>Presentation</span>
+          </NavLink>
+          <NavLink to="/bot">
+            <svg
+              className="nav-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="10" rx="2" />
+              <circle cx="8.5" cy="16" r="1" />
+              <circle cx="15.5" cy="16" r="1" />
+              <path d="M21 16V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8" />
+            </svg>
+            <span>Bots</span>
           </NavLink>
           <Link
             to="/#join-business"
@@ -221,6 +275,22 @@ function Layout({ children }) {
               <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
             </svg>
             <span>Premium Access</span>
+          </NavLink>
+          <NavLink to="/contact">
+            <svg
+              className="nav-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            <span>Contact</span>
           </NavLink>
         </nav>
         {menuOpen && (
@@ -302,162 +372,260 @@ function Layout({ children }) {
       </div>
       <main className="app-main">{children}</main>
       <RegisterPopup />
+      <CookieConsent />
       <footer className="app-footer">
-        <div className="social-bar" aria-label="Social links">
-          <a
-            className="social-link yt has-tip"
-            data-tip="YouTube"
-            href="https://youtube.com/@aitrendex_tamil?si=iCJ9LMew-CB0hvki"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="YouTube"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.2 0 12 0 12s0 3.8.5 5.8a3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-2 .5-5.8.5-5.8s0-3.8-.5-5.8zM9.6 15.5V8.5L15.8 12l-6.2 3.5z"
-              />
-            </svg>
-          </a>
-          <a
-            className="social-link ig has-tip"
-            data-tip="Instagram"
-            rel="noreferrer"
-            aria-label="Instagram"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm0 2h10c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3zm5 3.5A5.5 5.5 0 1 0 17.5 13 5.5 5.5 0 0 0 12 7.5zm0 2A3.5 3.5 0 1 1 8.5 13 3.5 3.5 0 0 1 12 9.5zm5.2-2.8a1.2 1.2 0 1 0 1.2 1.2a1.2 1.2 0 0 0-1.2-1.2z"
-              />
-            </svg>
-          </a>
-          <a
-            className="social-link fb has-tip"
-            data-tip="Facebook"
-            rel="noreferrer"
-            aria-label="Facebook"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M22 12A10 10 0 1 0 10.5 21.9v-6.9H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9c1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12H16l-.5 3h-2v6.9A10 10 0 0 0 22 12"
-              />
-            </svg>
-          </a>
-          <a
-            className="social-link wa has-tip"
-            data-tip="WhatsApp Channel"
-            href="https://whatsapp.com/channel/0029Vb61xAa6hENzJrPD5h1K"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="WhatsApp"
-          >
-            <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M19.11 17.49c-.26-.13-1.52-.75-1.75-.84c-.23-.09-.4-.13-.57.13c-.17.26-.65.84-.8 1.01c-.15.17-.3.19-.56.06c-.26-.13-1.1-.41-2.1-1.31c-.78-.69-1.3-1.55-1.45-1.81c-.15-.26-.02-.4.11-.53c.11-.11.26-.3.4-.45c.13-.15.17-.26.26-.43c.09-.17.04-.32-.02-.45c-.06-.13-.57-1.37-.78-1.88c-.2-.48-.4-.42-.57-.43h-.49c-.17 0-.45.06-.69.32c-.23.26-.9.88-.9 2.14c0 1.26.92 2.48 1.05 2.65c.13.17 1.82 2.78 4.41 3.9c.62.27 1.1.43 1.48.55c.62.2 1.18.17 1.63.1c.5-.07 1.52-.62 1.73-1.22c.21-.6.21-1.11.15-1.22c-.06-.11-.23-.17-.49-.3zM26.88 5.12C24.15 2.39 20.66 1 16.99 1C8.83 1 2.38 7.45 2.38 15.61c0 2.71.71 5.35 2.07 7.67L2 31l7.93-2.33c2.27 1.24 4.84 1.9 7.05 1.9h.01c8.16 0 14.61-6.45 14.61-14.61c0-3.66-1.39-7.15-4.12-9.88z"
-              />
-            </svg>
-          </a>
-        </div>
         <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          gap: '12px' 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          gap: '32px', 
+          padding: '24px 0',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          width: '100%'
         }}>
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            justifyContent: 'center', 
-            gap: '16px' 
-          }}>
-            <Link
-              to="/about-us"
-              style={{ 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
-              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              About Us
-            </Link>
-            <Link
-              to="/how-it-works"
-              style={{ 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
-              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              How It Works
-            </Link>
-            <Link
-              to="/risk-disclosure"
-              style={{ 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
-              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Risk Disclosure
-            </Link>
-            <Link
-              to="/terms"
-              style={{ 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
-              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Terms
-            </Link>
-            <Link
-              to="/privacy"
-              style={{ 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
-              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Privacy
-            </Link>
-            <Link
-              to="/contact"
-              style={{ 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
-              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Contact
-            </Link>
+          {/* Company Info */}
+          <div>
+            <h3 style={{ color: 'var(--neon)', marginBottom: '16px', fontSize: '1.1rem' }}>
+              Trendex AI
+            </h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              Automated cryptocurrency trading with AI-driven risk management. Your trusted partner in the crypto markets.
+            </p>
+            <div className="social-bar" aria-label="Social links" style={{ gap: '12px', justifyContent: 'flex-start' }}>
+              <a
+                className="social-link yt has-tip"
+                data-tip="YouTube"
+                href="https://youtube.com/@aitrendex_tamil?si=iCJ9LMew-CB0hvki"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="YouTube"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0.5 6.2C0 8.2 0 12 0 12s0 3.8.5 5.8a3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-2 .5-5.8.5-5.8s0-3.8-.5-5.8zM9.6 15.5V8.5L15.8 12l-6.2 3.5z"
+                  />
+                </svg>
+              </a>
+              <a
+                className="social-link wa has-tip"
+                data-tip="WhatsApp Channel"
+                href="https://whatsapp.com/channel/0029Vb61xAa6hENzJrPD5h1K"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="WhatsApp"
+              >
+                <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M19.11 17.49c-.26-.13-1.52-.75-1.75-.84c-.23-.09-.4-.13-.57.13c-.17.26-.65.84-.8 1.01c-.15.17-.3.19-.56.06c-.26-.13-1.1-.41-2.1-1.31c-.78-.69-1.3-1.55-1.45-1.81c-.15-.26-.02-.4.11-.53c.11-.11.26-.3.4-.45c.13-.15.17-.26.26-.43c.09-.17.04-.32-.02-.45c-.06-.13-.57-1.37-.78-1.88c-.2-.48-.4-.42-.57-.43h-.49c-.17 0-.45.06-.69.32c-.23.26-.9.88-.9 2.14c0 1.26.92 2.48 1.05 2.65c.13.17 1.82 2.78 4.41 3.9c.62.27 1.1.43 1.48.55c.62.2 1.18.17 1.63.1c.5-.07 1.52-.62 1.73-1.22c.21-.6.21-1.11.15-1.22c-.06-.11-.23-.17-.49-.3zM26.88 5.12C24.15 2.39 20.66 1 16.99 1C8.83 1 2.38 7.45 2.38 15.61c0 2.71.71 5.35 2.07 7.67L2 31l7.93-2.33c2.27 1.24 4.84 1.9 7.05 1.9h.01c8.16 0 14.61-6.45 14.61-14.61c0-3.66-1.39-7.15-4.12-9.88z"
+                  />
+                </svg>
+              </a>
+            </div>
           </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 style={{ color: 'var(--neon)', marginBottom: '16px', fontSize: '1.1rem' }}>
+              Quick Links
+            </h3>
+            <div style={{ display: 'grid', gap: '10px' }}>
+              <Link
+                to="/about-us"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                About Us
+              </Link>
+              <Link
+                to="/how-it-works"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                How It Works
+              </Link>
+              <Link
+                to="/bot"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Trading Bots
+              </Link>
+              <Link
+                to="/video"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Presentation
+              </Link>
+            </div>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 style={{ color: 'var(--neon)', marginBottom: '16px', fontSize: '1.1rem' }}>
+              Legal
+            </h3>
+            <div style={{ display: 'grid', gap: '10px' }}>
+              <Link
+                to="/risk-disclosure"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Risk Disclosure
+              </Link>
+              <Link
+                to="/terms"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Terms & Conditions
+              </Link>
+              <Link
+                to="/privacy"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/contact"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Contact Us
+              </Link>
+            </div>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h3 style={{ color: 'var(--neon)', marginBottom: '16px', fontSize: '1.1rem' }}>
+              Get In Touch
+            </h3>
+            <div style={{ display: 'grid', gap: '10px' }}>
+              <a
+                href="tel:+918012202083"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                📞 +91 80122 02083
+              </a>
+              <a
+                href="https://chat.whatsapp.com/JzznVDAlnsPImIlws2p3Ig"
+                target="_blank"
+                rel="noreferrer"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                💬 Join WhatsApp Group
+              </a>
+              <a
+                href="https://aitrendex.com"
+                target="_blank"
+                rel="noreferrer"
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                🌐 Main Website
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div style={{ 
+          borderTop: '1px solid #334155', 
+          paddingTop: '24px', 
+          marginTop: '24px',
+          textAlign: 'center',
+          maxWidth: '1200px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          width: '100%'
+        }}>
           <div style={{ 
             color: 'var(--text-muted)', 
             fontSize: '0.85rem',
-            textAlign: 'center'
+            marginBottom: '8px'
           }}>
-            © 2026 Trendex. All rights reserved.
+            © 2026 Trendex AI. All rights reserved.
+          </div>
+          <div style={{ 
+            color: '#EF4444', 
+            fontSize: '0.8rem',
+            maxWidth: '600px',
+            margin: '0 auto'
+          }}>
+            ⚠️ Real trading does not provide stable, guaranteed, or assured returns.
+            Cryptocurrency trading involves substantial risk of loss.
           </div>
         </div>
       </footer>
