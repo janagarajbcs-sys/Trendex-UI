@@ -9,6 +9,66 @@ import {
 } from '../lib/premium';
 import AchievementSlider from '../components/AchievementSlider.jsx';
 
+// Animation styles
+const animationStyles = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(0, 221, 235, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 221, 235, 0.6); }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  .animate-fade-in-left {
+    animation: fadeInLeft 0.6s ease-out forwards;
+  }
+  .animate-fade-in-right {
+    animation: fadeInRight 0.6s ease-out forwards;
+  }
+  .animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 221, 235, 0.2);
+  }
+  .btn-hover {
+    transition: all 0.3s ease;
+  }
+  .btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 221, 235, 0.3);
+  }
+`;
+
 export default function Home() {
   const location = useLocation();
   const chartRef = useRef(null);
@@ -29,6 +89,74 @@ export default function Home() {
   const holdTimer = useRef(null);
   const [showAllLeaders, setShowAllLeaders] = useState(false);
   const [screen, setScreen] = useState(window.innerWidth);
+  
+  // Animation states for sections
+  const [visibleSections, setVisibleSections] = useState({
+    hero: true,
+    quickStart: false,
+    market: false,
+    whyChoose: false,
+    testimonials: false,
+    bottom: false
+  });
+  
+  const sectionRefs = {
+    hero: useRef(null),
+    quickStart: useRef(null),
+    market: useRef(null),
+    whyChoose: useRef(null),
+    testimonials: useRef(null),
+    bottom: useRef(null)
+  };
+  
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionName = entry.target.dataset.section;
+            if (sectionName && !visibleSections[sectionName]) {
+              setVisibleSections((prev) => ({
+                ...prev,
+                [sectionName]: true
+              }));
+            }
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    
+    Object.entries(sectionRefs).forEach(([name, ref]) => {
+      if (ref.current) {
+        ref.current.dataset.section = name;
+        observer.observe(ref.current);
+      }
+    });
+    
+    return () => {
+      Object.values(sectionRefs).forEach((ref) => {
+        if (ref.current) observer.unobserve(ref.current);
+      });
+    };
+  }, [visibleSections]);
+  
+  // Add styles to head
+  useEffect(() => {
+    const styleId = 'home-animations';
+    let styleEl = document.getElementById(styleId);
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = animationStyles;
+    return () => {
+      const el = document.getElementById(styleId);
+      if (el) el.remove();
+    };
+  }, []);
 
   // Load TradingView widget
   useEffect(() => {
@@ -240,17 +368,26 @@ export default function Home() {
   const isLaptop = screen >= 768;
 
   return (
-    <div>
+    <div style={{ padding: '0 8px' }}>
       {/* Hero Section */}
-      <section className="card" style={{ marginBottom: 24, textAlign: 'center' }}>
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ color: '#00ddeb', margin: 6, fontSize: isLaptop ? '3rem' : isTablet ? '2.5rem' : '2rem' }}>
+      <section 
+        ref={sectionRefs.hero}
+        className="card card-hover" 
+        style={{ 
+          marginBottom: isMobile ? 16 : 24, 
+          textAlign: 'center', 
+          padding: isMobile ? '20px 12px' : '24px',
+          animation: 'fadeIn 0.8s ease-out forwards'
+        }}
+      >
+        <div style={{ marginBottom: isMobile ? 16 : 24 }}>
+          <h1 style={{ color: '#00ddeb', margin: 6, fontSize: isLaptop ? '3rem' : isTablet ? '2.2rem' : '1.6rem', lineHeight: 1.2 }}>
             AI Trendex - Tamil(Support & Guide)
           </h1>
-          <h3 style={{ marginBottom: 16, fontSize: isLaptop ? '1.5rem' : '1.2rem' }}>
+          <h3 style={{ marginBottom: 12, fontSize: isLaptop ? '1.5rem' : isTablet ? '1.2rem' : '1rem' }}>
             Automated Cryptocurrency Trading with 8 strategies
           </h3>
-          <p style={{ fontSize: isLaptop ? '1.1rem' : '1rem', maxWidth: 800, margin: '0 auto' }}>
+          <p style={{ fontSize: isLaptop ? '1.1rem' : isTablet ? '1rem' : '0.9rem', maxWidth: 800, margin: '0 auto', lineHeight: 1.6 }}>
             The first real-time spot & futures bots with AI-driven risk management. 
             Experience professional-grade trading automation for both beginners and advanced traders.
           </p>
@@ -259,75 +396,75 @@ export default function Home() {
         <div
           style={{
             display: 'flex',
-            gap: 16,
+            gap: isMobile ? 10 : 16,
             flexWrap: 'wrap',
             justifyContent: 'center',
-            marginTop: 24,
+            marginTop: isMobile ? 16 : 24,
           }}
         >
           <a
-            className="btn"
+            className="btn btn-hover"
             href="https://aitrendex.com/"
             target="_blank"
             rel="noreferrer"
-            style={{ padding: '14px 28px', fontSize: '1.1rem' }}
+            style={{ 
+              padding: isMobile ? '12px 24px' : '14px 28px', 
+              fontSize: isMobile ? '1rem' : '1.1rem', 
+              width: isMobile ? '100%' : 'auto', 
+              maxWidth: isMobile ? '280px' : 'none',
+              animation: 'pulse 2s ease-in-out infinite'
+            }}
           >
             🚀 Visit Trendex Website
           </a>
           <Link
-            className="btn secondary"
+            className="btn secondary btn-hover"
             to="/how-it-works"
-            style={{ padding: '14px 28px', fontSize: '1.1rem' }}
+            style={{ 
+              padding: isMobile ? '12px 24px' : '14px 28px', 
+              fontSize: isMobile ? '1rem' : '1.1rem', 
+              width: isMobile ? '100%' : 'auto', 
+              maxWidth: isMobile ? '280px' : 'none',
+              animation: 'glow 2s ease-in-out infinite'
+            }}
           >
             📖 How It Works
           </Link>
           <a
-            className="btn secondary"
+            className="btn secondary btn-hover"
             href="https://play.google.com/store/apps/details?id=com.binance.dev"
             target="_blank"
             rel="noreferrer"
+            style={{ padding: isMobile ? '10px 20px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1rem' }}
           >
             Binance Android
           </a>
           <a
-            className="btn secondary"
+            className="btn secondary btn-hover"
             href="https://apps.apple.com/app/binance-buy-bitcoin-crypto/id1436799971"
             target="_blank"
             rel="noreferrer"
+            style={{ padding: isMobile ? '10px 20px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1rem' }}
           >
             Binance iOS
           </a>
         </div>
       </section>
 
-      {/* Why Choose Trendex Section */}
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: 20 }}>
-          Why Choose Trendex AI?
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(4, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: 16 }}>
-          {[
-            { icon: '🤖', title: '8 Unique Strategies', desc: 'Spot and Futures trading strategies for every market condition' },
-            { icon: '🔒', title: 'Your Funds Stay Yours', desc: 'Never give up control - funds always stay in your Binance wallet' },
-            { icon: '⚡', title: '24/7 Automation', desc: 'Bots execute trades automatically around the clock' },
-            { icon: '🛡️', title: 'AI Risk Management', desc: 'Smart risk controls to protect your capital' }
-          ].map((item, i) => (
-            <div key={i} className="card" style={{ textAlign: 'center', padding: 20 }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>{item.icon}</div>
-              <h3 style={{ marginBottom: 8, color: '#00ddeb' }}>{item.title}</h3>
-              <p style={{ fontSize: '0.95rem' }}>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Quick Start Guide */}
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: 20 }}>
+      <section 
+        ref={sectionRefs.quickStart}
+        style={{ 
+          marginBottom: isMobile ? 16 : 24,
+          opacity: visibleSections.quickStart ? 1 : 0,
+          animation: visibleSections.quickStart ? 'fadeIn 0.8s ease-out 0.2s forwards' : 'none'
+        }}
+      >
+        <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: isMobile ? 12 : 20, fontSize: isLaptop ? '1.5rem' : isTablet ? '1.3rem' : '1.2rem' }}>
           Quick Start Guide
         </h2>
-        <div className="card" style={{ padding: 24 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(4, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: 20, textAlign: 'center' }}>
+        <div className="card card-hover" style={{ padding: isMobile ? '16px' : '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(4, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: isMobile ? 16 : 20, textAlign: 'center' }}>
             {[
               { 
                 step: 1, 
@@ -350,28 +487,36 @@ export default function Home() {
                 desc: 'Get Premium Access and start bot trading or referrals' 
               }
             ].map((item, i) => (
-              <div key={i}>
+              <div 
+                key={i}
+                style={{ 
+                  opacity: visibleSections.quickStart ? 1 : 0,
+                  animation: visibleSections.quickStart ? `fadeIn 0.6s ease-out ${0.3 + i * 0.15}s forwards` : 'none'
+                }}
+              >
                 <div style={{ 
-                  width: 60, height: 60, 
+                  width: isMobile ? 52 : 60, 
+                  height: isMobile ? 52 : 60, 
                   borderRadius: '50%', 
                   background: '#00ddeb', 
                   color: '#000', 
-                  fontSize: '1.8rem', 
+                  fontSize: isMobile ? '1.5rem' : '1.8rem', 
                   fontWeight: 'bold', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  margin: '0 auto 16px auto'
+                  margin: '0 auto 12px auto',
+                  animation: visibleSections.quickStart ? 'float 3s ease-in-out infinite' : 'none'
                 }}>
                   {item.step}
                 </div>
-                <h3 style={{ marginBottom: 8 }}>{item.title}</h3>
-                <p style={{ fontSize: '0.95rem' }}>{item.desc}</p>
+                <h3 style={{ marginBottom: 6, fontSize: isLaptop ? '1.1rem' : isTablet ? '1rem' : '0.95rem' }}>{item.title}</h3>
+                <p style={{ fontSize: isMobile ? '0.85rem' : '0.95rem', lineHeight: 1.5 }}>{item.desc}</p>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Link className="btn" to="/video">
+          <div style={{ textAlign: 'center', marginTop: isMobile ? 16 : 24 }}>
+            <Link className="btn btn-hover" to="/video" style={{ padding: isMobile ? '10px 20px' : '12px 24px' }}>
               📹 Watch Presentation Video
             </Link>
           </div>
@@ -384,15 +529,22 @@ export default function Home() {
 
       {/* Leaders board will be shown after Trading Strategies below */}
 
-      <section style={{ marginBottom: 16 }}>
-        <h2 style={{ color: '#cfeef3' }}>Live Crypto Market</h2>
-        <div className="card" style={{ overflow: 'hidden', borderRadius: 12 }}>
+      <section 
+        ref={sectionRefs.market}
+        style={{ 
+          marginBottom: isMobile ? 12 : 16,
+          opacity: visibleSections.market ? 1 : 0,
+          animation: visibleSections.market ? 'fadeIn 0.8s ease-out 0.3s forwards' : 'none'
+        }}
+      >
+        <h2 style={{ color: '#cfeef3', fontSize: isLaptop ? '1.5rem' : isTablet ? '1.3rem' : '1.2rem' }}>Live Crypto Market</h2>
+        <div className="card card-hover" style={{ overflow: 'hidden', borderRadius: 12 }}>
           <div
             id="tradingview_chart"
             ref={chartRef}
             style={{
               width: '100%',
-              height: '500px',
+              height: isMobile ? '350px' : '500px',
               borderRadius: '12px',
               overflow: 'hidden',
             }}
@@ -400,12 +552,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section style={{ marginBottom: 16 }}>
-        <h2 style={{ color: '#cfeef3' }}>Top Market Updates</h2>
+      <section 
+        style={{ 
+          marginBottom: isMobile ? 12 : 16,
+          opacity: visibleSections.market ? 1 : 0,
+          animation: visibleSections.market ? 'fadeIn 0.8s ease-out 0.5s forwards' : 'none'
+        }}
+      >
+        <h2 style={{ color: '#cfeef3', fontSize: isLaptop ? '1.5rem' : isTablet ? '1.3rem' : '1.2rem' }}>Top Market Updates</h2>
         <div
           className="card"
           style={{
-            padding: isMobile ? 8 : 15,
+            padding: isMobile ? 10 : 15,
             borderRadius: 10,
             background: '#f9fafb',
             width: '100%',
@@ -415,98 +573,97 @@ export default function Home() {
             <p
               style={{
                 color: '#ff8b92',
-                fontSize: isMobile ? '0.8rem' : '1rem',
+                fontSize: isMobile ? '0.85rem' : '1rem',
               }}
             >
               Unable to load market data.
             </p>
           ) : (
             <>
-              <table
-                style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  marginTop: 10,
-                  tableLayout: 'fixed',
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th style={{ fontSize: isMobile ? '0.65rem' : '0.9rem' }}>
-                      Asset
-                    </th>
-                    <th style={{ fontSize: isMobile ? '0.65rem' : '0.9rem' }}>
-                      USD
-                    </th>
-                    <th style={{ fontSize: isMobile ? '0.65rem' : '0.9rem' }}>
-                      INR
-                    </th>
-                    <th style={{ fontSize: isMobile ? '0.65rem' : '0.9rem' }}>
-                      24h
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {[
-                    ['Bitcoin (BTC)', market.btc],
-                    ['Ethereum (ETH)', market.eth],
-                    ['Binance Coin (BNB)', market.bnb],
-                  ].map(([label, coin]) => (
-                    <tr key={label}>
-                      {/* Asset */}
-                      <td
-                        style={{
-                          fontSize: isMobile ? '0.65rem' : '0.9rem',
-                          fontWeight: 600,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {isMobile ? label.split(' ')[0] : label}
-                      </td>
-
-                      {/* USD */}
-                      <td
-                        style={{
-                          fontSize: isMobile ? '0.65rem' : '0.9rem',
-                        }}
-                      >
-                        ${Number(coin.usd).toLocaleString()}
-                      </td>
-
-                      {/* INR */}
-                      <td
-                        style={{
-                          fontSize: isMobile ? '0.65rem' : '0.9rem',
-                        }}
-                      >
-                        ₹{Number(coin.inr).toLocaleString()}
-                      </td>
-
-                      {/* 24h */}
-                      <td
-                        style={{
-                          fontSize: isMobile ? '0.65rem' : '0.9rem',
-                          color:
-                            coin.usd_24h_change >= 0 ? '#4ef58b' : '#ff8b92',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {coin.usd_24h_change.toFixed(2)}%
-                      </td>
+              <div style={{ overflowX: 'auto' }}>
+                <table
+                  style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    marginTop: 10,
+                    minWidth: isMobile ? 320 : 'auto',
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th style={{ fontSize: isMobile ? '0.75rem' : '0.9rem' }}>
+                        Asset
+                      </th>
+                      <th style={{ fontSize: isMobile ? '0.75rem' : '0.9rem' }}>
+                        USD
+                      </th>
+                      <th style={{ fontSize: isMobile ? '0.75rem' : '0.9rem' }}>
+                        INR
+                      </th>
+                      <th style={{ fontSize: isMobile ? '0.75rem' : '0.9rem' }}>
+                        24h
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+
+                  <tbody>
+                    {[
+                      ['Bitcoin (BTC)', market.btc],
+                      ['Ethereum (ETH)', market.eth],
+                      ['Binance Coin (BNB)', market.bnb],
+                    ].map(([label, coin]) => (
+                      <tr key={label}>
+                        {/* Asset */}
+                        <td
+                          style={{
+                            fontSize: isMobile ? '0.75rem' : '0.9rem',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {isMobile ? label.split(' ')[0] : label}
+                        </td>
+
+                        {/* USD */}
+                        <td
+                          style={{
+                            fontSize: isMobile ? '0.75rem' : '0.9rem',
+                          }}
+                        >
+                          ${Number(coin.usd).toLocaleString()}
+                        </td>
+
+                        {/* INR */}
+                        <td
+                          style={{
+                            fontSize: isMobile ? '0.75rem' : '0.9rem',
+                          }}
+                        >
+                          ₹{Number(coin.inr).toLocaleString()}
+                        </td>
+
+                        {/* 24h */}
+                        <td
+                          style={{
+                            fontSize: isMobile ? '0.75rem' : '0.9rem',
+                            color:
+                              coin.usd_24h_change >= 0 ? '#4ef58b' : '#ff8b92',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {coin.usd_24h_change.toFixed(2)}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               {/* Footer */}
               <p
                 style={{
-                  marginTop: 10,
+                  marginTop: 12,
                   color: '#9fb3bf',
-                  fontSize: isMobile ? '0.7rem' : '0.9rem',
+                  fontSize: isMobile ? '0.75rem' : '0.9rem',
                   textAlign: 'center',
                 }}
               >
@@ -517,22 +674,29 @@ export default function Home() {
         </div>
       </section>
 
-      <section style={{ display: 'grid', gap: 12 }}>
-        <div className="card">
-          <h2>Full Plan Presentation Video</h2>
-          <Link className="btn" to="/video">
+      <section 
+        style={{ 
+          display: 'grid', 
+          gap: 12,
+          opacity: visibleSections.market ? 1 : 0,
+          animation: visibleSections.market ? 'fadeIn 0.8s ease-out 0.7s forwards' : 'none'
+        }}
+      >
+        <div className="card card-hover">
+          <h2 style={{ fontSize: isLaptop ? '1.3rem' : isTablet ? '1.2rem' : '1.1rem' }}>Full Plan Presentation Video</h2>
+          <Link className="btn btn-hover" to="/video" style={{ padding: isMobile ? '10px 20px' : '12px 24px' }}>
             Watch Now →
           </Link>
         </div>
-        <div className="card">
-          <h2>Trading Strategies</h2>
-          <Link className="btn" to="/bot">
+        <div className="card card-hover">
+          <h2 style={{ fontSize: isLaptop ? '1.3rem' : isTablet ? '1.2rem' : '1.1rem' }}>Trading Strategies</h2>
+          <Link className="btn btn-hover" to="/bot" style={{ padding: isMobile ? '10px 20px' : '12px 24px' }}>
             Types of Strategies →
           </Link>
         </div>
-        <div className="card">
-          <h2>💰 Share and Earn</h2>
-          <Link className="btn" to="/sharing">
+        <div className="card card-hover">
+          <h2 style={{ fontSize: isLaptop ? '1.3rem' : isTablet ? '1.2rem' : '1.1rem' }}>💰 Share and Earn</h2>
+          <Link className="btn btn-hover" to="/sharing" style={{ padding: isMobile ? '10px 20px' : '12px 24px' }}>
             View Details →
           </Link>
         </div>
@@ -742,41 +906,96 @@ export default function Home() {
             />
           </div>
         )}
-        <div className="card">
+        <div className="card card-hover">
           <h2>Suggestion or Complaint</h2>
-          <Link className="btn" to="/complaint">
+          <Link className="btn btn-hover" to="/complaint">
             Type Now →
           </Link>
         </div>
-        <div className="card">
-          <h2>100+ Frequently Asked Questions</h2>
+        
+        {/* Why Choose Trendex Section */}
+        <div 
+          ref={sectionRefs.whyChoose}
+          style={{ 
+            marginBottom: isMobile ? 12 : 12,
+            opacity: visibleSections.whyChoose ? 1 : 0,
+            animation: visibleSections.whyChoose ? 'fadeIn 0.8s ease-out 0.2s forwards' : 'none'
+          }}
+        >
+          <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: isMobile ? 10 : 12, fontSize: isLaptop ? '1.5rem' : isTablet ? '1.3rem' : '1.2rem' }}>
+            Why Choose Trendex AI?
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(4, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: isMobile ? 10 : 12 }}>
+            {[
+              { icon: '🤖', title: '8 Unique Strategies', desc: 'Spot and Futures trading strategies for every market condition' },
+              { icon: '🔒', title: 'Your Funds Stay Yours', desc: 'Never give up control - funds always stay in your Binance wallet' },
+              { icon: '⚡', title: '24/7 Automation', desc: 'Bots execute trades automatically around the clock' },
+              { icon: '🛡️', title: 'AI Risk Management', desc: 'Smart risk controls to protect your capital' }
+            ].map((item, i) => (
+              <div 
+                key={i} 
+                className="card card-hover" 
+                style={{ 
+                  textAlign: 'center', 
+                  padding: isMobile ? '14px' : '16px',
+                  opacity: visibleSections.whyChoose ? 1 : 0,
+                  animation: visibleSections.whyChoose ? `fadeIn 0.6s ease-out ${0.3 + i * 0.15}s forwards` : 'none'
+                }}
+              >
+                <div 
+                  style={{ 
+                    fontSize: isMobile ? '2rem' : '2.2rem', 
+                    marginBottom: isMobile ? 8 : 10,
+                    animation: visibleSections.whyChoose ? 'float 3s ease-in-out infinite' : 'none'
+                  }}
+                >
+                  {item.icon}
+                </div>
+                <h3 style={{ marginBottom: isMobile ? 4 : 6, color: '#00ddeb', fontSize: isLaptop ? '1.1rem' : isTablet ? '1rem' : '0.95rem' }}>{item.title}</h3>
+                <p style={{ fontSize: isMobile ? '0.82rem' : '0.85rem', lineHeight: 1.5 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="card card-hover">
+          <h2 style={{ fontSize: isLaptop ? '1.3rem' : isTablet ? '1.2rem' : '1.1rem' }}>100+ Frequently Asked Questions</h2>
           <div
             style={{
               display: 'flex',
-              gap: 8,
+              gap: isMobile ? 8 : 10,
               flexWrap: 'wrap',
               justifyContent: 'center',
             }}
           >
-            <Link className="btn secondary" to="/qanda/company">
+            <Link className="btn secondary btn-hover" to="/qanda/company" style={{ padding: isMobile ? '8px 16px' : '10px 20px', fontSize: isMobile ? '0.85rem' : '0.95rem' }}>
               Trendex Basics
             </Link>
-            <Link className="btn secondary" to="/qanda/trading">
+            <Link className="btn secondary btn-hover" to="/qanda/trading" style={{ padding: isMobile ? '8px 16px' : '10px 20px', fontSize: isMobile ? '0.85rem' : '0.95rem' }}>
               Trading
             </Link>
-            <Link className="btn secondary" to="/qanda/refer">
+            <Link className="btn secondary btn-hover" to="/qanda/refer" style={{ padding: isMobile ? '8px 16px' : '10px 20px', fontSize: isMobile ? '0.85rem' : '0.95rem' }}>
               Referral
             </Link>
-            <Link className="btn secondary" to="/qanda/pricing">
+            <Link className="btn secondary btn-hover" to="/qanda/pricing" style={{ padding: isMobile ? '8px 16px' : '10px 20px', fontSize: isMobile ? '0.85rem' : '0.95rem' }}>
               Payments
             </Link>
-            <Link className="btn secondary" to="/qanda/support">
+            <Link className="btn secondary btn-hover" to="/qanda/support" style={{ padding: isMobile ? '8px 16px' : '10px 20px', fontSize: isMobile ? '0.85rem' : '0.95rem' }}>
               Support
             </Link>
           </div>
         </div>
-        <div className="card" id="join-business" style={{ textAlign: 'left' }}>
-          <h2 style={{ marginTop: 0, textAlign: 'center' }}>
+        <div 
+          className="card card-hover" 
+          id="join-business" 
+          style={{ 
+            textAlign: 'left', 
+            padding: isMobile ? '18px 16px' : '24px',
+            opacity: visibleSections.whyChoose ? 1 : 0,
+            animation: visibleSections.whyChoose ? 'fadeIn 0.8s ease-out 0.5s forwards' : 'none'
+          }}
+        >
+          <h2 style={{ marginTop: 0, textAlign: 'center', fontSize: isLaptop ? '1.4rem' : isTablet ? '1.25rem' : '1.15rem' }}>
             Interested in starting/joining this Business
           </h2>
           <form
@@ -803,7 +1022,7 @@ export default function Home() {
             }}
             style={{
               display: 'grid',
-              gap: 10,
+              gap: isMobile ? 12 : 10,
               maxWidth: 560,
               margin: '0 auto',
             }}
@@ -817,8 +1036,9 @@ export default function Home() {
                 style={{
                   width: '100%',
                   marginTop: 6,
-                  padding: 10,
+                  padding: isMobile ? '12px 10px' : '10px',
                   borderRadius: 8,
+                  fontSize: isMobile ? '0.95rem' : '1rem',
                 }}
               />
             </label>
@@ -835,8 +1055,9 @@ export default function Home() {
                 style={{
                   width: '100%',
                   marginTop: 6,
-                  padding: 10,
+                  padding: isMobile ? '12px 10px' : '10px',
                   borderRadius: 8,
+                  fontSize: isMobile ? '0.95rem' : '1rem',
                 }}
               />
             </label>
@@ -852,8 +1073,9 @@ export default function Home() {
                 style={{
                   width: '100%',
                   marginTop: 6,
-                  padding: 10,
+                  padding: isMobile ? '12px 10px' : '10px',
                   borderRadius: 8,
+                  fontSize: isMobile ? '0.95rem' : '1rem',
                 }}
               />
             </label>
@@ -866,8 +1088,9 @@ export default function Home() {
                 style={{
                   width: '100%',
                   marginTop: 6,
-                  padding: 10,
+                  padding: isMobile ? '12px 10px' : '10px',
                   borderRadius: 8,
+                  fontSize: isMobile ? '0.95rem' : '1rem',
                 }}
               />
             </label>
@@ -879,8 +1102,9 @@ export default function Home() {
                 style={{
                   width: '100%',
                   marginTop: 6,
-                  padding: 10,
+                  padding: isMobile ? '12px 10px' : '10px',
                   borderRadius: 8,
+                  fontSize: isMobile ? '0.95rem' : '1rem',
                 }}
               >
                 <option value="">Select social media source</option>
@@ -902,13 +1126,14 @@ export default function Home() {
                 style={{
                   width: '100%',
                   marginTop: 6,
-                  padding: 10,
+                  padding: isMobile ? '12px 10px' : '10px',
                   borderRadius: 8,
+                  fontSize: isMobile ? '0.95rem' : '1rem',
                 }}
               />
             </label>
             <button
-              className="btn"
+              className="btn btn-hover"
               type="submit"
               disabled={
                 !name ||
@@ -919,6 +1144,8 @@ export default function Home() {
                 !message
               }
               style={{
+                padding: isMobile ? '12px 24px' : '12px 24px',
+                fontSize: isMobile ? '1rem' : '1.05rem',
                 opacity:
                   !name ||
                   !/^[0-9]{10}$/.test(mobile) ||
@@ -933,7 +1160,7 @@ export default function Home() {
               Submit
             </button>
             {submitted && (
-              <div style={{ color: '#22c55e', textAlign: 'center' }}>
+              <div style={{ color: '#22c55e', textAlign: 'center', marginTop: 8, fontSize: isMobile ? '0.95rem' : '1rem' }}>
                 Submitted successfully!
               </div>
             )}
@@ -941,11 +1168,18 @@ export default function Home() {
         </div>
         
         {/* Testimonials Section */}
-        <section style={{ marginBottom: 12 }}>
-          <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: 12 }}>
+        <section 
+          ref={sectionRefs.testimonials}
+          style={{ 
+            marginBottom: isMobile ? 12 : 12,
+            opacity: visibleSections.testimonials ? 1 : 0,
+            animation: visibleSections.testimonials ? 'fadeIn 0.8s ease-out 0.2s forwards' : 'none'
+          }}
+        >
+          <h2 style={{ color: '#cfeef3', textAlign: 'center', marginBottom: isMobile ? 10 : 12, fontSize: isLaptop ? '1.5rem' : isTablet ? '1.3rem' : '1.2rem' }}>
             What Our Traders Say
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(3, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isLaptop ? 'repeat(3, 1fr)' : isTablet ? 'repeat(2, 1fr)' : '1fr', gap: isMobile ? 10 : 12 }}>
             {[
               { 
                 name: 'Arun K.', 
@@ -978,30 +1212,47 @@ export default function Home() {
                 quote: 'What impressed me most was the community support, regular updates, and events. It feels more like learning and growing together rather than simply joining another platform.' 
               }
             ].map((testimonial, i) => (
-              <div key={i} className="card" style={{ padding: 16 }}>
-                <div style={{ fontSize: '2rem', marginBottom: 10 }}>"</div>
-                <p style={{ fontSize: '0.9rem', marginBottom: 12, fontStyle: 'italic' }}>{testimonial.quote}</p>
-                <div style={{ fontWeight: 'bold', color: '#00ddeb' }}>{testimonial.name}</div>
-                <div style={{ fontSize: '0.8rem', color: '#9fb3bf' }}>{testimonial.location}</div>
+              <div 
+                key={i} 
+                className="card card-hover" 
+                style={{ 
+                  padding: isMobile ? '14px' : '16px',
+                  opacity: visibleSections.testimonials ? 1 : 0,
+                  animation: visibleSections.testimonials ? `fadeIn 0.6s ease-out ${0.3 + i * 0.15}s forwards` : 'none'
+                }}
+              >
+                <div style={{ fontSize: isMobile ? '1.8rem' : '2rem', marginBottom: isMobile ? 8 : 10 }}>"</div>
+                <p style={{ fontSize: isMobile ? '0.85rem' : '0.9rem', marginBottom: isMobile ? 10 : 12, fontStyle: 'italic', lineHeight: 1.6 }}>{testimonial.quote}</p>
+                <div style={{ fontWeight: 'bold', color: '#00ddeb', fontSize: isMobile ? '0.95rem' : '1rem' }}>{testimonial.name}</div>
+                <div style={{ fontSize: isMobile ? '0.78rem' : '0.8rem', color: '#9fb3bf', marginTop: 4 }}>{testimonial.location}</div>
               </div>
             ))}
           </div>
         </section>
         
-        <div className="card" style={{ marginTop: 12 }}>
-          <h2>Premium Access</h2>
-          <Link className="btn" to="/premium">
+        <div 
+          ref={sectionRefs.bottom}
+          className="card card-hover" 
+          style={{ 
+            marginTop: isMobile ? 12 : 12, 
+            padding: isMobile ? '18px 16px' : '20px 24px',
+            opacity: visibleSections.bottom ? 1 : 0,
+            animation: visibleSections.bottom ? 'fadeIn 0.8s ease-out 0.2s forwards' : 'none'
+          }}
+        >
+          <h2 style={{ fontSize: isLaptop ? '1.3rem' : isTablet ? '1.2rem' : '1.1rem' }}>Premium Access</h2>
+          <Link className="btn btn-hover" to="/premium" style={{ padding: isMobile ? '10px 20px' : '12px 24px', fontSize: isMobile ? '1rem' : '1.05rem' }}>
             Go to Premium →
           </Link>
         </div>
         <div
           style={{
-            marginTop: 12,
-            fontSize: '0.85rem',
+            marginTop: isMobile ? 12 : 12,
+            fontSize: isMobile ? '0.8rem' : '0.85rem',
             fontWeight: 'bold',
             color: '#EF4444',
             display: 'inline-block',
-            padding: '8px 12px',
+            padding: isMobile ? '10px 14px' : '8px 12px',
             borderRadius: '8px',
             background: 'rgba(239, 68, 68, 0.1)',
             border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -1009,6 +1260,9 @@ export default function Home() {
             marginRight: 'auto',
             display: 'block',
             textAlign: 'center',
+            lineHeight: 1.5,
+            opacity: visibleSections.bottom ? 1 : 0,
+            animation: visibleSections.bottom ? 'fadeIn 0.8s ease-out 0.4s forwards' : 'none'
           }}
         >
           Real trading does not provide stable, guaranteed, or assured returns
