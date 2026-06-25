@@ -140,7 +140,7 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: #0b1220;
+  background: transparent;
 }
 .banner-track {
   display: flex;
@@ -149,13 +149,13 @@
 }
 .banner-item {
   min-width: 100%;
-  height: clamp(150px, 35vw, 360px);
+  height: auto;
   position: relative;
 }
 .banner-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
   filter: saturate(0.92) contrast(1.02);
 }
 .banner-overlay {
