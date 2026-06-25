@@ -4,35 +4,47 @@ export default function HowItWorks() {
       <h1 style={{ color: '#00ddeb' }}>How It Works</h1>
       <div className="card">
         <h2>Getting Started with Trendex AI</h2>
-        <p>
-          Follow these simple steps to start using Trendex AI trading bots.
-        </p>
+        <p>Follow these simple steps to start using Trendex AI trading bots.</p>
 
         <h2>Step 1: Join Our Community</h2>
         <p>
-          Register and join our community. Get access to our trading strategies, 
+          Register and join our community. Get access to our trading strategies,
           educational content, and support.
         </p>
 
         <h2>Step 2: Choose Your Trading Bot</h2>
-        <p>
-          We offer 8 different trading strategies:
-        </p>
+        <p>We offer 8 different trading strategies:</p>
         <ul>
-          <li><strong>DCA Bot</strong> - Low risk, spot trading</li>
-          <li><strong>Nero Bot</strong> - Low risk, futures with full averaging</li>
-          <li><strong>Quent Bot</strong> - Medium risk, gold-based futures</li>
-          <li><strong>Fin Bot</strong> - Medium risk, gold-based futures</li>
-          <li><strong>Zeno Bot</strong> - High risk, swing trading futures</li>
-          <li><strong>Candles Bot</strong> - High risk, light averaging futures</li>
-          <li><strong>Zeno 3x Bot</strong> - High risk, minimum Zeno variant</li>
-          <li><strong>Candle 3x Bot</strong> - High risk, minimum Candles variant</li>
+          <li>
+            <strong>DCA Bot</strong> - Low risk, spot trading
+          </li>
+          <li>
+            <strong>Nero Bot</strong> - Low risk, futures with full averaging
+          </li>
+          <li>
+            <strong>Quent Bot</strong> - Medium risk, gold-based futures
+          </li>
+          <li>
+            <strong>Fin Bot</strong> - Medium risk, gold-based futures
+          </li>
+          <li>
+            <strong>Zeno Bot</strong> - High risk, swing trading futures
+          </li>
+          <li>
+            <strong>Candles Bot</strong> - High risk, light averaging futures
+          </li>
+          <li>
+            <strong>Zeno 3x Bot</strong> - High risk, minimum Zeno variant
+          </li>
+          <li>
+            <strong>Candle 3x Bot</strong> - High risk, minimum Candles variant
+          </li>
         </ul>
 
         <h2>Step 3: Set Up Your Binance Account</h2>
         <p>
-          Create or log into your Binance account. You will need to set up API keys 
-          for the trading bot to execute trades on your behalf.
+          Create or log into your Binance account. You will need to set up API
+          keys for the trading bot to execute trades on your behalf.
         </p>
         <div
           style={{
@@ -52,7 +64,8 @@ export default function HowItWorks() {
 
         <h2>Step 4: Configure Your Bot</h2>
         <p>
-          Connect your Binance API and configure your trading parameters including:
+          Connect your Binance API and configure your trading parameters
+          including:
         </p>
         <ul>
           <li>Trading pair selection</li>
@@ -63,8 +76,9 @@ export default function HowItWorks() {
 
         <h2>Step 5: Monitor and Learn</h2>
         <p>
-          Watch your bot trade automatically. Use our calculator to estimate potential 
-          returns (5%-30% monthly, 60%-360% yearly - depending on market conditions).
+          Watch your bot trade automatically. Use our calculator to estimate
+          potential returns (5%-30% monthly, 60%-360% yearly - depending on
+          market conditions).
         </p>
 
         <h2>Important Notes</h2>

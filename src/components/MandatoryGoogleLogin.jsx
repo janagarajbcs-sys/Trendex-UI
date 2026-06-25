@@ -30,24 +30,26 @@ export default function MandatoryGoogleLogin({ onLoginSuccess }) {
 
     function initializeGoogle() {
       if (!window.google?.accounts?.id) return;
-      
+
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: async (response) => {
           try {
             setIsLoading(true);
             setGoogleError('');
-            
+
             // Call backend API to save user
-            const result = await api.post('/auth/google', { credential: response.credential });
-            
+            const result = await api.post('/auth/google', {
+              credential: response.credential,
+            });
+
             // Save to localStorage as well
             localStorage.setItem('user_logged_in', 'true');
             localStorage.setItem('google_credential', response.credential);
             if (result.user) {
               localStorage.setItem('current_user', JSON.stringify(result.user));
             }
-            
+
             onLoginSuccess && onLoginSuccess();
           } catch (err) {
             console.error('Google login failed:', err);
@@ -59,7 +61,7 @@ export default function MandatoryGoogleLogin({ onLoginSuccess }) {
         cancel_on_tap_outside: false,
         context: 'signin',
       });
-      
+
       // Render Google button
       const renderButton = () => {
         const buttonDiv = document.getElementById('google-signin-button');
@@ -124,13 +126,16 @@ export default function MandatoryGoogleLogin({ onLoginSuccess }) {
             lineHeight: '1.6',
           }}
         >
-          To continue using our website, you must sign in with Google.
-          This helps us provide you with a personalized experience and
-          access to premium features.
+          To continue using our website, you must sign in with Google. This
+          helps us provide you with a personalized experience and access to
+          premium features.
         </p>
 
         {/* Google Sign-in Button Container */}
-        <div id="google-signin-button" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}></div>
+        <div
+          id="google-signin-button"
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        ></div>
 
         {googleError && (
           <div

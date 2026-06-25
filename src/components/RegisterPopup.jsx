@@ -42,10 +42,45 @@ function readBrowserPrefill() {
   };
 
   const values = {
-    name: pick('user_name') || pick('name') || pick('full_name') || pick('fullName') || pick('userName') || readCookieValue('user_name') || readCookieValue('name') || readCookieValue('full_name') || readCookieValue('fullName') || '',
-    email: pick('user_email') || pick('email') || pick('gmail') || pick('userEmail') || readCookieValue('user_email') || readCookieValue('email') || readCookieValue('gmail') || readCookieValue('userEmail') || '',
-    mobile: pick('user_mobile') || pick('mobile') || pick('phone') || pick('user_phone') || readCookieValue('user_mobile') || readCookieValue('mobile') || readCookieValue('phone') || readCookieValue('user_phone') || '',
-    sponsor: pick('sponsor') || pick('referral') || pick('coupon') || readCookieValue('sponsor') || readCookieValue('referral') || readCookieValue('coupon') || '',
+    name:
+      pick('user_name') ||
+      pick('name') ||
+      pick('full_name') ||
+      pick('fullName') ||
+      pick('userName') ||
+      readCookieValue('user_name') ||
+      readCookieValue('name') ||
+      readCookieValue('full_name') ||
+      readCookieValue('fullName') ||
+      '',
+    email:
+      pick('user_email') ||
+      pick('email') ||
+      pick('gmail') ||
+      pick('userEmail') ||
+      readCookieValue('user_email') ||
+      readCookieValue('email') ||
+      readCookieValue('gmail') ||
+      readCookieValue('userEmail') ||
+      '',
+    mobile:
+      pick('user_mobile') ||
+      pick('mobile') ||
+      pick('phone') ||
+      pick('user_phone') ||
+      readCookieValue('user_mobile') ||
+      readCookieValue('mobile') ||
+      readCookieValue('phone') ||
+      readCookieValue('user_phone') ||
+      '',
+    sponsor:
+      pick('sponsor') ||
+      pick('referral') ||
+      pick('coupon') ||
+      readCookieValue('sponsor') ||
+      readCookieValue('referral') ||
+      readCookieValue('coupon') ||
+      '',
     source: pick('source') || readCookieValue('source') || '',
     message: pick('message') || readCookieValue('message') || '',
   };
@@ -359,8 +394,6 @@ export default function RegisterPopup() {
             onSubmit={handleSubmit}
             style={{ display: 'grid', gap: '14px' }}
           >
-
-
             <div
               style={{
                 display: 'grid',

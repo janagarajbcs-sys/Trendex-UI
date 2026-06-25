@@ -1075,17 +1075,12 @@ export async function deleteMPRAchievementBackend(id) {
 }
 export async function moveMPRAchievementBackend(id, direction) {
   try {
-    await api.put(
-      '/mpr-achievements/move',
-      { id, direction },
-      { admin: true }
-    );
+    await api.put('/mpr-achievements/move', { id, direction }, { admin: true });
     return await getMPRAchievementsAsync();
   } catch {
     return getMPRAchievements();
   }
 }
-
 
 const BANNERS_KEY = 'banners';
 export function getBanners() {

@@ -69,7 +69,7 @@ export default function LanguageTranslate({ inMenu = false }) {
     // 3. Clear existing cookies and set new one
     // We set it on both the exact hostname and the base domain to be safe
     const cookieValue = langCode === 'en' ? '' : `/en/${langCode}`;
-    
+
     // Set for current session
     setCookie('googtrans', cookieValue, '');
     setCookie('googtrans', cookieValue, hostname);
@@ -82,10 +82,10 @@ export default function LanguageTranslate({ inMenu = false }) {
     if (select) {
       select.value = langCode;
       select.dispatchEvent(new Event('change'));
-      
+
       // Close menu
       setIsOpen(false);
-      
+
       // If it's English, we might need a reload to fully clear the Google UI
       if (langCode === 'en') {
         setTimeout(() => window.location.reload(), 300);

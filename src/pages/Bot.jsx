@@ -371,7 +371,8 @@ export default function Bot() {
             border: '1px solid rgba(34, 197, 94, 0.3)',
           }}
         >
-          Monthly 5% to 30%<br />
+          Monthly 5% to 30%
+          <br />
           Yearly 60% to 360%
         </div>
         <div
@@ -397,7 +398,8 @@ export default function Bot() {
             border: '1px solid rgba(245, 158, 11, 0.3)',
           }}
         >
-          Deponds on the market movement<br />
+          Deponds on the market movement
+          <br />
           The results(returns) will be differ
         </div>
         <div

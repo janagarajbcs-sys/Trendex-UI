@@ -513,9 +513,7 @@ export default function PremiumAdmin() {
         </div>
       )}
       <div className="card" style={{ marginBottom: 12 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>
-          Website Visitors
-        </h2>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Website Visitors</h2>
         <div
           style={{
             display: 'grid',
@@ -524,19 +522,27 @@ export default function PremiumAdmin() {
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.total}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {analytics.total}
+            </div>
             <div style={{ opacity: 0.75 }}>Total Visits</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.today}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {analytics.today}
+            </div>
             <div style={{ opacity: 0.75 }}>Today</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.last7Days}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {analytics.last7Days}
+            </div>
             <div style={{ opacity: 0.75 }}>Last 7 Days</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.last30Days}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {analytics.last30Days}
+            </div>
             <div style={{ opacity: 0.75 }}>Last 30 Days</div>
           </div>
         </div>
@@ -551,7 +557,14 @@ export default function PremiumAdmin() {
           <button
             className="btn"
             onClick={() => {
-              const headers = ['Name', 'Email', 'Phone', 'Sign-up Date', 'Approved', 'Video Access'];
+              const headers = [
+                'Name',
+                'Email',
+                'Phone',
+                'Sign-up Date',
+                'Approved',
+                'Video Access',
+              ];
               const rows = googleUsers.map((u) => [
                 u.name,
                 u.email,
@@ -599,7 +612,9 @@ export default function PremiumAdmin() {
                   </span>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>
-                  <span style={{ color: u.videoAccess ? '#22c55e' : '#ef4444' }}>
+                  <span
+                    style={{ color: u.videoAccess ? '#22c55e' : '#ef4444' }}
+                  >
                     {u.videoAccess ? 'Yes' : 'No'}
                   </span>
                 </td>
