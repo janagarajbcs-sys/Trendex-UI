@@ -32,6 +32,7 @@ import {
   getProgressBackend,
   importApiFolderBackend,
   getTopSliderImagesBackend,
+  getAnalyticsSummaryAsync,
   addTopSliderImageBackend,
   deleteTopSliderImageBackend,
   getAchievements,
@@ -79,6 +80,12 @@ export default function PremiumAdmin() {
   const [slideFile, setSlideFile] = useState(null);
   const [slideUploading, setSlideUploading] = useState(false);
   const [pending, setPending] = useState(0);
+  const [analytics, setAnalytics] = useState({
+    total: 0,
+    today: 0,
+    last7Days: 0,
+    last30Days: 0,
+  });
 
   const [achievements, setAchievements] = useState(() => getAchievements());
   const [achFile, setAchFile] = useState(null);
@@ -119,6 +126,7 @@ export default function PremiumAdmin() {
     track(
       Promise.all([
         getUsersBackendAsync().then(() => setUsers(getUsers())),
+        getAnalyticsSummaryAsync().then((summary) => setAnalytics(summary)),
         getLeadersAsync().then((list) => {
           saveLeaders(list);
           setLeaders(list);
@@ -156,6 +164,7 @@ export default function PremiumAdmin() {
   const approved = users.filter((u) => u.approved && u.videoAccess);
   const disabledUsers = users.filter((u) => u.approved && !u.videoAccess);
   const pendingUser = users.filter((u) => !u.approved);
+  const googleUsers = users.filter((u) => u.isGoogleUser);
   function downloadExcel(filename, headers, rows) {
     const tableHead = `<tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>`;
     const tableRows = rows
@@ -503,15 +512,101 @@ export default function PremiumAdmin() {
           </div>
         </div>
       )}
-      <div
-        style={{
-          textAlign: 'center',
-          marginBottom: 10,
-          display: 'flex',
-          gap: 8,
-          justifyContent: 'center',
-        }}
-      >
+      <div className="card" style={{ marginBottom: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>
+          Website Visitors
+        </h2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 12,
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.total}</div>
+            <div style={{ opacity: 0.75 }}>Total Visits</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.today}</div>
+            <div style={{ opacity: 0.75 }}>Today</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.last7Days}</div>
+            <div style={{ opacity: 0.75 }}>Last 7 Days</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>{analytics.last30Days}</div>
+            <div style={{ opacity: 0.75 }}>Last 30 Days</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Google Sign-in Users */}
+      <div className="card" style={{ overflowX: 'auto', marginBottom: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>
+          Google Sign-in Users ({googleUsers.length})
+        </h2>
+        <div style={{ textAlign: 'right', marginBottom: 8 }}>
+          <button
+            className="btn"
+            onClick={() => {
+              const headers = ['Name', 'Email', 'Phone', 'Sign-up Date', 'Approved', 'Video Access'];
+              const rows = googleUsers.map((u) => [
+                u.name,
+                u.email,
+                u.phone,
+                new Date(u.createdAt || Date.now()).toLocaleString(),
+                u.approved ? 'Yes' : 'No',
+                u.videoAccess ? 'Yes' : 'No',
+              ]);
+              downloadExcel('google_users', headers, rows);
+            }}
+          >
+            Export Excel
+          </button>
+        </div>
+        <table
+          style={{
+            width: '100%',
+            minWidth: 800,
+            borderCollapse: 'collapse',
+            fontSize: '.9rem',
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Email</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Phone</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Sign-up Date</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Approved</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Video Access</th>
+            </tr>
+          </thead>
+          <tbody>
+            {googleUsers.map((u) => (
+              <tr key={u.id}>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.name}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.email}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{u.phone}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  {new Date(u.createdAt || Date.now()).toLocaleString()}
+                </td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  <span style={{ color: u.approved ? '#22c55e' : '#ef4444' }}>
+                    {u.approved ? 'Yes' : 'No'}
+                  </span>
+                </td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  <span style={{ color: u.videoAccess ? '#22c55e' : '#ef4444' }}>
+                    {u.videoAccess ? 'Yes' : 'No'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* 1. Pending Users */}

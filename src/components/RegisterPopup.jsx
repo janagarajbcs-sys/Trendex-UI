@@ -3,6 +3,55 @@ import { submitJoinResponse, getCurrentUser } from '../lib/premium';
 
 const SKIP_COUNT_KEY = 'register_popup_skip_count';
 const SKIPPED_AT_KEY = 'register_popup_skipped_at';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+function readCookieValue(name) {
+  if (typeof document === 'undefined') return '';
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`)
+  );
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
+function readBrowserPrefill() {
+  const storage = typeof window !== 'undefined' ? window.localStorage : null;
+  const keys = [
+    'user_name',
+    'name',
+    'full_name',
+    'fullName',
+    'userName',
+    'user_email',
+    'email',
+    'gmail',
+    'userEmail',
+    'user_mobile',
+    'mobile',
+    'phone',
+    'user_phone',
+    'sponsor',
+    'referral',
+    'coupon',
+    'source',
+    'message',
+  ];
+
+  const pick = (key) => {
+    if (!storage) return '';
+    return storage.getItem(key) || '';
+  };
+
+  const values = {
+    name: pick('user_name') || pick('name') || pick('full_name') || pick('fullName') || pick('userName') || readCookieValue('user_name') || readCookieValue('name') || readCookieValue('full_name') || readCookieValue('fullName') || '',
+    email: pick('user_email') || pick('email') || pick('gmail') || pick('userEmail') || readCookieValue('user_email') || readCookieValue('email') || readCookieValue('gmail') || readCookieValue('userEmail') || '',
+    mobile: pick('user_mobile') || pick('mobile') || pick('phone') || pick('user_phone') || readCookieValue('user_mobile') || readCookieValue('mobile') || readCookieValue('phone') || readCookieValue('user_phone') || '',
+    sponsor: pick('sponsor') || pick('referral') || pick('coupon') || readCookieValue('sponsor') || readCookieValue('referral') || readCookieValue('coupon') || '',
+    source: pick('source') || readCookieValue('source') || '',
+    message: pick('message') || readCookieValue('message') || '',
+  };
+
+  return values;
+}
 
 export default function RegisterPopup() {
   const [showPopup, setShowPopup] = useState(false);
@@ -17,6 +66,73 @@ export default function RegisterPopup() {
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleError, setGoogleError] = useState('');
+
+  useEffect(() => {
+    const prefill = readBrowserPrefill();
+    if (prefill.name) setName(prefill.name);
+    if (prefill.mobile) setMobile(prefill.mobile);
+    if (prefill.email) setEmail(prefill.email);
+    if (prefill.sponsor) setSponsor(prefill.sponsor);
+    if (prefill.source) setSource(prefill.source);
+    if (prefill.message) setMessage(prefill.message);
+  }, []);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || typeof window === 'undefined') return;
+
+    const scriptId = 'google-gsi-script';
+    const initializeGoogle = () => {
+      if (!window.google?.accounts?.id) return;
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: async (response) => {
+          try {
+            setGoogleLoading(true);
+            const res = await fetch('/api/auth/google', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ credential: response.credential }),
+            });
+            const data = await res.json();
+            if (!res.ok || !data?.ok) {
+              throw new Error(data?.error || 'google_auth_failed');
+            }
+            if (data.google?.name) setName(data.google.name);
+            if (data.google?.email) setEmail(data.google.email);
+            setGoogleError('');
+          } catch (err) {
+            console.error('Google callback failed', err);
+            setGoogleError('Google sign-in failed. Please try again.');
+          } finally {
+            setGoogleLoading(false);
+          }
+        },
+      });
+    };
+
+    if (document.getElementById(scriptId)) {
+      initializeGoogle();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogle;
+    document.body.appendChild(script);
+
+    return () => {
+      const existing = document.getElementById(scriptId);
+      if (existing && existing.parentNode) {
+        existing.parentNode.removeChild(existing);
+      }
+    };
+  }, []);
 
   const showPopupAfterDelay = (delayMs) => {
     return setTimeout(() => {
@@ -73,6 +189,22 @@ export default function RegisterPopup() {
       localStorage.setItem(SKIPPED_AT_KEY, Date.now().toString());
       showPopupAfterDelay(5 * 60 * 1000); // 5 minutes = 300,000 ms
     }
+  };
+
+  const handleGoogleLogin = () => {
+    if (!GOOGLE_CLIENT_ID || !window.google?.accounts?.id) {
+      setGoogleError('Google login is not configured yet.');
+      return;
+    }
+
+    setGoogleLoading(true);
+    setGoogleError('');
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        setGoogleLoading(false);
+        setGoogleError('Google sign-in was not shown. Please try again.');
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -227,6 +359,8 @@ export default function RegisterPopup() {
             onSubmit={handleSubmit}
             style={{ display: 'grid', gap: '14px' }}
           >
+
+
             <div
               style={{
                 display: 'grid',
@@ -320,7 +454,7 @@ export default function RegisterPopup() {
                 placeholder="example@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                pattern="^[a-zA-Z0-9._%+-]+@gmail\\.com$"
+                pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
                 style={{
                   width: '100%',
                   padding: '10px 14px',

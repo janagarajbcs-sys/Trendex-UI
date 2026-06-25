@@ -7,16 +7,25 @@ export default function PremiumAdminLogin() {
   const [pwd, setPwd] = useState('');
   const [err, setErr] = useState('');
   const nav = useNavigate();
-  function onSubmit(e) {
+
+  async function onSubmit(e) {
     e.preventDefault();
     const em = email.trim();
     const pw = pwd;
-    // const okLocal = loginAdmin(em, pw)
-    // if (okLocal) { nav('/premium/admin'); return }
-    // loginAdminBackend(em, pw).then((token) => {
-    //   if (token) nav('/premium/admin')
-    //   else setErr('Invalid admin credentials.')
-    // })
+
+    if (!em || !pw) {
+      setErr('Please enter both email and password.');
+      return;
+    }
+
+    const token = await loginAdminBackend(em, pw);
+    if (token) {
+      setErr('');
+      nav('/premium/admin');
+      return;
+    }
+
+    setErr('Invalid admin credentials.');
   }
   return (
     <div

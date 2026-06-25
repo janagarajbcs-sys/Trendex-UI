@@ -3,8 +3,20 @@ import { useState, useEffect } from 'react'
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false)
 
+  const trackVisit = () => {
+    fetch('/api/analytics/track', {
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store'
+    }).catch(() => {})
+  }
+
   useEffect(() => {
     const consent = localStorage.getItem('cookieConsent')
+    if (consent === 'accepted') {
+      trackVisit()
+      return
+    }
     if (!consent) {
       setShowBanner(true)
     }
@@ -13,6 +25,7 @@ export default function CookieConsent() {
   const handleAccept = () => {
     localStorage.setItem('cookieConsent', 'accepted')
     setShowBanner(false)
+    trackVisit()
   }
 
   const handleDecline = () => {

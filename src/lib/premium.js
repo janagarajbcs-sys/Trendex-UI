@@ -226,6 +226,24 @@ export async function getUsersCountAsync() {
     }
   }
 }
+
+export async function getAnalyticsSummaryAsync() {
+  try {
+    const data = await api.get('/analytics/summary');
+    if (data && typeof data.total === 'number') {
+      return {
+        total: data.total || 0,
+        today: data.today || 0,
+        last7Days: data.last7Days || 0,
+        last30Days: data.last30Days || 0,
+      };
+    }
+    return { total: 0, today: 0, last7Days: 0, last30Days: 0 };
+  } catch {
+    return { total: 0, today: 0, last7Days: 0, last30Days: 0 };
+  }
+}
+
 export function getCurrentUser() {
   const id = localStorage.getItem(CURRENT_KEY);
   if (!id) {
@@ -574,7 +592,7 @@ export async function getJoinResponsesBackend() {
     const data = await api.get('/join', { admin: true }).catch(() => []);
     const normalized = Array.isArray(data)
       ? data.map((r) => ({
-          id: r._id || '',
+          id: r.id ?? r._id ?? '',
           name: r.name || '',
           mobile: r.mobile || '',
           gmail: r.gmail || '',
