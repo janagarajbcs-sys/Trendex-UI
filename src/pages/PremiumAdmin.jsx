@@ -47,6 +47,8 @@ import {
   addMPRAchievementBackend,
   deleteMPRAchievementBackend,
   moveMPRAchievementBackend,
+  editJoinResponseBackend,
+  deleteJoinResponseBackend,
 } from '../lib/premium';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -96,6 +98,18 @@ export default function PremiumAdmin() {
   );
   const [mprFile, setMPRFile] = useState(null);
   const [mprUploading, setMPRUploading] = useState(false);
+
+  // Join response editing
+  const [editingJoin, setEditingJoin] = useState(null);
+  const [joinForm, setJoinForm] = useState({
+    name: '',
+    mobile: '',
+    gmail: '',
+    place: '',
+    sponsor: '',
+    source: '',
+    message: '',
+  });
   console.log(complaints, 'complaints');
   const nav = useNavigate();
   function resolvePhoto(val) {
@@ -161,10 +175,14 @@ export default function PremiumAdmin() {
       ])
     );
   }, [nav]);
-  const approved = users.filter((u) => u.approved && u.videoAccess);
-  const disabledUsers = users.filter((u) => u.approved && !u.videoAccess);
-  const pendingUser = users.filter((u) => !u.approved);
+  // Separate manual signup users (non-Google) and Google users
+  const manualUsers = users.filter((u) => !u.isGoogleUser);
   const googleUsers = users.filter((u) => u.isGoogleUser);
+  
+  // Filter manual users into pending/approved/disabled
+  const approved = manualUsers.filter((u) => u.approved && u.videoAccess);
+  const disabledUsers = manualUsers.filter((u) => u.approved && !u.videoAccess);
+  const pendingUser = manualUsers.filter((u) => !u.approved);
   function downloadExcel(filename, headers, rows) {
     const tableHead = `<tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>`;
     const tableRows = rows
@@ -429,7 +447,7 @@ export default function PremiumAdmin() {
   const stats = (() => {
     const counts = Array.from({ length: modules.length }, () => 0);
     let completed = 0;
-    users.forEach((u) => {
+    manualUsers.forEach((u) => {
       const prog = u.progress || getProgress(u.id);
       if (prog.completed[modules.length - 1]) completed++;
       else {
@@ -437,7 +455,7 @@ export default function PremiumAdmin() {
         counts[st - 1]++;
       }
     });
-    const total = users.length;
+    const total = manualUsers.length;
     const max = Math.max(completed, ...counts, 1);
     return { counts, completed, total, max };
   })();
@@ -450,6 +468,33 @@ export default function PremiumAdmin() {
     } catch {
       /* noop */
     }
+  }
+
+  function handleEditJoin(r) {
+    setEditingJoin(r.id);
+    setJoinForm({
+      name: r.name || '',
+      mobile: r.mobile || '',
+      gmail: r.gmail || '',
+      place: r.place || '',
+      sponsor: r.sponsor || '',
+      source: r.source || '',
+      message: r.message || '',
+    });
+  }
+
+  function handleDeleteJoin(id) {
+    track(deleteJoinResponseBackend(id)).then(() => {
+      getJoinResponsesBackend().then(setJoins);
+    });
+  }
+
+  function handleSaveJoin(e) {
+    e.preventDefault();
+    track(editJoinResponseBackend(editingJoin, joinForm)).then(() => {
+      getJoinResponsesBackend().then(setJoins);
+      setEditingJoin(null);
+    });
   }
   return (
     <div>
@@ -548,7 +593,7 @@ export default function PremiumAdmin() {
         </div>
       </div>
 
-      {/* Google Sign-in Users */}
+      {/* Google Sign-in Users (Visitors) */}
       <div className="card" style={{ overflowX: 'auto', marginBottom: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: 'center' }}>
           Google Sign-in Users ({googleUsers.length})
@@ -557,21 +602,12 @@ export default function PremiumAdmin() {
           <button
             className="btn"
             onClick={() => {
-              const headers = [
-                'Name',
-                'Email',
-                'Phone',
-                'Sign-up Date',
-                'Approved',
-                'Video Access',
-              ];
+              const headers = ['Name', 'Email', 'Phone', 'Sign-up Date'];
               const rows = googleUsers.map((u) => [
                 u.name,
                 u.email,
                 u.phone,
                 new Date(u.createdAt || Date.now()).toLocaleString(),
-                u.approved ? 'Yes' : 'No',
-                u.videoAccess ? 'Yes' : 'No',
               ]);
               downloadExcel('google_users', headers, rows);
             }}
@@ -582,7 +618,7 @@ export default function PremiumAdmin() {
         <table
           style={{
             width: '100%',
-            minWidth: 800,
+            minWidth: 600,
             borderCollapse: 'collapse',
             fontSize: '.9rem',
           }}
@@ -593,8 +629,6 @@ export default function PremiumAdmin() {
               <th style={{ whiteSpace: 'nowrap' }}>Email</th>
               <th style={{ whiteSpace: 'nowrap' }}>Phone</th>
               <th style={{ whiteSpace: 'nowrap' }}>Sign-up Date</th>
-              <th style={{ whiteSpace: 'nowrap' }}>Approved</th>
-              <th style={{ whiteSpace: 'nowrap' }}>Video Access</th>
             </tr>
           </thead>
           <tbody>
@@ -605,18 +639,6 @@ export default function PremiumAdmin() {
                 <td style={{ whiteSpace: 'nowrap' }}>{u.phone}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   {new Date(u.createdAt || Date.now()).toLocaleString()}
-                </td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  <span style={{ color: u.approved ? '#22c55e' : '#ef4444' }}>
-                    {u.approved ? 'Yes' : 'No'}
-                  </span>
-                </td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  <span
-                    style={{ color: u.videoAccess ? '#22c55e' : '#ef4444' }}
-                  >
-                    {u.videoAccess ? 'Yes' : 'No'}
-                  </span>
                 </td>
               </tr>
             ))}
@@ -952,7 +974,7 @@ export default function PremiumAdmin() {
           </button>
         </div>
         <table
-          style={{ width: '100%', minWidth: 800, borderCollapse: 'collapse' }}
+          style={{ width: '100%', minWidth: 950, borderCollapse: 'collapse' }}
         >
           <thead>
             <tr>
@@ -963,11 +985,12 @@ export default function PremiumAdmin() {
               <th style={{ whiteSpace: 'nowrap' }}>Sponsor</th>
               <th style={{ whiteSpace: 'nowrap' }}>Source</th>
               <th style={{ whiteSpace: 'nowrap' }}>Time</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {joins.map((r, i) => (
-              <tr key={i}>
+              <tr key={r.id || i}>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.name}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.mobile}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.gmail}</td>
@@ -977,11 +1000,163 @@ export default function PremiumAdmin() {
                 <td style={{ whiteSpace: 'nowrap' }}>
                   {new Date(r.ts).toLocaleString()}
                 </td>
+                <td
+                  style={{
+                    display: 'flex',
+                    gap: 6,
+                    justifyContent: 'center',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <button
+                    className="btn"
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '.8rem',
+                      transition:
+                        'transform .15s ease, background-color .15s ease',
+                    }}
+                    onClick={() => handleEditJoin(r)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn secondary"
+                    style={{
+                      background: '#ef4444',
+                      color: '#ffffff',
+                      padding: '4px 10px',
+                      fontSize: '.8rem',
+                      transition:
+                        'transform .15s ease, background-color .15s ease',
+                    }}
+                    onClick={() => handleDeleteJoin(r.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Edit Join Response Modal */}
+      {editingJoin && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="card"
+            style={{ width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}
+          >
+            <h2 style={{ textAlign: 'center', marginTop: 0 }}>
+              Edit Join Response
+            </h2>
+            <form onSubmit={handleSaveJoin} style={{ display: 'grid', gap: 12 }}>
+              <div>
+                <label>Name</label>
+                <input
+                  type="text"
+                  required
+                  value={joinForm.name}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, name: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Mobile</label>
+                <input
+                  type="text"
+                  required
+                  value={joinForm.mobile}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, mobile: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Gmail</label>
+                <input
+                  type="email"
+                  required
+                  value={joinForm.gmail}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, gmail: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Place</label>
+                <input
+                  type="text"
+                  value={joinForm.place}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, place: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Sponsor</label>
+                <input
+                  type="text"
+                  value={joinForm.sponsor}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, sponsor: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Source</label>
+                <input
+                  type="text"
+                  value={joinForm.source}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, source: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Message</label>
+                <textarea
+                  value={joinForm.message}
+                  onChange={(e) =>
+                    setJoinForm({ ...joinForm, message: e.target.value })
+                  }
+                  style={{ width: '100%', minHeight: 100 }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="btn secondary"
+                  onClick={() => setEditingJoin(null)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* 5. Complaint/Suggestion Responses */}
       <div className="card" style={{ marginTop: 12, overflowX: 'auto' }}>

@@ -610,6 +610,42 @@ export async function getJoinResponsesBackend() {
   }
 }
 
+export function editJoinResponse(id, patch) {
+  const items = getJoinResponses();
+  const idx = items.findIndex((x) => x.id === id);
+  if (idx >= 0) {
+    items[idx] = { ...items[idx], ...patch };
+    localStorage.setItem(JOIN_RESP_KEY, JSON.stringify(items));
+  }
+}
+
+export function deleteJoinResponse(id) {
+  const items = getJoinResponses().filter((x) => x.id !== id);
+  localStorage.setItem(JOIN_RESP_KEY, JSON.stringify(items));
+}
+
+export async function editJoinResponseBackend(id, patch) {
+  try {
+    await api.put(`/join/${encodeURIComponent(id)}`, patch, { admin: true });
+    const list = await getJoinResponsesBackend();
+    return list;
+  } catch {
+    editJoinResponse(id, patch);
+    return getJoinResponses();
+  }
+}
+
+export async function deleteJoinResponseBackend(id) {
+  try {
+    await api.del(`/join/${encodeURIComponent(id)}`, { admin: true });
+    const list = await getJoinResponsesBackend();
+    return list;
+  } catch {
+    deleteJoinResponse(id);
+    return getJoinResponses();
+  }
+}
+
 export async function getComplaintResponsesBackend() {
   try {
     const data = await api.get('/complaints', { admin: true }).catch(() => []);
