@@ -49,6 +49,8 @@ import {
   moveMPRAchievementBackend,
   editJoinResponseBackend,
   deleteJoinResponseBackend,
+  editComplaintResponseBackend,
+  deleteComplaintResponseBackend,
 } from '../lib/premium';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -108,6 +110,15 @@ export default function PremiumAdmin() {
     place: '',
     sponsor: '',
     source: '',
+    message: '',
+  });
+
+  // Complaint response editing
+  const [editingComplaint, setEditingComplaint] = useState(null);
+  const [complaintForm, setComplaintForm] = useState({
+    type: '',
+    name: '',
+    contact: '',
     message: '',
   });
   console.log(complaints, 'complaints');
@@ -494,6 +505,30 @@ export default function PremiumAdmin() {
     track(editJoinResponseBackend(editingJoin, joinForm)).then(() => {
       getJoinResponsesBackend().then(setJoins);
       setEditingJoin(null);
+    });
+  }
+
+  function handleEditComplaint(r) {
+    setEditingComplaint(r.id);
+    setComplaintForm({
+      type: r.type || '',
+      name: r.name || '',
+      contact: r.contact || '',
+      message: r.message || '',
+    });
+  }
+
+  function handleDeleteComplaint(id) {
+    track(deleteComplaintResponseBackend(id)).then(() => {
+      getComplaintResponsesBackend().then(setComplaints);
+    });
+  }
+
+  function handleSaveComplaint(e) {
+    e.preventDefault();
+    track(editComplaintResponseBackend(editingComplaint, complaintForm)).then(() => {
+      getComplaintResponsesBackend().then(setComplaints);
+      setEditingComplaint(null);
     });
   }
   return (
@@ -956,6 +991,7 @@ export default function PremiumAdmin() {
                 'Place',
                 'Sponsor',
                 'Source',
+                'Message',
                 'Time',
               ];
               const rows = joins.map((r) => [
@@ -965,6 +1001,7 @@ export default function PremiumAdmin() {
                 r.place,
                 r.sponsor,
                 r.source,
+                r.message,
                 new Date(r.ts).toLocaleString(),
               ]);
               downloadExcel('join_responses', headers, rows);
@@ -974,7 +1011,7 @@ export default function PremiumAdmin() {
           </button>
         </div>
         <table
-          style={{ width: '100%', minWidth: 950, borderCollapse: 'collapse' }}
+          style={{ width: '100%', minWidth: 1100, borderCollapse: 'collapse' }}
         >
           <thead>
             <tr>
@@ -984,6 +1021,7 @@ export default function PremiumAdmin() {
               <th style={{ whiteSpace: 'nowrap' }}>Place</th>
               <th style={{ whiteSpace: 'nowrap' }}>Sponsor</th>
               <th style={{ whiteSpace: 'nowrap' }}>Source</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Message</th>
               <th style={{ whiteSpace: 'nowrap' }}>Time</th>
               <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
@@ -997,6 +1035,7 @@ export default function PremiumAdmin() {
                 <td style={{ whiteSpace: 'nowrap' }}>{r.place}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.sponsor}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.source}</td>
+                <td style={{ whiteSpace: 'normal', maxWidth: 200 }}>{r.message}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   {new Date(r.ts).toLocaleString()}
                 </td>
@@ -1182,7 +1221,7 @@ export default function PremiumAdmin() {
           </button>
         </div>
         <table
-          style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse' }}
+          style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse' }}
         >
           <thead>
             <tr>
@@ -1191,23 +1230,147 @@ export default function PremiumAdmin() {
               <th style={{ whiteSpace: 'nowrap' }}>Contact</th>
               <th style={{ whiteSpace: 'nowrap' }}>Message</th>
               <th style={{ whiteSpace: 'nowrap' }}>Time</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {complaints.map((r, i) => (
-              <tr key={i}>
+              <tr key={r.id || i}>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.type}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.name}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{r.contact}</td>
-                <td style={{ whiteSpace: 'nowrap' }}>{r.message}</td>
+                <td style={{ whiteSpace: 'normal', maxWidth: 200 }}>{r.message}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   {new Date(r.ts).toLocaleString()}
+                </td>
+                <td
+                  style={{
+                    display: 'flex',
+                    gap: 6,
+                    justifyContent: 'center',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <button
+                    className="btn"
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '.8rem',
+                      transition:
+                        'transform .15s ease, background-color .15s ease',
+                    }}
+                    onClick={() => handleEditComplaint(r)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn secondary"
+                    style={{
+                      background: '#ef4444',
+                      color: '#ffffff',
+                      padding: '4px 10px',
+                      fontSize: '.8rem',
+                      transition:
+                        'transform .15s ease, background-color .15s ease',
+                    }}
+                    onClick={() => handleDeleteComplaint(r.id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Edit Complaint Response Modal */}
+      {editingComplaint && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="card"
+            style={{ width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}
+          >
+            <h2 style={{ textAlign: 'center', marginTop: 0 }}>
+              Edit Complaint/Suggestion Response
+            </h2>
+            <form onSubmit={handleSaveComplaint} style={{ display: 'grid', gap: 12 }}>
+              <div>
+                <label>Type</label>
+                <select
+                  required
+                  value={complaintForm.type}
+                  onChange={(e) =>
+                    setComplaintForm({ ...complaintForm, type: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                >
+                  <option value="">Select type</option>
+                  <option value="Suggestion">Suggestion</option>
+                  <option value="Complaint">Complaint</option>
+                </select>
+              </div>
+              <div>
+                <label>Name</label>
+                <input
+                  type="text"
+                  required
+                  value={complaintForm.name}
+                  onChange={(e) =>
+                    setComplaintForm({ ...complaintForm, name: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Contact</label>
+                <input
+                  type="text"
+                  required
+                  value={complaintForm.contact}
+                  onChange={(e) =>
+                    setComplaintForm({ ...complaintForm, contact: e.target.value })
+                  }
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label>Message</label>
+                <textarea
+                  required
+                  value={complaintForm.message}
+                  onChange={(e) =>
+                    setComplaintForm({ ...complaintForm, message: e.target.value })
+                  }
+                  style={{ width: '100%', minHeight: 100 }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="btn secondary"
+                  onClick={() => setEditingComplaint(null)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* 6. Homepage Top Slider — Images */}
       <div className="card" style={{ marginTop: 12 }}>

@@ -630,6 +630,20 @@ export function deleteJoinResponse(id) {
   localStorage.setItem(JOIN_RESP_KEY, JSON.stringify(items));
 }
 
+export function editComplaintResponse(id, patch) {
+  const items = getComplaintResponses();
+  const idx = items.findIndex((x) => x.id === id);
+  if (idx >= 0) {
+    items[idx] = { ...items[idx], ...patch };
+    localStorage.setItem(COMPLAINT_RESP_KEY, JSON.stringify(items));
+  }
+}
+
+export function deleteComplaintResponse(id) {
+  const items = getComplaintResponses().filter((x) => x.id !== id);
+  localStorage.setItem(COMPLAINT_RESP_KEY, JSON.stringify(items));
+}
+
 export async function editJoinResponseBackend(id, patch) {
   try {
     await api.put(`/join/${encodeURIComponent(id)}`, patch, { admin: true });
@@ -649,6 +663,28 @@ export async function deleteJoinResponseBackend(id) {
   } catch {
     deleteJoinResponse(id);
     return getJoinResponses();
+  }
+}
+
+export async function editComplaintResponseBackend(id, patch) {
+  try {
+    await api.put(`/complaints/${encodeURIComponent(id)}`, patch, { admin: true });
+    const list = await getComplaintResponsesBackend();
+    return list;
+  } catch {
+    editComplaintResponse(id, patch);
+    return getComplaintResponses();
+  }
+}
+
+export async function deleteComplaintResponseBackend(id) {
+  try {
+    await api.del(`/complaints/${encodeURIComponent(id)}`, { admin: true });
+    const list = await getComplaintResponsesBackend();
+    return list;
+  } catch {
+    deleteComplaintResponse(id);
+    return getComplaintResponses();
   }
 }
 
