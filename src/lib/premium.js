@@ -36,6 +36,7 @@ export function registerUser({ name, phone, email, team, leader, password }) {
     password,
     approved: false,
     createdAt: Date.now(),
+    isGoogleUser: false,
   };
   users.push(user);
   saveUsers(users);
@@ -79,25 +80,30 @@ export async function getUsersBackendAsync() {
     .get('/auth/list', { admin: true })
     .catch(() => getUsers());
   const items = Array.isArray(arr)
-    ? arr.map((x) => ({
-        id: x.id || x._id || '',
-        name: x.name || '',
-        phone: x.phone || '',
-        email: x.email || '',
-        team: x.team || '',
-        leader: x.leader || '',
-        approved: !!x.approved,
-        videoAccess: !!x.videoAccess,
-        createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
-        approvedAt: x.approvedAt ? new Date(x.approvedAt).getTime() : null,
-        paidAccessUntil: x.paidAccessUntil
-          ? new Date(x.paidAccessUntil).getTime()
-          : null,
-        progress: x.progress || {
-          unlocked: 1,
-          completed: [false, false, false, false],
-        },
-      }))
+    ? arr.map((x) => {
+        const id = x.id || x._id || '';
+        const isGoogleUser = !!x.isGoogleUser || String(id).startsWith('google-');
+        return {
+          id,
+          name: x.name || '',
+          phone: x.phone || '',
+          email: x.email || '',
+          team: x.team || '',
+          leader: x.leader || '',
+          approved: !!x.approved,
+          videoAccess: !!x.videoAccess,
+          createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
+          approvedAt: x.approvedAt ? new Date(x.approvedAt).getTime() : null,
+          paidAccessUntil: x.paidAccessUntil
+            ? new Date(x.paidAccessUntil).getTime()
+            : null,
+          progress: x.progress || {
+            unlocked: 1,
+            completed: [false, false, false, false],
+          },
+          isGoogleUser,
+        };
+      })
     : [];
   saveUsers(items);
   return items;
