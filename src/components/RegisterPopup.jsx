@@ -487,7 +487,6 @@ export default function RegisterPopup() {
                 placeholder="example@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
                 style={{
                   width: '100%',
                   padding: '10px 14px',
