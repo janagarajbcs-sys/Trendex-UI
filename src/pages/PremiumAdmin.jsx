@@ -153,7 +153,7 @@ export default function PremiumAdmin() {
   const [emailHistoryStatus, setEmailHistoryStatus] = useState('all');
   const [emailHistoryPeriod, setEmailHistoryPeriod] = useState('overall');
   const [emailHistoryList, setEmailHistoryList] = useState([]);
-  console.log(complaints, 'complaints');
+  console.log('complaints', complaints);
   const nav = useNavigate();
   function resolvePhoto(val) {
     if (!val) return '';

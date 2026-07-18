@@ -68,7 +68,7 @@ export default function PremiumLogin() {
       user = loginUser(identifier, password);
       console.log('[Login] Local login result:', user);
     }
-    console.log(user, 'user');
+    console.log('user', user);
 
     if (user) {
       if (user.isAdmin) {
