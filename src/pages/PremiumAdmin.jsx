@@ -51,6 +51,15 @@ import {
   deleteJoinResponseBackend,
   editComplaintResponseBackend,
   deleteComplaintResponseBackend,
+  getEmailTemplates,
+  getEmailTemplatesBackend,
+  createEmailTemplateBackend,
+  updateEmailTemplateBackend,
+  deleteEmailTemplateBackend,
+  sendTestEmailBackend,
+  sendBulkEmailBackend,
+  getEmailTrackingReportBackend,
+  getEmailTrackingListBackend,
 } from '../lib/premium';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -121,6 +130,29 @@ export default function PremiumAdmin() {
     contact: '',
     message: '',
   });
+
+  // Email templates
+  const [emailTemplates, setEmailTemplates] = useState(() => getEmailTemplates());
+  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [templateForm, setTemplateForm] = useState({
+    name: '',
+    subject: '',
+    body: '',
+    imageUrl: '',
+    isActive: true,
+  });
+  const [testEmailForm, setTestEmailForm] = useState({
+    to: '',
+    subject: '',
+    body: '',
+    imageUrl: '',
+  });
+  const [showTestEmailModal, setShowTestEmailModal] = useState(false);
+  const [emailTrackingReport, setEmailTrackingReport] = useState(null);
+  const [emailTrackingPeriod, setEmailTrackingPeriod] = useState('overall');
+  const [emailHistoryStatus, setEmailHistoryStatus] = useState('all');
+  const [emailHistoryPeriod, setEmailHistoryPeriod] = useState('overall');
+  const [emailHistoryList, setEmailHistoryList] = useState([]);
   console.log(complaints, 'complaints');
   const nav = useNavigate();
   function resolvePhoto(val) {
@@ -143,6 +175,29 @@ export default function PremiumAdmin() {
     });
   }
   const loading = pending > 0;
+  const fetchEmailTrackingReport = async (period = emailTrackingPeriod) => {
+    try {
+      const report = await getEmailTrackingReportBackend(period);
+      setEmailTrackingReport(report);
+    } catch (error) {
+      console.error('Error fetching email tracking report:', error);
+    }
+  };
+
+  const fetchEmailHistoryList = async (status = emailHistoryStatus, period = emailHistoryPeriod) => {
+    try {
+      const list = await getEmailTrackingListBackend(status, period);
+      setEmailHistoryList(list);
+    } catch (error) {
+      console.error('Error fetching email history list:', error);
+    }
+  };
+
+  // Fetch email history on component mount
+  useEffect(() => {
+    fetchEmailHistoryList();
+  }, []);
+
   useEffect(() => {
     // if (!isAdminLoggedIn()) {
     //   nav('/premium/admin-login')
@@ -183,6 +238,8 @@ export default function PremiumAdmin() {
           saveMPRAchievements(list);
           setMPRAchievements(list);
         }),
+        getEmailTemplatesBackend().then((list) => setEmailTemplates(list)),
+        fetchEmailTrackingReport()
       ])
     );
   }, [nav]);
@@ -531,6 +588,85 @@ export default function PremiumAdmin() {
       setEditingComplaint(null);
     });
   }
+
+  // --- Email Template Handlers ---
+  const [templateImageFile, setTemplateImageFile] = useState(null);
+  const [removeTemplateImage, setRemoveTemplateImage] = useState(false);
+
+  function resetTemplateForm() {
+    setEditingTemplate(null);
+    setTemplateForm({ name: '', subject: '', body: '', isActive: true, imageUrl: '' });
+    setTemplateImageFile(null);
+    setRemoveTemplateImage(false);
+  }
+
+  function handleEditTemplate(template) {
+    setEditingTemplate(template.id);
+    setTemplateForm({
+      name: template.name || '',
+      subject: template.subject || '',
+      body: template.body || '',
+      imageUrl: template.imageUrl || '',
+      isActive: template.isActive ?? true,
+    });
+    setTemplateImageFile(null);
+    setRemoveTemplateImage(false);
+  }
+
+  function handleTemplateImageChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setTemplateImageFile(file);
+      setRemoveTemplateImage(false);
+    }
+  }
+
+  function handleSaveTemplate(e) {
+    e.preventDefault();
+    if (editingTemplate) {
+      track(updateEmailTemplateBackend(editingTemplate, templateForm, templateImageFile, removeTemplateImage)).then((list) => {
+        setEmailTemplates(list);
+        resetTemplateForm();
+      });
+    } else {
+      track(createEmailTemplateBackend(templateForm, templateImageFile)).then((list) => {
+        setEmailTemplates(list);
+        resetTemplateForm();
+      });
+    }
+  }
+
+  function handleDeleteTemplate(id) {
+    if (confirm('Are you sure you want to delete this template?')) {
+      track(deleteEmailTemplateBackend(id)).then((list) => setEmailTemplates(list));
+    }
+  }
+
+  function handleSendTestEmail(template) {
+    setTestEmailForm({
+      to: '',
+      subject: template.subject,
+      body: template.body,
+      imageUrl: template.imageUrl,
+    });
+    setShowTestEmailModal(true);
+  }
+
+  function handleSubmitTestEmail(e) {
+    e.preventDefault();
+    track(sendTestEmailBackend(testEmailForm)).then(() => {
+      setShowTestEmailModal(false);
+      alert('Test email sent!');
+    });
+  }
+
+  function handleSendBulkEmail(templateId) {
+    if (confirm('Are you sure you want to send this email to all registered users?')) {
+      track(sendBulkEmailBackend(templateId)).then(() => {
+        alert('Bulk email sent!');
+      });
+    }
+  }
   return (
     <div>
       <div
@@ -637,12 +773,14 @@ export default function PremiumAdmin() {
           <button
             className="btn"
             onClick={() => {
-              const headers = ['Name', 'Email', 'Phone', 'Sign-up Date'];
+              const headers = ['Name', 'Email', 'Phone', 'Sign-up Date', 'Visit Count', 'Last Seen'];
               const rows = googleUsers.map((u) => [
                 u.name,
                 u.email,
                 u.phone,
                 new Date(u.createdAt || Date.now()).toLocaleString(),
+                u.visitCount || 0,
+                u.lastSeenAt ? new Date(u.lastSeenAt).toLocaleString() : '-',
               ]);
               downloadExcel('google_users', headers, rows);
             }}
@@ -653,7 +791,7 @@ export default function PremiumAdmin() {
         <table
           style={{
             width: '100%',
-            minWidth: 600,
+            minWidth: 800,
             borderCollapse: 'collapse',
             fontSize: '.9rem',
           }}
@@ -664,6 +802,8 @@ export default function PremiumAdmin() {
               <th style={{ whiteSpace: 'nowrap' }}>Email</th>
               <th style={{ whiteSpace: 'nowrap' }}>Phone</th>
               <th style={{ whiteSpace: 'nowrap' }}>Sign-up Date</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Visit Count</th>
+              <th style={{ whiteSpace: 'nowrap' }}>Last Seen</th>
             </tr>
           </thead>
           <tbody>
@@ -674,6 +814,10 @@ export default function PremiumAdmin() {
                 <td style={{ whiteSpace: 'nowrap' }}>{u.phone}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   {new Date(u.createdAt || Date.now()).toLocaleString()}
+                </td>
+                <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>{u.visitCount || 0}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  {u.lastSeenAt ? new Date(u.lastSeenAt).toLocaleString() : '-'}
                 </td>
               </tr>
             ))}
@@ -2075,6 +2219,693 @@ export default function PremiumAdmin() {
           </table>
         </div>
       </div>
+
+      {/* Email Templates Management */}
+      <div className="card" style={{ marginTop: 12, padding: 16 }}>
+        <h2
+          style={{
+            marginTop: 0,
+            textAlign: 'center',
+            fontSize: '1.25rem',
+            fontWeight: 600,
+          }}
+        >
+          Email Templates
+        </h2>
+
+        {/* Create/Edit Template Form */}
+        <form
+          onSubmit={handleSaveTemplate}
+          style={{
+            display: 'grid',
+            gap: 12,
+            marginBottom: 20,
+          }}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '.85rem',
+                  marginBottom: 4,
+                  fontWeight: 500,
+                  color: '#64748b',
+                }}
+              >
+                Template Name
+              </label>
+              <input
+                required
+                value={templateForm.name}
+                onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
+                placeholder="e.g., 5th of Month Reminder"
+                style={{
+                  width: '100%',
+                  padding: '7px 10px',
+                  borderRadius: 6,
+                  border: '1px solid #e5e7eb',
+                  fontSize: '.9rem',
+                }}
+              />
+            </div>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '.85rem',
+                  marginBottom: 4,
+                  fontWeight: 500,
+                  color: '#64748b',
+                }}
+              >
+                Email Subject
+              </label>
+              <input
+                required
+                value={templateForm.subject}
+                onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
+                placeholder="Email subject line"
+                style={{
+                  width: '100%',
+                  padding: '7px 10px',
+                  borderRadius: 6,
+                  border: '1px solid #e5e7eb',
+                  fontSize: '.9rem',
+                }}
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '.85rem',
+                marginBottom: 4,
+                fontWeight: 500,
+                color: '#64748b',
+              }}
+            >
+              Email Body
+            </label>
+            <textarea
+              required
+              value={templateForm.body}
+              onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })}
+              placeholder="Enter your email body here..."
+              rows={6}
+              style={{
+                width: '100%',
+                padding: '7px 10px',
+                borderRadius: 6,
+                border: '1px solid #e5e7eb',
+                fontSize: '.9rem',
+                resize: 'vertical',
+              }}
+            />
+          </div>
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '.85rem',
+                marginBottom: 4,
+                fontWeight: 500,
+                color: '#64748b',
+              }}
+            >
+              Email Image (Optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleTemplateImageChange}
+              style={{ marginBottom: 8 }}
+            />
+            {/* Preview */}
+            {(templateImageFile || templateForm.imageUrl) && !removeTemplateImage && (
+              <div style={{ marginTop: 8, border: '1px solid #e5e7eb', padding: 8, borderRadius: 6 }}>
+                <img
+                  src={
+                    templateImageFile
+                      ? URL.createObjectURL(templateImageFile)
+                      : templateForm.imageUrl
+                  }
+                  alt="Template Preview"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: 200,
+                    borderRadius: 4,
+                  }}
+                />
+                {editingTemplate && (
+                  <div style={{ marginTop: 8 }}>
+                    <button
+                      type="button"
+                      className="btn secondary"
+                      onClick={() => {
+                        setRemoveTemplateImage(true);
+                        setTemplateImageFile(null);
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '.8rem',
+                        background: '#ef4444',
+                        color: '#fff',
+                      }}
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: '.85rem',
+                color: '#64748b',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={templateForm.isActive}
+                onChange={(e) => setTemplateForm({ ...templateForm, isActive: e.target.checked })}
+              />
+              Active
+            </label>
+            <div style={{ flex: 1 }} />
+            <button
+              className="btn"
+              type="submit"
+              style={{
+                padding: '6px 12px',
+                fontSize: '.85rem',
+                transition: 'transform .15s ease, background-color .15s ease',
+              }}
+            >
+              {editingTemplate ? 'Update Template' : 'Add Template'}
+            </button>
+            {editingTemplate ? (
+              <button
+                className="btn secondary"
+                type="button"
+                onClick={resetTemplateForm}
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '.85rem',
+                  transition: 'transform .15s ease, background-color .15s ease',
+                }}
+              >
+                Cancel
+              </button>
+            ) : null}
+          </div>
+        </form>
+
+        {/* Templates List */}
+        <div style={{ overflowX: 'auto', marginTop: 12 }}>
+          <table
+            style={{
+              width: '100%',
+              minWidth: 800,
+              borderCollapse: 'collapse',
+              fontSize: '.9rem',
+            }}
+          >
+            <thead>
+              <tr>
+                <th style={{ whiteSpace: 'nowrap' }}>Name</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Subject</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Image</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Status</th>
+                <th style={{ whiteSpace: 'nowrap' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emailTemplates.map((template) => (
+                <tr key={template.id}>
+                  <td style={{ whiteSpace: 'nowrap' }}>{template.name}</td>
+                  <td
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 300,
+                    }}
+                  >
+                    {template.subject}
+                  </td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    {template.imageUrl ? (
+                      <span
+                        style={{
+                          padding: '2px 8px',
+                          borderRadius: 9999,
+                          fontSize: '.75rem',
+                          fontWeight: 500,
+                          background: '#dbeafe',
+                          color: '#1e40af',
+                        }}
+                      >
+                        Attached
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '.75rem', color: '#9ca3af' }}>None</span>
+                    )}
+                  </td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 9999,
+                        fontSize: '.75rem',
+                        fontWeight: 500,
+                        background: template.isActive ? '#dcfce7' : '#fee2e2',
+                        color: template.isActive ? '#166534' : '#991b1b',
+                      }}
+                    >
+                      {template.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td
+                    style={{
+                      display: 'flex',
+                      gap: 6,
+                      justifyContent: 'center',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => handleEditTemplate(template)}
+                      style={{ padding: '4px 8px', fontSize: '.8rem' }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => handleSendTestEmail(template)}
+                      style={{ padding: '4px 8px', fontSize: '.8rem' }}
+                    >
+                      Test Email
+                    </button>
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => handleSendBulkEmail(template.id)}
+                      style={{ padding: '4px 8px', fontSize: '.8rem' }}
+                    >
+                      Send All
+                    </button>
+                    <button
+                      className="btn secondary"
+                      type="button"
+                      onClick={() => handleDeleteTemplate(template.id)}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '.8rem',
+                        background: '#ef4444',
+                        color: '#fff',
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Email Tracking Report */}
+      <div className="card" style={{ marginTop: 12, padding: 16 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center', fontSize: '1.25rem', fontWeight: 600 }}>
+          Email Tracking Report
+        </h2>
+        
+        {/* Period Selector */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20, flexWrap: 'wrap' }}>
+          <label style={{ fontSize: '.85rem', color: '#64748b', fontWeight: 500 }}>Period:</label>
+          <select 
+            value={emailTrackingPeriod} 
+            onChange={(e) => {
+              setEmailTrackingPeriod(e.target.value);
+              fetchEmailTrackingReport(e.target.value);
+            }}
+            style={{
+              padding: '7px 12px',
+              borderRadius: 6,
+              border: '1px solid #e5e7eb',
+              fontSize: '.9rem'
+            }}
+          >
+            <option value="overall">Overall</option>
+            <option value="monthly">This Month</option>
+            <option value="last15days">Last 15 Days</option>
+          </select>
+        </div>
+
+        {emailTrackingReport ? (
+          <div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+              gap: 16, 
+              marginBottom: 24 
+            }}>
+              <div style={{ 
+                padding: 16, 
+                borderRadius: 8, 
+                background: '#dbeafe', 
+                textAlign: 'center' 
+              }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e40af' }}>
+                  {emailTrackingReport.totalSent}
+                </div>
+                <div style={{ color: '#374151', fontWeight: 500 }}>Total Sent</div>
+              </div>
+              
+              <div style={{ 
+                padding: 16, 
+                borderRadius: 8, 
+                background: '#d1fae5', 
+                textAlign: 'center' 
+              }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#065f46' }}>
+                  {emailTrackingReport.totalViewed}
+                </div>
+                <div style={{ color: '#374151', fontWeight: 500 }}>Total Viewed</div>
+              </div>
+              
+              <div style={{ 
+                padding: 16, 
+                borderRadius: 8, 
+                background: '#fee2e2', 
+                textAlign: 'center' 
+              }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#991b1b' }}>
+                  {emailTrackingReport.totalUnsubscribed}
+                </div>
+                <div style={{ color: '#374151', fontWeight: 500 }}>Total Unsubscribed</div>
+              </div>
+            </div>
+
+            {/* Template Breakdown */}
+            {emailTrackingReport.templateBreakdown && emailTrackingReport.templateBreakdown.length > 0 && (
+              <div>
+                <h3 style={{ marginBottom: 12, fontSize: '1rem' }}>Breakdown by Template</h3>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse', 
+                    fontSize: '0.9rem' 
+                  }}>
+                    <thead>
+                      <tr>
+                        <th style={{ 
+                          textAlign: 'left', 
+                          padding: '8px 12px', 
+                          borderBottom: '1px solid #e5e7eb' 
+                        }}>Template</th>
+                        <th style={{ 
+                          textAlign: 'left', 
+                          padding: '8px 12px', 
+                          borderBottom: '1px solid #e5e7eb' 
+                        }}>Sent</th>
+                        <th style={{ 
+                          textAlign: 'left', 
+                          padding: '8px 12px', 
+                          borderBottom: '1px solid #e5e7eb' 
+                        }}>Viewed</th>
+                        <th style={{ 
+                          textAlign: 'left', 
+                          padding: '8px 12px', 
+                          borderBottom: '1px solid #e5e7eb' 
+                        }}>Unsubscribed</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {emailTrackingReport.templateBreakdown.map((template, index) => (
+                        <tr key={index}>
+                          <td style={{ 
+                            padding: '8px 12px', 
+                            borderBottom: '1px solid #f3f4f6' 
+                          }}>{template.templateName || 'Unknown'}</td>
+                          <td style={{ 
+                            padding: '8px 12px', 
+                            borderBottom: '1px solid #f3f4f6' 
+                          }}>{template.sent}</td>
+                          <td style={{ 
+                            padding: '8px 12px', 
+                            borderBottom: '1px solid #f3f4f6' 
+                          }}>{template.viewed}</td>
+                          <td style={{ 
+                            padding: '8px 12px', 
+                            borderBottom: '1px solid #f3f4f6' 
+                          }}>{template.unsubscribed}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            
+            <button 
+              className="btn" 
+              onClick={() => fetchEmailTrackingReport()} 
+              style={{ marginTop: 16 }}
+            >
+              Refresh Report
+            </button>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+            <p>Loading report...</p>
+            <button 
+              className="btn" 
+              onClick={() => fetchEmailTrackingReport()} 
+              style={{ marginTop: 12 }}
+            >
+              Load Report
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Email History */}
+      <div className="card" style={{ marginTop: 12, padding: 16 }}>
+        <h2 style={{ marginTop: 0, textAlign: 'center', fontSize: '1.25rem', fontWeight: 600 }}>
+          Email History
+        </h2>
+        
+        {/* Filters */}
+        <div style={{ 
+          display: 'flex', 
+          gap: 12, 
+          alignItems: 'center', 
+          marginBottom: 20, 
+          flexWrap: 'wrap',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <label style={{ fontSize: '.85rem', color: '#64748b', fontWeight: 500 }}>Status:</label>
+              <select 
+                value={emailHistoryStatus} 
+                onChange={(e) => {
+                  setEmailHistoryStatus(e.target.value);
+                  fetchEmailHistoryList(e.target.value, emailHistoryPeriod);
+                }}
+                style={{
+                  padding: '7px 12px',
+                  borderRadius: 6,
+                  border: '1px solid #e5e7eb',
+                  fontSize: '.9rem'
+                }}
+              >
+                <option value="all">All</option>
+                <option value="sent">Sent</option>
+                <option value="viewed">Viewed</option>
+                <option value="unsubscribed">Unsubscribed</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <label style={{ fontSize: '.85rem', color: '#64748b', fontWeight: 500 }}>Period:</label>
+              <select 
+                value={emailHistoryPeriod} 
+                onChange={(e) => {
+                  setEmailHistoryPeriod(e.target.value);
+                  fetchEmailHistoryList(emailHistoryStatus, e.target.value);
+                }}
+                style={{
+                  padding: '7px 12px',
+                  borderRadius: 6,
+                  border: '1px solid #e5e7eb',
+                  fontSize: '.9rem'
+                }}
+              >
+                <option value="overall">Overall</option>
+                <option value="monthly">This Month</option>
+                <option value="last15days">Last 15 Days</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            className="btn"
+            onClick={() => {
+              const headers = ['Email', 'Template', 'Status', 'Sent At', 'Viewed At', 'Unsubscribed At'];
+              const rows = emailHistoryList.map(email => [
+                email.email,
+                email.templateName || 'Unknown',
+                email.status,
+                email.sentAt ? new Date(email.sentAt).toLocaleString() : '-',
+                email.viewedAt ? new Date(email.viewedAt).toLocaleString() : '-',
+                email.unsubscribedAt ? new Date(email.unsubscribedAt).toLocaleString() : '-'
+              ]);
+              downloadExcel('email-history', headers, rows);
+            }}
+          >
+            Export to Excel
+          </button>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>Email</th>
+                <th style={{ textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>Template</th>
+                <th style={{ textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>Status</th>
+                <th style={{ textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>Sent At</th>
+                <th style={{ textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>Viewed At</th>
+                <th style={{ textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>Unsubscribed At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emailHistoryList.map((email, index) => (
+                <tr key={email.id || index}>
+                  <td style={{ padding: '8px 12px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>{email.email}</td>
+                  <td style={{ padding: '8px 12px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>{email.templateName || 'Unknown'}</td>
+                  <td style={{ padding: '8px 12px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>
+                    <span style={{
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      fontSize: '.75rem',
+                      fontWeight: 500,
+                      background: 
+                        email.status === 'sent' ? '#dbeafe' : 
+                        email.status === 'viewed' ? '#d1fae5' : 
+                        '#fee2e2',
+                      color: 
+                        email.status === 'sent' ? '#1e40af' : 
+                        email.status === 'viewed' ? '#065f46' : 
+                        '#991b1b'
+                    }}>
+                      {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
+                    </span>
+                  </td>
+                  <td style={{ padding: '8px 12px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>
+                    {email.sentAt ? new Date(email.sentAt).toLocaleString() : '-'}
+                  </td>
+                  <td style={{ padding: '8px 12px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>
+                    {email.viewedAt ? new Date(email.viewedAt).toLocaleString() : '-'}
+                  </td>
+                  <td style={{ padding: '8px 12px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>
+                    {email.unsubscribedAt ? new Date(email.unsubscribedAt).toLocaleString() : '-'}
+                  </td>
+                </tr>
+              ))}
+              {emailHistoryList.length === 0 && (
+                <tr>
+                  <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+                    No email history found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        <button 
+          className="btn" 
+          onClick={() => fetchEmailHistoryList()} 
+          style={{ marginTop: 16 }}
+        >
+          Refresh History
+        </button>
+      </div>
+
+      {/* Test Email Modal */}
+      {showTestEmailModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div className="card" style={{ width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}>
+            <h2 style={{ textAlign: 'center', marginTop: 0 }}>Send Test Email</h2>
+            <form onSubmit={handleSubmitTestEmail} style={{ display: 'grid', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: '.85rem' }}>To</label>
+                <input
+                  required
+                  type="email"
+                  value={testEmailForm.to}
+                  onChange={(e) => setTestEmailForm({ ...testEmailForm, to: e.target.value })}
+                  placeholder="recipient@example.com"
+                  style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: '.85rem' }}>Subject</label>
+                <input
+                  required
+                  value={testEmailForm.subject}
+                  onChange={(e) => setTestEmailForm({ ...testEmailForm, subject: e.target.value })}
+                  style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: '.85rem' }}>Body</label>
+                <textarea
+                  required
+                  value={testEmailForm.body}
+                  onChange={(e) => setTestEmailForm({ ...testEmailForm, body: e.target.value })}
+                  rows={8}
+                  style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: '1px solid #e5e7eb', resize: 'vertical' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="btn secondary"
+                  onClick={() => setShowTestEmailModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn">Send Test Email</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

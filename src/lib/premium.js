@@ -1603,3 +1603,121 @@ export async function submitComplaintResponse(payload) {
     return false;
   }
 }
+
+// --- Email Templates ---
+const EMAIL_TEMPLATES_KEY = 'email_templates';
+
+export function getEmailTemplates() {
+  const v = localStorage.getItem(EMAIL_TEMPLATES_KEY);
+  return v ? JSON.parse(v) : [];
+}
+
+export async function getEmailTemplatesBackend() {
+  try {
+    const data = await api.get('/email-templates', { admin: true }).catch(() => []);
+    const normalized = Array.isArray(data)
+      ? data.map((t) => ({
+          id: t.id ?? t._id ?? '',
+          name: t.name || '',
+          subject: t.subject || '',
+          body: t.body || '',
+          imageUrl: t.imageUrl || '',
+          isActive: t.isActive ?? true,
+        }))
+      : [];
+    localStorage.setItem(EMAIL_TEMPLATES_KEY, JSON.stringify(normalized));
+    return normalized;
+  } catch {
+    return getEmailTemplates();
+  }
+}
+
+export async function createEmailTemplateBackend(template, imageFile) {
+  try {
+    const fd = new FormData();
+    fd.append('name', template.name);
+    fd.append('subject', template.subject);
+    fd.append('body', template.body);
+    fd.append('isActive', template.isActive ?? true);
+    if (imageFile) {
+      fd.append('image', imageFile);
+    }
+    const created = await api.post('/email-templates', fd, { admin: true });
+    return await getEmailTemplatesBackend();
+  } catch {
+    const templates = getEmailTemplates();
+    const newTemplate = { ...template, id: 't_' + Date.now() };
+    templates.push(newTemplate);
+    localStorage.setItem(EMAIL_TEMPLATES_KEY, JSON.stringify(templates));
+    return templates;
+  }
+}
+
+export async function updateEmailTemplateBackend(id, patch, imageFile, removeImage) {
+  try {
+    const fd = new FormData();
+    if (patch.name !== undefined) fd.append('name', patch.name);
+    if (patch.subject !== undefined) fd.append('subject', patch.subject);
+    if (patch.body !== undefined) fd.append('body', patch.body);
+    if (patch.isActive !== undefined) fd.append('isActive', patch.isActive);
+    if (removeImage) fd.append('removeImage', 'true');
+    if (imageFile) fd.append('image', imageFile);
+    await api.put(`/email-templates/${encodeURIComponent(id)}`, fd, { admin: true });
+    return await getEmailTemplatesBackend();
+  } catch {
+    const templates = getEmailTemplates();
+    const idx = templates.findIndex((t) => t.id === id);
+    if (idx >= 0) {
+      templates[idx] = { ...templates[idx], ...patch };
+      localStorage.setItem(EMAIL_TEMPLATES_KEY, JSON.stringify(templates));
+    }
+    return templates;
+  }
+}
+
+export async function deleteEmailTemplateBackend(id) {
+  try {
+    await api.del(`/email-templates/${encodeURIComponent(id)}`, { admin: true });
+    return await getEmailTemplatesBackend();
+  } catch {
+    const templates = getEmailTemplates().filter((t) => t.id !== id);
+    localStorage.setItem(EMAIL_TEMPLATES_KEY, JSON.stringify(templates));
+    return templates;
+  }
+}
+
+export async function sendTestEmailBackend({ to, subject, body, imageUrl }) {
+  try {
+    await api.post('/email-templates/test', { to, subject, body, imageUrl }, { admin: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function sendBulkEmailBackend(templateId) {
+  try {
+    await api.post('/email-templates/send-all', { templateId }, { admin: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function getEmailTrackingReportBackend(period = 'overall') {
+  try {
+    const data = await api.get(`/email-tracking/report?period=${period}`, { admin: true });
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+export async function getEmailTrackingListBackend(status = 'all', period = 'overall') {
+  try {
+    const data = await api.get(`/email-tracking/list?status=${status}&period=${period}`, { admin: true });
+    return data;
+  } catch {
+    return [];
+  }
+}
